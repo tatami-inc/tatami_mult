@@ -193,11 +193,11 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            auto rext = tatami::consecutive_extractor<false>(&rhs, false, 0, rhs_col);
+            auto rext = tatami::consecutive_extractor<true>(&rhs, false, 0, rhs_col);
 
             // Expanding the sparse vector into a dense format for easier mapping by the RHS's sparse vector.
             for (Index_ i = 0; i < range.number; ++i) {
-                expanded[range.index[i]] = range.value;
+                expanded[range.index[i]] = range.value[i];
             }
 
             if constexpr(supports_specials) {
