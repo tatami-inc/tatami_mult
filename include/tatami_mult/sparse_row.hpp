@@ -33,14 +33,14 @@ void sparse_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right
 
             if constexpr(supports_specials) {
                 if (specials.size()) {
-                    output[r] = special_dense_sparse_multiply(specials, rhs, range);
+                    output[r] = special_dense_sparse_multiply<Output_>(specials, rhs, range);
                     continue;
                 }
             }
 
             output[r] = dense_sparse_multiply<Output_>(rhs, range);
         }
-    }, matrix.nrow(), num_threads);
+    }, NR, num_threads);
 }
 
 template<typename Value_, typename Index_, typename Right_, typename Output_>
@@ -53,24 +53,26 @@ void sparse_row_matrix(const tatami::Matrix<Value_, Index_>& matrix, const Right
     typename std::conditional<supports_specials, std::vector<std::vector<Index_> >, bool>::type specials;
     if constexpr(supports_specials) {
         specials.resize(rhs_col);
-        size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
+        size_t rhs_offset = 0; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
         for (size_t j = 0; j < rhs_col; ++j, rhs_offset += NC) {
             fill_special_index(NC, rhs + rhs_offset, specials[j]);
         }
     }
 
     tatami::parallelize([&](size_t, Index_ start, Index_ length) {
-        auto ext = tatami::consecutive_extractor<false>(&matrix, true, start, length);
-        std::vector<Value_> buffer(NC);
+        auto ext = tatami::consecutive_extractor<true>(&matrix, true, start, length);
+        std::vector<Value_> vbuffer(NC);
+        std::vector<Index_> ibuffer(NC);
+
         for (Index_ r = start, end = start + length; r < end; ++r) {
-            auto ptr = ext->fetch(buffer.data());
+            auto range = ext->fetch(vbuffer.data(), ibuffer.data());
             size_t rhs_offset = 0;
             size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
             for (size_t j = 0; j < rhs_col; ++j, rhs_offset += NC, out_offset += NR) {
                 if constexpr(supports_specials) {
                     if (specials[j].size()) {
-                        output[out_offset] = special_dense_sparse_multiply(specials[j], rhs + rhs_offset, range);
+                        output[out_offset] = special_dense_sparse_multiply<Output_>(specials[j], rhs + rhs_offset, range);
                         continue;
                     }
                 }
@@ -96,12 +98,12 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
         has_special.resize(rhs_col);
 
         tatami::parallelize([&](size_t, Index_ start, Index_ length) {
-            auto rext = tatami::consecutive_extractor<false>(&right, false, start, length);
+            auto rext = tatami::consecutive_extractor<false>(&rhs, false, start, length);
             std::vector<RightValue_> buffer(NC); // remember, NC == right.nrow() here.
             for (RightIndex_ c = start, end = start + length; c < end; ++c) {
                 auto rptr = rext->fetch(buffer.data());
                 for (RightIndex_ r = 0; r < NC; ++r) {
-                    if (!std::finite(rptr[r])) {
+                    if (is_special(rptr[r])) {
                         has_special[r] = true;
                         break;
                     }
@@ -135,21 +137,21 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            auto rext = tatami::consecutive_extractor<false>(&right, false, 0, rhs_col);
+            auto rext = tatami::consecutive_extractor<false>(&rhs, false, 0, rhs_col);
             size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
             if constexpr(supports_specials) {
                 if (any_special) {
                     for (Index_ i = 0; i < range.number; ++i) {
-                        expanded[range.index[i]] = range.value;
+                        expanded[range.index[i]] = range.value[i];
                     }
 
                     for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
                         auto rptr = rext->fetch(rbuffer.data());
-                        if (is_special[j]) {
+                        if (has_special[j]) {
                             output[out_offset] = std::inner_product(expanded.begin(), expanded.end(), rptr, static_cast<Output_>(0));
                         } else {
-                            output[out_offset] = dense_sparse_multiply(rptr, range);
+                            output[out_offset] = dense_sparse_multiply<Output_>(rptr, range);
                         }
                     }
 
@@ -162,7 +164,7 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
 
             for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
                 auto rptr = rext->fetch(rbuffer.data());
-                output[out_offset] = dense_sparse_multiply(rptr, range);
+                output[out_offset] = dense_sparse_multiply<Output_>(rptr, range);
             }
         }
     }, NR, num_threads);
@@ -191,17 +193,17 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            auto rext = tatami::consecutive_extractor<false>(&right, false, 0, rhs_col);
+            auto rext = tatami::consecutive_extractor<true>(&rhs, false, 0, rhs_col);
 
             // Expanding the sparse vector into a dense format for easier mapping by the RHS's sparse vector.
             for (Index_ i = 0; i < range.number; ++i) {
-                expanded[range.index[i]] = range.value;
+                expanded[range.index[i]] = range.value[i];
             }
 
             if constexpr(supports_specials) {
                 specials.clear();
                 for (Index_ i = 0; i < range.number; ++i) {
-                    if (!std::finite(range.value[i])) {
+                    if (is_special(range.value[i])) {
                         specials.push_back(range.index[i]);
                     }
                 }

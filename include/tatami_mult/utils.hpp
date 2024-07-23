@@ -46,7 +46,6 @@ Output_ special_dense_sparse_multiply(const std::vector<SpecialIndex_>& specials
         Index_ spec = *sIt;
         Index_ ridx = range.index[k];
         while (1) {
-            std::cout << ridx << "\t" << spec << std::endl;
             if (ridx < spec) {
                 out += ptr[ridx] * range.value[k]; // need to multiply by zero in case the range.value is special.
                 if (++k == range.number) {

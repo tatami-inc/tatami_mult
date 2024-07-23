@@ -26,6 +26,7 @@ macro(create_test target)
     add_executable(
         ${target}
         src/dense_row.cpp
+        src/sparse_row.cpp
         src/utils.cpp
     )
 
