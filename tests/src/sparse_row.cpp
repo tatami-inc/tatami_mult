@@ -18,14 +18,6 @@ protected:
         tatami::DenseRowMatrix<double, int> dense(NR, NC, dump);
         sparse = tatami::convert_to_compressed_sparse(&dense, true);
     }
-
-    static tatami::DenseRowMatrix<double, int> rounded() {
-        auto idump = dump;
-        for (auto& x : idump) {
-            x = std::round(x);
-        }
-        return tatami::DenseRowMatrix<double, int>(NR, NC, std::move(idump));
-    }
 };
 
 TEST_F(SparseRowTest, Vector) {
@@ -58,18 +50,15 @@ TEST_F(SparseRowTest, VectorSpecial) {
 }
 
 TEST_F(SparseRowTest, VectorNoSpecial) {
-    auto dmat = rounded();
-    auto spptr1 = tatami::convert_to_compressed_sparse(&dmat, true);
-    auto spptr2 = tatami::convert_to_compressed_sparse<int>(&dmat, true);
-
-    auto rhs = tatami_test::simulate_sparse_vector<double>(NC, /* lower = */ -10, /* upper = */ 10, /* seed = */ 423);
+    auto rhs_i = tatami_test::simulate_sparse_vector<int>(NC, /* lower = */ -10, /* upper = */ 10, /* seed = */ 423);
+    std::vector<double> rhs_d(rhs_i.begin(), rhs_i.end());
 
     std::vector<double> ref(NR);
-    tatami_mult::internal::sparse_row_vector(*spptr1, rhs.data(), ref.data(), 1);
+    tatami_mult::internal::sparse_row_vector(*sparse, rhs_d.data(), ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR);
-        tatami_mult::internal::sparse_row_vector(*spptr2, rhs.data(), output.data(), threads);
+        tatami_mult::internal::sparse_row_vector(*sparse, rhs_i.data(), output.data(), threads);
         EXPECT_EQ(output, ref);
     }
 }
@@ -107,32 +96,29 @@ TEST_F(SparseRowTest, MatrixSpecial) {
 }
 
 TEST_F(SparseRowTest, MatrixNoSpecial) {
-    auto dmat = rounded();
-    auto spptr1 = tatami::convert_to_compressed_sparse(&dmat, true);
-    auto spptr2 = tatami::convert_to_compressed_sparse<int>(&dmat, true);
-
-    auto rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 426);
+    auto rhs_i = tatami_test::simulate_dense_vector<int>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 426);
+    std::vector<double> rhs_d(rhs_i.begin(), rhs_i.end());
 
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::sparse_row_matrix(*spptr1, rhs.data(), 2, ref.data(), 1);
+    tatami_mult::internal::sparse_row_matrix(*sparse, rhs_d.data(), 2, ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_matrix(*spptr2, rhs.data(), 2, output.data(), threads);
+        tatami_mult::internal::sparse_row_matrix(*sparse, rhs_i.data(), 2, output.data(), threads);
         EXPECT_EQ(output, ref);
     }
 }
 
 TEST_F(SparseRowTest, TatamiDense) {
     auto rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 427);
-    tatami::DenseColumnMatrix<double, int> rhs_mat(NC, 2, rhs);
+    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, rhs);
 
     std::vector<double> ref(NR * 2);
     tatami_mult::internal::sparse_row_matrix(*sparse, rhs.data(), 2, ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_dense(*sparse, rhs_mat, output.data(), threads);
+        tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_dense, output.data(), threads);
         EXPECT_EQ(output, ref);
     }
 }
@@ -141,11 +127,11 @@ TEST_F(SparseRowTest, TatamiDenseSpecial) {
     auto rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 428);
     rhs[0] = std::numeric_limits<double>::quiet_NaN();
     rhs[2 * NC - 1] = std::numeric_limits<double>::infinity();
-    tatami::DenseColumnMatrix<double, int> rhs_mat(NC, 2, rhs);
+    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::move(rhs));
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_matrix(*sparse, rhs.data(), 2, output.data(), threads);
+        tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_dense, output.data(), threads);
         for (size_t r = 0; r < NR; ++r) {
             EXPECT_TRUE(std::isnan(output[r]));
         }
@@ -156,49 +142,46 @@ TEST_F(SparseRowTest, TatamiDenseSpecial) {
 }
 
 TEST_F(SparseRowTest, TatamiDenseNoSpecial) {
-    auto dmat = rounded();
-    auto spptr1 = tatami::convert_to_compressed_sparse(&dmat, true);
-    auto spptr2 = tatami::convert_to_compressed_sparse<int>(&dmat, true);
-
-    auto rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 429);
-    tatami::DenseColumnMatrix<double, int> rhs_mat(NC, 2, rhs);
+    auto raw_rhs_i = tatami_test::simulate_dense_vector<int>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 429);
+    auto rhs_i = std::make_shared<tatami::DenseColumnMatrix<int, int> >(NC, 2, raw_rhs_i);
+    auto rhs_d = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::vector<double>(raw_rhs_i.begin(), raw_rhs_i.end()));
 
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::sparse_row_tatami_dense(*spptr1, rhs_mat, ref.data(), 1);
+    tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_d, ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_dense(*spptr2, rhs_mat, output.data(), threads);
+        tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_i, output.data(), threads);
         EXPECT_EQ(output, ref);
     }
 }
 
 TEST_F(SparseRowTest, TatamiSparse) {
-    auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 421);
-    tatami::DenseColumnMatrix<double, int> rhs_mat(NC, 2, rhs);
-    auto rhs_spptr = tatami::convert_to_compressed_sparse(&rhs_mat, false);
+    auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 430);
+    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, rhs);
+    auto rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::sparse_row_tatami_dense(*sparse, rhs_mat, ref.data(), 1);
+    tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_dense, ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_spptr, output.data(), threads);
+        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_sparse, output.data(), threads);
         EXPECT_EQ(output, ref);
     }
 }
 
 TEST_F(SparseRowTest, TatamiSparseSpecial) {
-    auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 421);
+    auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 431);
     rhs[0] = std::numeric_limits<double>::quiet_NaN();
     rhs[2 * NC - 1] = std::numeric_limits<double>::infinity();
-    tatami::DenseColumnMatrix<double, int> rhs_mat(NC, 2, rhs);
-    auto rhs_spptr = tatami::convert_to_compressed_sparse(&rhs_mat, false);
+    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, rhs);
+    auto rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_spptr, output.data(), threads);
+        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_dense, output.data(), threads);
         for (size_t r = 0; r < NR; ++r) {
             EXPECT_TRUE(std::isnan(output[r]));
         }
@@ -209,20 +192,17 @@ TEST_F(SparseRowTest, TatamiSparseSpecial) {
 }
 
 TEST_F(SparseRowTest, TatamiSparseNoSpecial) {
-    auto dmat = rounded();
-    auto spptr1 = tatami::convert_to_compressed_sparse(&dmat, true);
-    auto spptr2 = tatami::convert_to_compressed_sparse<int>(&dmat, true);
-
-    auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 421);
-    tatami::DenseColumnMatrix<double, int> rhs_mat(NC, 2, rhs);
-    auto rhs_spptr = tatami::convert_to_compressed_sparse(&rhs_mat, false);
+    auto raw_rhs_i = tatami_test::simulate_sparse_vector<int>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 432);
+    auto raw_rhs_mat_i = std::make_shared<tatami::DenseColumnMatrix<int, int> >(NC, 2, std::move(raw_rhs_i));
+    auto rhs_i = tatami::convert_to_compressed_sparse<int>(raw_rhs_mat_i.get(), false);
+    auto rhs_d = tatami::convert_to_compressed_sparse<double>(raw_rhs_mat_i.get(), false);
 
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::sparse_row_tatami_dense(*spptr1, *rhs_spptr, ref.data(), 1);
+    tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_d, ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_dense(*spptr2, *rhs_spptr, output.data(), threads);
+        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_i, output.data(), threads);
         EXPECT_EQ(output, ref);
     }
 }

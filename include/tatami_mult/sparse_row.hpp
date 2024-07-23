@@ -100,11 +100,11 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
         tatami::parallelize([&](size_t, Index_ start, Index_ length) {
             auto rext = tatami::consecutive_extractor<false>(&rhs, false, start, length);
             std::vector<RightValue_> buffer(NC); // remember, NC == right.nrow() here.
-            for (RightIndex_ c = start, end = start + length; c < end; ++c) {
+            for (RightIndex_ j = start, end = start + length; j < end; ++j) {
                 auto rptr = rext->fetch(buffer.data());
                 for (RightIndex_ r = 0; r < NC; ++r) {
                     if (is_special(rptr[r])) {
-                        has_special[r] = true;
+                        has_special[j] = true;
                         break;
                     }
                 }
@@ -182,12 +182,11 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
         std::vector<Index_> ibuffer(NC);
         std::vector<RightValue_> rvbuffer(NC);
         std::vector<RightIndex_> ribuffer(NC);
-        std::vector<Value_> expanded;
+        std::vector<Value_> expanded(NC);
 
         constexpr bool supports_specials = supports_special_values<RightValue_>();
         typename std::conditional<supports_specials, std::vector<Index_>, bool>::type specials;
         if constexpr(supports_specials) {
-            expanded.resize(NC);
             specials.reserve(NC);
         }
 
@@ -211,7 +210,7 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
 
             size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
             for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
-                auto rrange = rext->fetch(vbuffer.data(), ibuffer.data());
+                auto rrange = rext->fetch(rvbuffer.data(), ribuffer.data());
 
                 if constexpr(supports_specials) {
                     if (specials.size()) {
