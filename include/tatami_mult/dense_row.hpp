@@ -29,9 +29,10 @@ void dense_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right_
 }
 
 template<typename Value_, typename Index_, typename Right_, typename Output_>
-void dense_row_matrix(const tatami::Matrix<Value_, Index_>& matrix, const Right_* rhs, size_t rhs_col, Output_* output, int num_threads) {
+void dense_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, Output_* output, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
+    size_t num_rhs = rhs.size();
 
     tatami::parallelize([&](size_t, Index_ start, Index_ length) {
         auto ext = tatami::consecutive_extractor<false>(&matrix, true, start, length);
@@ -39,11 +40,10 @@ void dense_row_matrix(const tatami::Matrix<Value_, Index_>& matrix, const Right_
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto ptr = ext->fetch(buffer.data());
-            size_t rhs_offset = 0;
             size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
-            for (size_t j = 0; j < rhs_col; ++j, rhs_offset += NC, out_offset += NR) {
-                output[out_offset] = std::inner_product(ptr, ptr + NC, rhs + rhs_offset, static_cast<Output_>(0));
+            for (size_t j = 0; j < num_rhs; ++j, out_offset += NR) {
+                output[out_offset] = std::inner_product(ptr, ptr + NC, rhs[j], static_cast<Output_>(0));
             }
         }
 

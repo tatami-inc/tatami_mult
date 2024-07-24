@@ -44,18 +44,18 @@ void sparse_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right
 }
 
 template<typename Value_, typename Index_, typename Right_, typename Output_>
-void sparse_row_matrix(const tatami::Matrix<Value_, Index_>& matrix, const Right_* rhs, size_t rhs_col, Output_* output, int num_threads) {
+void sparse_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, Output_* output, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
+    size_t num_rhs = rhs.size();
 
     // Check if the RHS has any special values.
     constexpr bool supports_specials = supports_special_values<Right_>();
     typename std::conditional<supports_specials, std::vector<std::vector<Index_> >, bool>::type specials;
     if constexpr(supports_specials) {
-        specials.resize(rhs_col);
-        size_t rhs_offset = 0; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
-        for (size_t j = 0; j < rhs_col; ++j, rhs_offset += NC) {
-            fill_special_index(NC, rhs + rhs_offset, specials[j]);
+        specials.resize(num_rhs);
+        for (size_t j = 0; j < num_rhs; ++j) {
+            fill_special_index(NC, rhs[j], specials[j]);
         }
     }
 
@@ -66,17 +66,16 @@ void sparse_row_matrix(const tatami::Matrix<Value_, Index_>& matrix, const Right
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            size_t rhs_offset = 0;
             size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
-            for (size_t j = 0; j < rhs_col; ++j, rhs_offset += NC, out_offset += NR) {
+            for (size_t j = 0; j < num_rhs; ++j, out_offset += NR) {
                 if constexpr(supports_specials) {
                     if (specials[j].size()) {
-                        output[out_offset] = special_dense_sparse_multiply<Output_>(specials[j], rhs + rhs_offset, range);
+                        output[out_offset] = special_dense_sparse_multiply<Output_>(specials[j], rhs[j], range);
                         continue;
                     }
                 }
-                output[out_offset] = dense_sparse_multiply<Output_>(rhs + rhs_offset, range);
+                output[out_offset] = dense_sparse_multiply<Output_>(rhs[j], range);
             }
         }
     }, NR, num_threads);

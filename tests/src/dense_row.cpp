@@ -35,28 +35,30 @@ TEST_F(DenseRowTest, Vector) {
     }
 }
 
-TEST_F(DenseRowTest, Matrix) {
-    auto rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 422);
+TEST_F(DenseRowTest, Vectors) {
+    auto raw_rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 422);
+    std::vector<double*> rhs{ raw_rhs.data(), raw_rhs.data() + NC };
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::dense_row_vector(*dense, rhs.data(), ref.data(), 1);
-    tatami_mult::internal::dense_row_vector(*dense, rhs.data() + NC, ref.data() + NR, 1);
+    tatami_mult::internal::dense_row_vector(*dense, rhs[0], ref.data(), 1);
+    tatami_mult::internal::dense_row_vector(*dense, rhs[1], ref.data() + NR, 1);
 
     for (int thread = 1; thread < 4; thread +=2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::dense_row_matrix(*dense, rhs.data(), 2, output.data(), thread);
+        tatami_mult::internal::dense_row_vectors(*dense, rhs, output.data(), thread);
         EXPECT_EQ(output, ref);
     }
 }
 
 TEST_F(DenseRowTest, TatamiDense) {
-    auto rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 423);
-    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, rhs);
+    auto raw_rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 423);
+    std::vector<double*> rhs_ptrs { raw_rhs.data(), raw_rhs.data() + NC };
+    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, raw_rhs);
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::dense_row_matrix(*dense, rhs.data(), 2, ref.data(), 1);
+    tatami_mult::internal::dense_row_vectors(*dense, rhs_ptrs, ref.data(), 1);
 
     for (int thread = 1; thread < 4; thread += 2) {
         std::vector<double> output(NR * 2);
