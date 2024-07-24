@@ -58,7 +58,7 @@ void sparse_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right
 }
 
 template<typename Value_, typename Index_, typename Right_, typename Output_>
-void sparse_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, Output_* output, int num_threads) {
+void sparse_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, const std::vector<Output_*>& output, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     size_t num_rhs = rhs.size();
@@ -80,23 +80,23 @@ void sparse_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std:
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
-            for (size_t j = 0; j < num_rhs; ++j, out_offset += NR) {
+            for (size_t j = 0; j < num_rhs; ++j) {
+                auto& out = output[j][r];
                 if constexpr(supports_specials) {
                     if (specials[j].size()) {
-                        output[out_offset] = special_dense_sparse_multiply<Output_>(specials[j], rhs[j], range);
+                        out = special_dense_sparse_multiply<Output_>(specials[j], rhs[j], range);
                         continue;
                     }
                 }
-                output[out_offset] = dense_sparse_multiply<Output_>(rhs[j], range);
+                out = dense_sparse_multiply<Output_>(rhs[j], range);
             }
         }
     }, NR, num_threads);
 }
 
 template<typename Value_, typename Index_, typename RightValue_, typename RightIndex_, typename Output_>
-void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, int num_threads) {
+void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, size_t row_shift, size_t col_shift, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
@@ -151,14 +151,14 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
             auto rext = tatami::consecutive_extractor<false>(&rhs, false, 0, rhs_col);
-            size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
+            size_t out_offset = static_cast<size_t>(r) * row_shift; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
             if constexpr(supports_specials) {
                 if (any_special) {
                     // Expanding the range for easier full multiplication with a dense vector.
                     expand_sparse_range(range, expanded);
 
-                    for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
+                    for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += col_shift) {
                         auto rptr = rext->fetch(rbuffer.data());
                         if (has_special[j]) {
                             output[out_offset] = std::inner_product(expanded.begin(), expanded.end(), rptr, static_cast<Output_>(0));
@@ -172,7 +172,7 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
                 }
             }
 
-            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
+            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += col_shift) {
                 auto rptr = rext->fetch(rbuffer.data());
                 output[out_offset] = dense_sparse_multiply<Output_>(rptr, range);
             }
@@ -181,7 +181,7 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
 }
 
 template<typename Value_, typename Index_, typename RightValue_, typename RightIndex_, typename Output_>
-void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, int num_threads) {
+void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, size_t row_shift, size_t col_shift, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
@@ -216,8 +216,8 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
                 }
             }
 
-            size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
-            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
+            size_t out_offset = static_cast<size_t>(r) * row_shift; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
+            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += col_shift) {
                 auto rrange = rext->fetch(rvbuffer.data(), ribuffer.data());
 
                 if constexpr(supports_specials) {

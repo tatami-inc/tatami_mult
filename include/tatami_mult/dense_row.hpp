@@ -29,7 +29,7 @@ void dense_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right_
 }
 
 template<typename Value_, typename Index_, typename Right_, typename Output_>
-void dense_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, Output_* output, int num_threads) {
+void dense_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, const std::vector<Output_*>& output, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     size_t num_rhs = rhs.size();
@@ -40,10 +40,8 @@ void dense_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto ptr = ext->fetch(buffer.data());
-            size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
-
-            for (size_t j = 0; j < num_rhs; ++j, out_offset += NR) {
-                output[out_offset] = std::inner_product(ptr, ptr + NC, rhs[j], static_cast<Output_>(0));
+            for (size_t j = 0; j < num_rhs; ++j) {
+                output[j][r] = std::inner_product(ptr, ptr + NC, rhs[j], static_cast<Output_>(0));
             }
         }
 
@@ -51,7 +49,7 @@ void dense_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::
 }
 
 template<typename Value_, typename Index_, typename RightValue_, typename RightIndex_, typename Output_>
-void dense_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, int num_threads) {
+void dense_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, size_t row_shift, size_t col_shift, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
@@ -64,9 +62,9 @@ void dense_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto ptr = ext->fetch(buffer.data());
             auto rext = tatami::consecutive_extractor<false>(&rhs, false, 0, rhs_col);
-            size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
+            size_t out_offset = static_cast<size_t>(r) * row_shift; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
-            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
+            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += col_shift) {
                 auto rptr = rext->fetch(rbuffer.data());
                 output[out_offset] = std::inner_product(ptr, ptr + NC, rptr, static_cast<Output_>(0));
             }
@@ -76,7 +74,7 @@ void dense_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const 
 }
 
 template<typename Value_, typename Index_, typename RightValue_, typename RightIndex_, typename Output_>
-void dense_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, int num_threads) {
+void dense_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, size_t row_shift, size_t col_shift, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
@@ -93,14 +91,14 @@ void dense_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, const
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto ptr = ext->fetch(buffer.data());
             auto rext = tatami::consecutive_extractor<true>(&rhs, false, 0, rhs_col);
-            size_t out_offset = r; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
+            size_t out_offset = static_cast<size_t>(r) * row_shift; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
             if constexpr(supports_specials) {
                 specials.clear();
                 fill_special_index(NC, ptr, specials);
             }
 
-            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
+            for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += col_shift) {
                 auto range = rext->fetch(vbuffer.data(), ibuffer.data());
 
                 if constexpr(supports_specials) {

@@ -82,15 +82,41 @@ Output_ special_dense_sparse_multiply(const std::vector<SpecialIndex_>& specials
 }
 
 template<typename Index_, typename Output_>
-std::vector<tatami_stats::LocalOutputBuffer<Output_> > create_stores(size_t NR, size_t rhs_col, size_t thread, Index_ start, Index_ length, Output_* output) {
+std::vector<tatami_stats::LocalOutputBuffer<Output_> > create_stores(size_t thread, Index_ start, Index_ length, const std::vector<Output_*>& output) {
+    size_t rhs_col = output.size();
+    std::vector<tatami_stats::LocalOutputBuffer<Output_> > stores;
+    stores.reserve(rhs_col);
+    for (size_t j = 0; j < rhs_col; ++j) {
+        stores.emplace_back(thread, start, length, output[j]);
+    }
+    return stores;
+}
+
+template<typename Index_, typename Output_>
+std::vector<tatami_stats::LocalOutputBuffer<Output_> > create_stores(size_t thread, Index_ start, Index_ length, Output_* output, size_t rhs_col, size_t col_shift) {
     std::vector<tatami_stats::LocalOutputBuffer<Output_> > stores;
     stores.reserve(rhs_col);
     size_t out_offset = 0; // using offsets instead of directly adding the pointer, to avoid forming an invalid address on the final iteration.
-    for (size_t j = 0; j < rhs_col; ++j, out_offset += NR) {
+    for (size_t j = 0; j < rhs_col; ++j, out_offset += col_shift) {
         stores.emplace_back(thread, start, length, output + out_offset);
     }
     return stores;
 }
+
+template<typename Output_>
+void non_contiguous_transfer(std::vector<tatami_stats::LocalOutputBuffer<Output_> >& stores, size_t start, size_t length, Output_* output, size_t row_shift, size_t col_shift) {
+    size_t rhs_col = stores.size();
+    size_t out_offset_raw = start * row_shift; // using offsets instead of directly adding the pointer, to avoid forming an invalid address on the final iteration.
+    for (size_t j = 0; j < rhs_col; ++j, out_offset_raw += col_shift) {
+        auto optr = stores[j].data();
+        size_t out_offset = out_offset_raw;
+        for (size_t r = 0; r < length; ++r, out_offset += row_shift) {
+            output[out_offset] = optr[r];
+        }
+    }
+}
+
+
 
 }
 
