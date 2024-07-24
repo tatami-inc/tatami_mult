@@ -11,6 +11,20 @@ namespace tatami_mult {
 
 namespace internal {
 
+template<typename Value_, typename Index_>
+void expand_sparse_range(const tatami::SparseRange<Value_, Index_>& range, std::vector<Value_>& expanded) {
+    for (Index_ k = 0; k < range.number; ++k) {
+        expanded[range.index[k]] = range.value[k];
+    }
+}
+
+template<typename Value_, typename Index_>
+void reset_expanded_sparse_range(const tatami::SparseRange<Value_, Index_>& range, std::vector<Value_>& expanded) {
+    for (Index_ k = 0; k < range.number; ++k) {
+        expanded[range.index[k]] = 0;
+    }
+}
+
 template<typename Value_, typename Index_, typename Right_, typename Output_>
 void sparse_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right_* rhs, Output_* output, int num_threads) {
     Index_ NR = matrix.nrow();
@@ -141,9 +155,8 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
 
             if constexpr(supports_specials) {
                 if (any_special) {
-                    for (Index_ i = 0; i < range.number; ++i) {
-                        expanded[range.index[i]] = range.value[i];
-                    }
+                    // Expanding the range for easier full multiplication with a dense vector.
+                    expand_sparse_range(range, expanded);
 
                     for (RightIndex_ j = 0; j < rhs_col; ++j, out_offset += NR) {
                         auto rptr = rext->fetch(rbuffer.data());
@@ -154,9 +167,7 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
                         }
                     }
 
-                    for (Index_ i = 0; i < range.number; ++i) {
-                        expanded[range.index[i]] = 0;
-                    }
+                    reset_expanded_sparse_range(range, expanded);
                     continue;
                 }
             }
@@ -183,7 +194,7 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
         std::vector<RightIndex_> ribuffer(NC);
         std::vector<Value_> expanded(NC);
 
-        constexpr bool supports_specials = supports_special_values<RightValue_>();
+        constexpr bool supports_specials = supports_special_values<Value_>();
         typename std::conditional<supports_specials, std::vector<Index_>, bool>::type specials;
         if constexpr(supports_specials) {
             specials.reserve(NC);
@@ -194,9 +205,7 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
             auto rext = tatami::consecutive_extractor<true>(&rhs, false, 0, rhs_col);
 
             // Expanding the sparse vector into a dense format for easier mapping by the RHS's sparse vector.
-            for (Index_ i = 0; i < range.number; ++i) {
-                expanded[range.index[i]] = range.value[i];
-            }
+            expand_sparse_range(range, expanded);
 
             if constexpr(supports_specials) {
                 specials.clear();
@@ -221,9 +230,7 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
                 output[out_offset] = dense_sparse_multiply<Output_>(expanded.data(), rrange);
             }
 
-            for (Index_ i = 0; i < range.number; ++i) {
-                expanded[range.index[i]] = 0;
-            }
+            reset_expanded_sparse_range(range, expanded);
         }
     }, NR, num_threads);
 }
