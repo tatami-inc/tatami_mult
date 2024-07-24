@@ -27,7 +27,41 @@ TEST(Utils, SparseMultiply) {
     range.index = sp_indices.data();
 
     std::vector<double> dense_values { 0, 1, 2, 3, 4, 5, 6 };
-    EXPECT_EQ(tatami_mult::internal::dense_sparse_multiply<double>(dense_values.data(), range), 0.5 * 1 + 1.5 * 3 + 2.5 * 5);
+    double expected = 0.5 * 1 + 1.5 * 3 + 2.5 * 5;
+    EXPECT_EQ(tatami_mult::internal::dense_sparse_multiply<double>(dense_values.data(), range), expected);
+
+    // Same behavior with no specials.
+    {
+        std::vector<int> specials;
+        EXPECT_EQ(tatami_mult::internal::special_dense_sparse_multiply<double>(specials, dense_values.data(), range), expected);
+    }
+
+    // Now only specials:
+    {
+        std::vector<int> specials { 0, 1, 2, 3, 4, 5, 6 };
+        std::vector<double> new_dense_values(7, std::numeric_limits<double>::infinity());
+        tatami::SparseRange<double, int> empty;
+        EXPECT_TRUE(std::isnan(tatami_mult::internal::special_dense_sparse_multiply<double>(specials, new_dense_values.data(), empty)));
+    }
+
+    // Getting an Inf back:
+    {
+        std::vector<double> copy = dense_values;
+        for (auto i : sp_indices) {
+            copy[i] = std::numeric_limits<double>::infinity();
+        }
+        EXPECT_TRUE(std::isinf(tatami_mult::internal::special_dense_sparse_multiply<double>(sp_indices, copy.data(), range)));
+    }
+
+    // Getting an NaN back:
+    {
+        std::vector<int> specials { 0, 2, 4, 6 };
+        std::vector<double> copy = dense_values;
+        for (auto i : specials) {
+            copy[i] = std::numeric_limits<double>::infinity();
+        }
+        EXPECT_TRUE(std::isnan(tatami_mult::internal::special_dense_sparse_multiply<double>(specials, copy.data(), range)));
+    }
 
     // Throwing in one NaN at each position and checking we get an NaN back.
     for (size_t i = 0; i < dense_values.size(); ++i) {
