@@ -35,22 +35,22 @@ void dense_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Rig
 }
 
 template<typename Value_, typename Index_, typename Right_, typename Output_>
-void dense_column_matrix(const tatami::Matrix<Value_, Index_>& matrix, const Right_* rhs, size_t rhs_col, Output_* output, int num_threads) {
+void dense_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, Output_* output, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
+    size_t num_rhs = rhs.size();
 
     tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
         auto ext = tatami::consecutive_extractor<false>(&matrix, false, 0, NC, start, length);
         std::vector<Value_> buffer(length);
-        auto stores = create_stores(NR, rhs_col, start, length, output);
+        auto stores = create_stores(NR, num_rhs, t, start, length, output);
 
         for (Index_ c = 0; c < NC; ++c) {
             auto ptr = ext->fetch(buffer.data());
 
-            size_t rhs_offset = c; // using offsets instead of directly adding the pointer, to avoid forming an invalid address on the final iteration.
-            for (size_t j = 0; j < rhs_col; ++j, rhs_offset += NC) {
+            for (size_t j = 0; j < num_rhs; ++j) {
                 auto optr = stores[j].data();
-                Output_ mult = rhs[rhs_offset];
+                Output_ mult = rhs[j][c];
                 for (Index_ r = 0; r < length; ++r) {
                     optr[r] += mult * ptr[r];
                 }
@@ -71,10 +71,10 @@ void dense_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, con
 
     tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
         auto ext = tatami::consecutive_extractor<false>(&matrix, false, 0, NC, start, length);
-        auto rext = tatami::consecutive_extractor<false>(&matrix, true, 0, NC); // remember, NC == rhs.nrow().
+        auto rext = tatami::consecutive_extractor<false>(&rhs, true, 0, NC); // remember, NC == rhs.nrow().
         std::vector<Value_> buffer(length);
         std::vector<RightValue_> rbuffer(rhs_col);
-        auto stores = create_stores(NR, rhs_col, start, length, output);
+        auto stores = create_stores(NR, rhs_col, t, start, length, output);
 
         for (Index_ c = 0; c < NC; ++c) {
             auto ptr = ext->fetch(buffer.data());
@@ -101,13 +101,13 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
         auto ext = tatami::consecutive_extractor<false>(&matrix, false, 0, NC, start, length);
-        auto rext = tatami::consecutive_extractor<true>(&matrix, true, 0, NC); // remember, NC == rhs.nrow().
+        auto rext = tatami::consecutive_extractor<true>(&rhs, true, 0, NC); // remember, NC == rhs.nrow().
         std::vector<Value_> buffer(length);
         std::vector<RightValue_> vbuffer(rhs_col);
         std::vector<RightIndex_> ibuffer(rhs_col);
-        auto stores = create_stores(NR, rhs_col, start, length, output);
+        auto stores = create_stores(NR, rhs_col, t, start, length, output);
 
         constexpr bool supports_specials = supports_special_values<Value_>();
         typename std::conditional<supports_specials, std::vector<Index_>, bool>::type specials;
@@ -116,12 +116,10 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
             auto ptr = ext->fetch(buffer.data());
             auto range = rext->fetch(vbuffer.data(), ibuffer.data());
 
-            if constexpr(supports_specials) {
+            if constexpr(supports_specials) { // need separate multiplication to preserve the specials.
                 specials.clear();
                 fill_special_index(length, ptr, specials);
-            }
 
-            if constexpr(supports_specials) { // need separate multiplication to preserve the specials.
                 if (specials.size()) {
                     RightIndex_ k = 0; 
                     for (RightIndex_ j = 0; j < rhs_col; ++j) {
@@ -149,6 +147,10 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
                     optr[r] += mult * ptr[r];
                 }
             }
+        }
+
+        for (auto& s : stores) {
+            s.transfer();
         }
     }, NR, num_threads);
 }

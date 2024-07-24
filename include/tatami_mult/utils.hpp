@@ -81,9 +81,9 @@ Output_ special_dense_sparse_multiply(const std::vector<SpecialIndex_>& specials
     return out;
 }
 
-template<typename Value_, typename Index_, typename Output_>
-std::vector<tatami_stats::LocalOutputBuffer<Value_> > create_stores(size_t NR, size_t rhs_col, size_t thread, Index_ start, Index_ length, Output_* output) {
-    std::vector<tatami_stats::LocalOutputBuffer<Value_> > stores;
+template<typename Index_, typename Output_>
+std::vector<tatami_stats::LocalOutputBuffer<Output_> > create_stores(size_t NR, size_t rhs_col, size_t thread, Index_ start, Index_ length, Output_* output) {
+    std::vector<tatami_stats::LocalOutputBuffer<Output_> > stores;
     stores.reserve(rhs_col);
     size_t out_offset = 0; // using offsets instead of directly adding the pointer, to avoid forming an invalid address on the final iteration.
     for (size_t j = 0; j < rhs_col; ++j, out_offset += NR) {

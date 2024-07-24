@@ -27,6 +27,7 @@ macro(create_test target)
         ${target}
         src/dense_row.cpp
         src/sparse_row.cpp
+        src/dense_column.cpp
         src/utils.cpp
     )
 
