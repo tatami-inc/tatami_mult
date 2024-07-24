@@ -165,9 +165,13 @@ TEST_F(SparseRowTest, TatamiDenseSpecial) {
 }
 
 TEST_F(SparseRowTest, TatamiDenseNoSpecial) {
-    auto raw_rhs_i = tatami_test::simulate_dense_vector<int>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 429);
-    auto rhs_i = std::make_shared<tatami::DenseColumnMatrix<int, int> >(NC, 2, raw_rhs_i);
-    auto rhs_d = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::vector<double>(raw_rhs_i.begin(), raw_rhs_i.end()));
+    std::shared_ptr<tatami::Matrix<int, int> > rhs_i;
+    std::shared_ptr<tatami::Matrix<double, int> > rhs_d;
+    {
+        auto raw_rhs_i = tatami_test::simulate_dense_vector<int>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 429);
+        rhs_d = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::vector<double>(raw_rhs_i.begin(), raw_rhs_i.end()));
+        rhs_i = std::make_shared<tatami::DenseColumnMatrix<int, int> >(NC, 2, std::move(raw_rhs_i));
+    }
 
     std::vector<double> ref(NR * 2);
     tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_d, ref.data(), 1);
@@ -180,9 +184,12 @@ TEST_F(SparseRowTest, TatamiDenseNoSpecial) {
 }
 
 TEST_F(SparseRowTest, TatamiSparse) {
-    auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 430);
-    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, rhs);
-    auto rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
+    std::shared_ptr<tatami::Matrix<double, int> > rhs_dense, rhs_sparse;
+    {
+        auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 430);
+        rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, rhs);
+        rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
+    }
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
@@ -196,36 +203,46 @@ TEST_F(SparseRowTest, TatamiSparse) {
 }
 
 TEST_F(SparseRowTest, TatamiSparseSpecial) {
-    auto dump2 = dump;
-    for (size_t r = 0; r < NR; ++r) { 
-        int scenario = r % 3;
-        if (scenario == 0 || scenario == 2) { // adding Inf to the start of each row.
-            dump2[r * NC] = std::numeric_limits<double>::infinity();
+    // Injecting special values into the LHS, which gets checked
+    // before attempting multiplication by the sparse RHS.
+    std::shared_ptr<tatami::Matrix<double, int> > sparse2;
+    {
+        auto dump2 = dump;
+        for (size_t r = 0; r < NR; ++r) { 
+            int scenario = r % 3;
+            if (scenario == 0 || scenario == 2) { // adding Inf to the start of each row.
+                dump2[r * NC] = std::numeric_limits<double>::infinity();
+            }
+            if (scenario == 1 || scenario == 2) { // adding -Inf to the end of each row.
+                dump2[(r + 1) * NC - 1] = -std::numeric_limits<double>::infinity();
+            }
         }
-        if (scenario == 1 || scenario == 2) { // adding -Inf to the end of each row.
-            dump2[(r + 1) * NC - 1] = -std::numeric_limits<double>::infinity();
-        }
+        auto dense2 = std::make_shared<tatami::DenseRowMatrix<double, int> >(NR, NC, std::move(dump2));
+        sparse2 = tatami::convert_to_compressed_sparse(dense2.get(), false);
     }
-    auto dense2 = std::make_shared<tatami::DenseRowMatrix<double, int> >(NR, NC, dump2);
-    auto sparse2 = tatami::convert_to_compressed_sparse(dense2.get(), false);
 
-    auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 6, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 431);
-    // Remember, we're injecting Inf's to the first and/or last values of each
-    // row of the LHS matrix. So we need to set some of the RHS values to
-    // ensure that we get a good mix of NaNs and Infs in the output; otherwise
-    // we couldn't tell if the specials were processed correctly.
-    // Specifically, we set the first/last values of each RHS column to 0
-    // and/or 10, which yield NaN and Inf respectively when multiplied by Inf.
-    rhs[0] = 10;          // (0, 0)
-    rhs[NC] = 0;          // (0, 1)
-    rhs[4 * NC] = 0;      // (0, 4)
-    rhs[5 * NC] = 0;      // (0, 5)
-    rhs[3 * NC - 1] = 10; // (NC-1, 2)
-    rhs[4 * NC - 1] = 0;  // (NC-1, 3)
-    rhs[5 * NC - 1] = 10; // (NC-1, 4)
-    rhs[6 * NC - 1] = 0;  // (NC-1, 5)
-    auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 6, rhs);
-    auto rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
+    std::shared_ptr<tatami::Matrix<double, int> > rhs_dense, rhs_sparse;
+    {
+        auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 6, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 431);
+
+        // Remember, we're injecting Inf's to the first and/or last values of each
+        // row of the LHS matrix. So we need to set some of the RHS values to
+        // ensure that we get a good mix of NaNs and Infs in the output; otherwise
+        // we couldn't tell if the specials were processed correctly.
+        // Specifically, we set the first/last values of each RHS column to 0
+        // and/or 10, which yield NaN and Inf respectively when multiplied by Inf.
+        rhs[0] = 10;          // (0, 0)
+        rhs[NC] = 0;          // (0, 1)
+        rhs[4 * NC] = 0;      // (0, 4)
+        rhs[5 * NC] = 0;      // (0, 5)
+        rhs[3 * NC - 1] = 10; // (NC-1, 2)
+        rhs[4 * NC - 1] = 0;  // (NC-1, 3)
+        rhs[5 * NC - 1] = 10; // (NC-1, 4)
+        rhs[6 * NC - 1] = 0;  // (NC-1, 5)
+
+        rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 6, rhs);
+        rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
+    }
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 6);
@@ -239,17 +256,33 @@ TEST_F(SparseRowTest, TatamiSparseSpecial) {
 }
 
 TEST_F(SparseRowTest, TatamiSparseNoSpecial) {
-    auto raw_rhs_i = tatami_test::simulate_sparse_vector<int>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 432);
-    auto raw_rhs_mat_i = std::make_shared<tatami::DenseColumnMatrix<int, int> >(NC, 2, std::move(raw_rhs_i));
-    auto rhs_i = tatami::convert_to_compressed_sparse<int>(raw_rhs_mat_i.get(), false);
-    auto rhs_d = tatami::convert_to_compressed_sparse<double>(raw_rhs_mat_i.get(), false);
+    // The special check is based on the type of the LHS this time,
+    // so we convert our LHS into an integer matrix.
+    std::shared_ptr<tatami::Matrix<double, int> > sparse_d;
+    std::shared_ptr<tatami::Matrix<int, int> > sparse_i;
+    {
+        auto dump_i = dump;
+        for (auto& x : dump_i) {
+            x = std::round(x);
+        }
+        auto dense_d = std::make_shared<tatami::DenseRowMatrix<double, int> >(NR, NC, std::move(dump_i));
+        sparse_d = tatami::convert_to_dense<double>(dense_d.get(), true);
+        sparse_i = tatami::convert_to_dense<int>(dense_d.get(), true);
+    }
+
+    std::shared_ptr<tatami::Matrix<double, int> > rhs_sparse;
+    {
+        auto raw_rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 432);
+        auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::move(raw_rhs));
+        rhs_sparse = tatami::convert_to_compressed_sparse<double>(rhs_dense.get(), false);
+    }
 
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_d, ref.data(), 1);
+    tatami_mult::internal::sparse_row_tatami_sparse(*sparse_d, *rhs_sparse, ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_i, output.data(), threads);
+        tatami_mult::internal::sparse_row_tatami_sparse(*sparse_i, *rhs_sparse, output.data(), threads);
         EXPECT_EQ(output, ref);
     }
 }

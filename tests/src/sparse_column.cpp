@@ -165,9 +165,13 @@ TEST_F(SparseColumnTest, TatamiDenseSpecial) {
 }
 
 TEST_F(SparseColumnTest, TatamiDenseNoSpecial) {
-    auto raw_rhs_i = tatami_test::simulate_dense_vector<int>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 429);
-    auto rhs_i = std::make_shared<tatami::DenseColumnMatrix<int, int> >(NC, 2, raw_rhs_i);
-    auto rhs_d = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::vector<double>(raw_rhs_i.begin(), raw_rhs_i.end()));
+    std::shared_ptr<tatami::Matrix<int, int> > rhs_i;
+    std::shared_ptr<tatami::Matrix<double, int> > rhs_d;
+    {
+        auto raw_rhs_i = tatami_test::simulate_dense_vector<int>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 429);
+        rhs_d = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::vector<double>(raw_rhs_i.begin(), raw_rhs_i.end()));
+        rhs_i = std::make_shared<tatami::DenseColumnMatrix<int, int> >(NC, 2, std::move(raw_rhs_i));
+    }
 
     std::vector<double> ref(NR * 2);
     tatami_mult::internal::sparse_column_tatami_dense(*sparse, *rhs_d, ref.data(), 1);
@@ -187,7 +191,6 @@ TEST_F(SparseColumnTest, TatamiSparse) {
         rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
     }
 
-
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
     tatami_mult::internal::sparse_column_tatami_dense(*sparse, *rhs_dense, ref.data(), 1);
@@ -200,6 +203,8 @@ TEST_F(SparseColumnTest, TatamiSparse) {
 }
 
 TEST_F(SparseColumnTest, TatamiSparseSpecial) {
+    // Injecting special values into the LHS, which gets checked
+    // before attempting multiplication by the sparse RHS.
     std::shared_ptr<tatami::Matrix<double, int> > sparse2;
     {
         auto dump2 = dump;
