@@ -30,6 +30,7 @@ macro(create_test target)
         src/dense_column.cpp
         src/sparse_column.cpp
         src/utils.cpp
+        src/overlord.cpp
     )
 
     target_link_libraries(
