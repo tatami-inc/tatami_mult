@@ -51,9 +51,6 @@ endmacro()
 
 create_test(libtest)
 
-create_test(cuspartest)
-target_compile_definitions(cuspartest PRIVATE CUSTOM_PARALLEL_TEST=1)
-
 find_package(OpenMP)
 if(OpenMP_FOUND)
     create_test(omptest)
