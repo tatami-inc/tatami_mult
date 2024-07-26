@@ -14,6 +14,9 @@ namespace internal {
 
 template<typename Value_, typename Index_, typename Output_>
 void sparse_multiply_add(const tatami::SparseRange<Value_, Index_>& range, Index_ start, Output_ mult, Output_* optr) {
+#ifdef _OPENMP
+    #pragma omp simd
+#endif
     for (Index_ r = 0; r < range.number; ++r) {
         optr[range.index[r] - start] += mult * range.value[r];
     }
@@ -21,6 +24,9 @@ void sparse_multiply_add(const tatami::SparseRange<Value_, Index_>& range, Index
 
 template<typename Value_, typename Index_>
 void expand_sparse_range(const tatami::SparseRange<Value_, Index_>& range, Index_ start, std::vector<Value_>& expanded) {
+#ifdef _OPENMP
+    #pragma omp simd
+#endif
     for (Index_ k = 0; k < range.number; ++k) {
         expanded[range.index[k] - start] = range.value[k];
     }
@@ -28,6 +34,9 @@ void expand_sparse_range(const tatami::SparseRange<Value_, Index_>& range, Index
 
 template<typename Value_, typename Index_>
 void reset_expanded_sparse_range(const tatami::SparseRange<Value_, Index_>& range, Index_ start, std::vector<Value_>& expanded) {
+#ifdef _OPENMP
+    #pragma omp simd
+#endif
     for (Index_ k = 0; k < range.number; ++k) {
         expanded[range.index[k] - start] = 0;
     }
@@ -59,6 +68,9 @@ void sparse_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Ri
                     expanded.resize(length);
                     expand_sparse_range(range, start, expanded);
 
+#ifdef _OPENMP
+                    #pragma omp simd
+#endif
                     for (Index_ r = 0; r < length; ++r) {
                         optr[r] += expanded[r] * mult;
                     }
@@ -107,6 +119,9 @@ void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const s
                             has_expanded = true;
                         }
 
+#ifdef _OPENMP
+                        #pragma omp simd
+#endif
                         for (Index_ r = 0; r < length; ++r) {
                             optr[r] += expanded[r] * mult;
                         }
@@ -168,6 +183,9 @@ void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, co
                             has_expanded = true;
                         }
 
+#ifdef _OPENMP
+                        #pragma omp simd
+#endif
                         for (Index_ r = 0; r < length; ++r) {
                             optr[r] += expanded[r] * mult;
                         }
@@ -239,6 +257,9 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
                         auto optr = stores[j].data();
                         if (rhs_k < rhs_range.number && j == rhs_range.index[rhs_k]) {
                             Output_ mult = rhs_range.value[rhs_k];
+#ifdef _OPENMP
+                            #pragma omp simd
+#endif
                             for (Index_ k = 0; k < range.number; ++k) {
                                 optr[range.index[k] - start] += mult * range.value[k];
                             }
@@ -256,6 +277,9 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
             for (RightIndex_ rhs_k = 0; rhs_k < rhs_range.number; ++rhs_k) {
                 auto optr = stores[rhs_range.index[rhs_k]].data();
                 Output_ mult = rhs_range.value[rhs_k];
+#ifdef _OPENMP
+                #pragma omp simd
+#endif
                 for (Index_ k = 0; k < range.number; ++k) {
                     optr[range.index[k] - start] += mult * range.value[k];
                 }
