@@ -14,45 +14,29 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-include(GoogleTest)
+add_executable(
+    libtest
+    src/dense_row.cpp
+    src/sparse_row.cpp
+    src/dense_column.cpp
+    src/sparse_column.cpp
+    src/utils.cpp
+    src/overlord.cpp
+)
+
+target_link_libraries(
+    libtest
+    gtest_main
+    tatami_mult
+)
+
+target_compile_options(libtest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 set(CODE_COVERAGE OFF CACHE BOOL "Enable coverage testing")
-set(DO_CODE_COVERAGE OFF)
 if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    set(DO_CODE_COVERAGE ON)
+    target_compile_options(libtest PRIVATE -O0 -g --coverage)
+    target_link_options(libtest PRIVATE --coverage)
 endif()
 
-macro(create_test target)
-    add_executable(
-        ${target}
-        src/dense_row.cpp
-        src/sparse_row.cpp
-        src/dense_column.cpp
-        src/sparse_column.cpp
-        src/utils.cpp
-        src/overlord.cpp
-    )
-
-    target_link_libraries(
-        ${target}
-        gtest_main
-        tatami_mult
-    )
-
-    target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror)
-
-    if(DO_CODE_COVERAGE)
-        target_compile_options(${target} PRIVATE -O0 -g --coverage)
-        target_link_options(${target} PRIVATE --coverage)
-    endif()
-
-    gtest_discover_tests(${target})
-endmacro()
-
-create_test(libtest)
-
-find_package(OpenMP)
-if(OpenMP_FOUND)
-    create_test(omptest)
-    target_link_libraries(omptest OpenMP::OpenMP_CXX)
-endif()
+include(GoogleTest)
+gtest_discover_tests(libtest)

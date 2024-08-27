@@ -24,7 +24,7 @@ namespace tatami_mult {
  */
 struct Options {
     /**
-     * Number of threads to use.
+     * Number of threads to use, for parallelization via `tatami::parallelize()`.
      */
     int num_threads = 1;
 
