@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(tatami_mult
-    VERSION 0.1.1
+    VERSION 0.1.2
     DESCRIPTION "Multiplication of tatami matrices"
     LANGUAGES CXX)
 

@@ -111,6 +111,10 @@ find_package(tatami_tatami_mult CONFIG REQUIRED)
 target_link_libraries(mylib INTERFACE tatami::tatami_mult)
 ```
 
+By default, this will use `FetchContent` to fetch all external dependencies.
+If you want to install them manually, use `-DTATAMI_MULT_FETCH_EXTERN=OFF`.
+See [`extern/CMakeLists.txt`](extern/CMakeLists.txt) to find compatible versions of each dependency.
+
 ### Manual
 
 If you're not using CMake, the simple approach is to just copy the files the `include/` subdirectory - 
