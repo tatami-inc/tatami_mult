@@ -159,7 +159,8 @@ CMake with &lt;tt&gt;find_package()&lt;/tt&gt;</h2>
 </div><!-- fragment --><p>Then you can use <code>find_package()</code> as usual:</p>
 <div class="fragment"><div class="line">find_package(tatami_tatami_mult CONFIG REQUIRED)</div>
 <div class="line">target_link_libraries(mylib INTERFACE tatami::tatami_mult)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
+</div><!-- fragment --><p>By default, this will use <code>FetchContent</code> to fetch all external dependencies. If you want to install them manually, use <code>-DTATAMI_MULT_FETCH_EXTERN=OFF</code>. See <a href="extern/CMakeLists.txt"><code>extern/CMakeLists.txt</code></a> to find compatible versions of each dependency.</p>
+<h2><a class="anchor" id="autotoc_md6"></a>
 Manual</h2>
 <p>If you're not using CMake, the simple approach is to just copy the files the <code>include/</code> subdirectory - either directly or with Git submodules - and include their path during compilation with, e.g., GCC's <code>-I</code>. You'll need to include the transitive dependencies yourself, check out <a href="extern/CMakeLists.txt"><code>extern/CMakeLists.txt</code></a> for a list. </p>
 </div></div><!-- PageDoc -->
