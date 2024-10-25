@@ -5,6 +5,7 @@
 
 #include "tatami/tatami.hpp"
 #include "tatami_stats/tatami_stats.hpp"
+#include "subpar/subpar.hpp"
 #include "utils.hpp"
 
 namespace tatami_mult {
@@ -25,6 +26,7 @@ void dense_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Rig
         for (Index_ c = 0; c < NC; ++c) {
             auto ptr = ext->fetch(buffer.data());
             Output_ mult = rhs[c];
+            SUBPAR_VECTORIZABLE
             for (Index_ r = 0; r < length; ++r) {
                 optr[r] += mult * ptr[r];
             }
@@ -51,6 +53,7 @@ void dense_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const st
             for (size_t j = 0; j < num_rhs; ++j) {
                 auto optr = stores[j].data();
                 Output_ mult = rhs[j][c];
+                SUBPAR_VECTORIZABLE
                 for (Index_ r = 0; r < length; ++r) {
                     optr[r] += mult * ptr[r];
                 }
@@ -86,6 +89,7 @@ void dense_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, con
             for (RightIndex_ j = 0; j < rhs_col; ++j) {
                 auto optr = stores[j].data();
                 Output_ mult = rptr[j];
+                SUBPAR_VECTORIZABLE
                 for (Index_ r = 0; r < length; ++r) {
                     optr[r] += mult * ptr[r];
                 }
@@ -136,11 +140,13 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
                         auto optr = stores[j].data();
                         if (k < range.number && j == range.index[k]) {
                             Output_ mult = range.value[k];
+                            SUBPAR_VECTORIZABLE
                             for (Index_ r = 0; r < length; ++r) {
                                 optr[r] += mult * ptr[r];
                             }
                             ++k;
                         } else {
+                            SUBPAR_VECTORIZABLE
                             for (auto s : specials) {
                                 optr[s] += ptr[s] * static_cast<Output_>(0);
                             }
@@ -153,6 +159,7 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
             for (RightIndex_ k = 0; k < range.number; ++k) {
                 auto optr = stores[range.index[k]].data();
                 Output_ mult = range.value[k];
+                SUBPAR_VECTORIZABLE
                 for (Index_ r = 0; r < length; ++r) {
                     optr[r] += mult * ptr[r];
                 }
