@@ -147,7 +147,8 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
                             ++k;
                         } else {
                             SUBPAR_VECTORIZABLE
-                            for (auto s : specials) {
+                            for (size_t i = 0, end = specials.size(); i < end; ++i) {
+                                auto s = specials[i];
                                 optr[s] += ptr[s] * static_cast<Output_>(0);
                             }
                         }

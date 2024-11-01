@@ -253,7 +253,8 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
                             ++rhs_k;
                         } else {
                             SUBPAR_VECTORIZABLE
-                            for (auto k : special_k) {
+                            for (size_t i = 0, end = special_k.size(); i < end; ++i) {
+                                auto k = special_k[i];
                                 optr[range.index[k] - start] += range.value[k] * static_cast<Output_>(0);
                             }
                         }
