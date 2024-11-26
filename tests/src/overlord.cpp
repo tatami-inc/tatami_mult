@@ -13,7 +13,16 @@ protected:
     static void SetUpTestSuite() {
         NR = 82;
         NC = 52;
-        std::vector<double> dump = tatami_test::simulate_sparse_vector<double>(NR * NC, 0.2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 99);
+
+        std::vector<double> dump = tatami_test::simulate_vector<double>(NR * NC, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.density = 0.2;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 99;
+            return opt;
+        }());
+
         dense_row.reset(new tatami::DenseRowMatrix<double, int>(NR, NC, std::move(dump)));
         dense_column = tatami::convert_to_dense(dense_row.get(), false);
         sparse_row = tatami::convert_to_compressed_sparse(dense_row.get(), true);
@@ -22,7 +31,13 @@ protected:
 };
 
 TEST_F(OverlordTest, RightVector) {
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NC, /* lower = */ -10, /* upper = */ 10, /* seed = */ 69);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NC, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 69;
+        return opt;
+    }());
     tatami_mult::Options opt;
 
     std::vector<double> output_dr(NR);
@@ -42,7 +57,13 @@ TEST_F(OverlordTest, RightVector) {
 }
 
 TEST_F(OverlordTest, LeftVector) {
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NR, /* lower = */ -10, /* upper = */ 10, /* seed = */ 70);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NR, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 70;
+        return opt;
+    }());
     tatami_mult::Options opt;
 
     std::vector<double> output_dr(NC);
@@ -62,7 +83,13 @@ TEST_F(OverlordTest, LeftVector) {
 }
 
 TEST_F(OverlordTest, RightVectors) {
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NC * 5, /* lower = */ -10, /* upper = */ 10, /* seed = */ 71);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NC * 5, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 71;
+        return opt;
+    }());
     auto vec_ptrs = populate_pointers(vec, NC, 5);
     tatami_mult::Options opt;
 
@@ -92,7 +119,13 @@ TEST_F(OverlordTest, RightVectors) {
 }
 
 TEST_F(OverlordTest, LeftVectors) {
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NR * 5, /* lower = */ -10, /* upper = */ 10, /* seed = */ 71);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NR * 5, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 72;
+        return opt;
+    }());
     auto vec_ptrs = populate_pointers(vec, NR, 5);
     tatami_mult::Options opt;
 
@@ -123,7 +156,13 @@ TEST_F(OverlordTest, LeftVectors) {
 
 TEST_F(OverlordTest, RightMatrixDense) {
     std::shared_ptr<tatami::Matrix<double, int> > rhs;
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NC * 5, /* lower = */ -10, /* upper = */ 10, /* seed = */ 71);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NC * 5, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 73;
+        return opt;
+    }());
     rhs.reset(new tatami::DenseColumnMatrix<double, int>(NC, 5, vec));
 
     tatami_mult::Options opt;
@@ -151,7 +190,13 @@ TEST_F(OverlordTest, RightMatrixDense) {
 
 TEST_F(OverlordTest, LeftMatrixDense) {
     std::shared_ptr<tatami::Matrix<double, int> > lhs;
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NR * 5, /* lower = */ -10, /* upper = */ 10, /* seed = */ 71);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NR * 5, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 74;
+        return opt;
+    }());
     lhs.reset(new tatami::DenseRowMatrix<double, int>(5, NR, vec));
 
     tatami_mult::Options opt;
@@ -180,7 +225,15 @@ TEST_F(OverlordTest, LeftMatrixDense) {
 }
 
 TEST_F(OverlordTest, RightMatrixSparse) {
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NC * 5, /* lower = */ -10, /* upper = */ 10, /* seed = */ 71);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NC * 5, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.density = 0.1;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 75;
+        return opt;
+    }());
+
     std::shared_ptr<tatami::Matrix<double, int> > rhs;
     {
         tatami::DenseColumnMatrix<double, int> dense(NC, 5, vec);
@@ -211,7 +264,15 @@ TEST_F(OverlordTest, RightMatrixSparse) {
 }
 
 TEST_F(OverlordTest, LeftMatrixSparse) {
-    std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NR * 5, /* lower = */ -10, /* upper = */ 10, /* seed = */ 71);
+    std::vector<double> vec = tatami_test::simulate_vector<double>(NR * 5, []{ 
+        tatami_test::SimulateVectorOptions opt;
+        opt.density = 0.1;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 76;
+        return opt;
+    }());
+
     std::shared_ptr<tatami::Matrix<double, int> > lhs;
     {
         tatami::DenseRowMatrix<double, int> dense(5, NR, vec);
@@ -246,7 +307,13 @@ TEST_F(OverlordTest, LeftMatrixSparse) {
 TEST_F(OverlordTest, MatrixOptions) {
     std::shared_ptr<tatami::Matrix<double, int> > lhs;
     {
-        std::vector<double> vec = tatami_test::simulate_dense_vector<double>(NR * 5, /* lower = */ -10, /* upper = */ 10, /* seed = */ 71);
+        std::vector<double> vec = tatami_test::simulate_vector<double>(NR * 5, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 77;
+            return opt;
+        }());
         lhs.reset(new tatami::DenseRowMatrix<double, int>(5, NR, std::move(vec)));
     }
 

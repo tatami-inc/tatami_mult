@@ -14,13 +14,27 @@ public:
     static void SetUpTestSuite() {
         NR = 102;
         NC = 92;
-        dump = tatami_test::simulate_dense_vector<double>(NR * NC, /* lower = */ -10, /* upper = */ 10, /* seed = */ 69);
+
+        dump = tatami_test::simulate_vector<double>(NR * NC, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 69;
+            return opt;
+        }());
+
         dense.reset(new tatami::DenseRowMatrix<double, int>(NR, NC, dump));
     }
 };
 
 TEST_F(DenseRowTest, Vector) {
-    auto rhs = tatami_test::simulate_dense_vector<double>(NC, /* lower = */ -10, /* upper = */ 10, /* seed = */ 421);
+    auto rhs = tatami_test::simulate_vector<double>(NC, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 421;
+        return opt;
+    }());
 
     // Doing a reference calculation.
     std::vector<double> ref(NR);
@@ -36,7 +50,14 @@ TEST_F(DenseRowTest, Vector) {
 }
 
 TEST_F(DenseRowTest, Vectors) {
-    auto raw_rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 422);
+    auto raw_rhs = tatami_test::simulate_vector<double>(NC * 2, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 422;
+        return opt;
+    }());
+
     std::vector<double*> rhs{ raw_rhs.data(), raw_rhs.data() + NC };
 
     // Doing a reference calculation.
@@ -53,7 +74,14 @@ TEST_F(DenseRowTest, Vectors) {
 }
 
 TEST_F(DenseRowTest, TatamiDense) {
-    auto raw_rhs = tatami_test::simulate_dense_vector<double>(NC * 2, /* lower = */ -10, /* upper = */ 10, /* seed = */ 423);
+    auto raw_rhs = tatami_test::simulate_vector<double>(NC * 2, []{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 423;
+        return opt;
+    }());
+
     std::vector<double*> rhs_ptrs { raw_rhs.data(), raw_rhs.data() + NC };
     auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, raw_rhs);
 
@@ -78,7 +106,15 @@ TEST_F(DenseRowTest, TatamiDense) {
 TEST_F(DenseRowTest, TatamiSparse) {
     std::shared_ptr<tatami::Matrix<double, int> > rhs_dense, rhs_sparse;
     {
-        auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 424);
+        auto rhs = tatami_test::simulate_vector<double>(NC * 2, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.density = 0.1;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 424;
+            return opt;
+        }());
+
         rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::move(rhs));
         rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
     }
@@ -120,7 +156,15 @@ TEST_F(DenseRowTest, TatamiSparseSpecial) {
 
     std::shared_ptr<tatami::Matrix<double, int> > rhs_dense, rhs_sparse;
     {
-        auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 6, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 426);
+        auto rhs = tatami_test::simulate_vector<double>(NC * 6, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.density = 0.1;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 426;
+            return opt;
+        }());
+
         // Remember, we're injecting Inf's to the first and/or last values of each
         // row of the LHS matrix. So we need to set some of the RHS values to
         // ensure that we get a good mix of NaNs and Infs in the output; otherwise
@@ -166,7 +210,15 @@ TEST_F(DenseRowTest, TatamiSparseNoSpecial) {
 
     std::shared_ptr<tatami::Matrix<double, int> > rhs_sparse;
     {
-        auto rhs = tatami_test::simulate_sparse_vector<double>(NC * 2, 0.1, /* lower = */ -10, /* upper = */ 10, /* seed = */ 421);
+        auto rhs = tatami_test::simulate_vector<double>(NC * 2, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.density = 0.1;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 421;
+            return opt;
+        }());
+
         auto rhs_dense = std::make_shared<tatami::DenseColumnMatrix<double, int> >(NC, 2, std::move(rhs));
         rhs_sparse = tatami::convert_to_compressed_sparse(rhs_dense.get(), false);
     }
