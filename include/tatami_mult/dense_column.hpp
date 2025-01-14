@@ -43,13 +43,14 @@ void dense_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const st
     tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
         auto ext = tatami::consecutive_extractor<false>(&matrix, false, 0, NC, start, length);
         std::vector<Value_> buffer(length);
-        auto stores = create_stores(t, start, length, output);
+        auto getter = [&](Index_ i) -> Output_* { return output[i]; };
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(t, output.size(), start, length, std::move(getter));
 
         for (Index_ c = 0; c < NC; ++c) {
             auto ptr = ext->fetch(buffer.data());
 
             for (size_t j = 0; j < num_rhs; ++j) {
-                auto optr = stores[j].data();
+                auto optr = stores.data(j);
                 Output_ mult = rhs[j][c];
                 for (Index_ r = 0; r < length; ++r) {
                     optr[r] += mult * ptr[r];
@@ -57,9 +58,7 @@ void dense_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const st
             }
         }
    
-        for (auto& s : stores) {
-            s.transfer();
-        }
+        stores.transfer();
     }, NR, num_threads);
 }
 
@@ -76,15 +75,16 @@ void dense_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, con
         std::vector<RightValue_> rbuffer(rhs_col);
 
         bool contiguous_output = (row_shift == 1);
-        size_t mock_thread = (contiguous_output ? t : static_cast<size_t>(-1)); // avoid a direct right if it's not contiguous.
-        auto stores = create_stores(mock_thread, start, length, output, rhs_col, col_shift);
+        size_t mock_thread = (contiguous_output ? t : static_cast<size_t>(-1)); // avoid a direct write if it's not contiguous.
+        auto getter = [&](Index_ i) -> Output_* { return output + static_cast<size_t>(i) * col_shift; };
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(mock_thread, rhs_col, start, length, std::move(getter));
 
         for (Index_ c = 0; c < NC; ++c) {
             auto ptr = ext->fetch(buffer.data());
             auto rptr = rext->fetch(rbuffer.data());
 
             for (RightIndex_ j = 0; j < rhs_col; ++j) {
-                auto optr = stores[j].data();
+                auto optr = stores.data(j);
                 Output_ mult = rptr[j];
                 for (Index_ r = 0; r < length; ++r) {
                     optr[r] += mult * ptr[r];
@@ -93,9 +93,7 @@ void dense_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, con
         }
 
         if (contiguous_output) {
-            for (auto& s : stores) {
-                s.transfer();
-            }
+            stores.transfer();
         } else {
             non_contiguous_transfer(stores, start, length, output, row_shift, col_shift);
         }
@@ -117,7 +115,8 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
 
         bool contiguous_output = (row_shift == 1);
         size_t mock_thread = (contiguous_output ? t : static_cast<size_t>(-1)); // avoid a direct right if it's not contiguous.
-        auto stores = create_stores(mock_thread, start, length, output, rhs_col, col_shift);
+        auto getter = [&](Index_ i) -> Output_* { return output + static_cast<size_t>(i) * col_shift; };
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(mock_thread, rhs_col, start, length, std::move(getter));
 
         constexpr bool supports_specials = supports_special_values<Value_>();
         typename std::conditional<supports_specials, std::vector<Index_>, bool>::type specials;
@@ -133,7 +132,7 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
                 if (specials.size()) {
                     RightIndex_ k = 0; 
                     for (RightIndex_ j = 0; j < rhs_col; ++j) {
-                        auto optr = stores[j].data();
+                        auto optr = stores.data(j);
                         if (k < range.number && j == range.index[k]) {
                             Output_ mult = range.value[k];
                             for (Index_ r = 0; r < length; ++r) {
@@ -151,7 +150,7 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
             }
 
             for (RightIndex_ k = 0; k < range.number; ++k) {
-                auto optr = stores[range.index[k]].data();
+                auto optr = stores.data(range.index[k]);
                 Output_ mult = range.value[k];
                 for (Index_ r = 0; r < length; ++r) {
                     optr[r] += mult * ptr[r];
@@ -160,9 +159,7 @@ void dense_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, co
         }
 
         if (contiguous_output) {
-            for (auto& s : stores) {
-                s.transfer();
-            }
+            stores.transfer();
         } else {
             non_contiguous_transfer(stores, start, length, output, row_shift, col_shift);
         }

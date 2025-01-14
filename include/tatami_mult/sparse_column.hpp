@@ -85,7 +85,8 @@ void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const s
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, 0, NC, start, length);
         std::vector<Value_> vbuffer(length);
         std::vector<Index_> ibuffer(length);
-        auto stores = create_stores(t, start, length, output);
+        auto getter = [&](Index_ i) -> Output_* { return output[i]; };
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(t, output.size(), start, length, std::move(getter));
 
         constexpr bool supports_specials = supports_special_values<Right_>();
         typename std::conditional<supports_specials, std::vector<Value_>, bool>::type expanded;
@@ -95,7 +96,7 @@ void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const s
             bool has_expanded = false;
 
             for (size_t j = 0; j < num_rhs; ++j) {
-                auto optr = stores[j].data();
+                auto optr = stores.data(j);
                 Output_ mult = rhs[j][c];
 
                 if constexpr(supports_specials) {
@@ -123,10 +124,8 @@ void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const s
                 }
             }
         }
-   
-        for (auto& s : stores) {
-            s.transfer();
-        }
+
+        stores.transfer();
     }, NR, num_threads);
 }
 
@@ -145,7 +144,8 @@ void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, co
 
         bool contiguous_output = (row_shift == 1);
         size_t mock_thread = (contiguous_output ? t : static_cast<size_t>(-1)); // avoid a direct right if it's not contiguous.
-        auto stores = create_stores(mock_thread, start, length, output, rhs_col, col_shift);
+        auto getter = [&](Index_ i) -> Output_* { return output + static_cast<size_t>(i) * col_shift; };
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(mock_thread, rhs_col, start, length, std::move(getter));
 
         constexpr bool supports_specials = supports_special_values<RightValue_>();
         typename std::conditional<supports_specials, std::vector<Value_>, bool>::type expanded;
@@ -156,7 +156,7 @@ void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, co
             bool has_expanded = false;
 
             for (RightIndex_ j = 0; j < rhs_col; ++j) {
-                auto optr = stores[j].data();
+                auto optr = stores.data(j);
                 Output_ mult = rptr[j];
 
                 if constexpr(supports_specials) {
@@ -186,9 +186,7 @@ void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, co
         }
 
         if (contiguous_output) {
-            for (auto& s : stores) {
-                s.transfer();
-            }
+            stores.transfer();
         } else {
             non_contiguous_transfer(stores, start, length, output, row_shift, col_shift);
         }
@@ -211,7 +209,8 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
 
         bool contiguous_output = (row_shift == 1);
         size_t mock_thread = (contiguous_output ? t : static_cast<size_t>(-1)); // avoid a direct right if it's not contiguous.
-        auto stores = create_stores(mock_thread, start, length, output, rhs_col, col_shift);
+        auto getter = [&](Index_ i) -> Output_* { return output + static_cast<size_t>(i) * col_shift; };
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(mock_thread, rhs_col, start, length, std::move(getter));
 
         // This time, we're checking for special values in the LHS because
         // we're potentially skipping its columns based on the sparsity of the
@@ -236,7 +235,7 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
                 if (special_k.size()) {
                     RightIndex_ rhs_k = 0; 
                     for (RightIndex_ j = 0; j < rhs_col; ++j) {
-                        auto optr = stores[j].data();
+                        auto optr = stores.data(j);
                         if (rhs_k < rhs_range.number && j == rhs_range.index[rhs_k]) {
                             Output_ mult = rhs_range.value[rhs_k];
                             for (Index_ k = 0; k < range.number; ++k) {
@@ -254,7 +253,7 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
             }
 
             for (RightIndex_ rhs_k = 0; rhs_k < rhs_range.number; ++rhs_k) {
-                auto optr = stores[rhs_range.index[rhs_k]].data();
+                auto optr = stores.data(rhs_range.index[rhs_k]);
                 Output_ mult = rhs_range.value[rhs_k];
                 for (Index_ k = 0; k < range.number; ++k) {
                     optr[range.index[k] - start] += mult * range.value[k];
@@ -263,9 +262,7 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
         }
 
         if (contiguous_output) {
-            for (auto& s : stores) {
-                s.transfer();
-            }
+            stores.transfer();
         } else {
             non_contiguous_transfer(stores, start, length, output, row_shift, col_shift);
         }
