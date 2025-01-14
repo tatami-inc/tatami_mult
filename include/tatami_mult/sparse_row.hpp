@@ -150,7 +150,7 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            auto rext = tatami::consecutive_extractor<false>(&rhs, false, 0, rhs_col);
+            auto rext = tatami::consecutive_extractor<false>(&rhs, false, static_cast<RightIndex_>(0), rhs_col);
             size_t out_offset = static_cast<size_t>(r) * row_shift; // using offsets instead of directly adding to the pointer, to avoid forming an invalid address on the final iteration.
 
             if constexpr(supports_specials) {
@@ -202,7 +202,7 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
 
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            auto rext = tatami::consecutive_extractor<true>(&rhs, false, 0, rhs_col);
+            auto rext = tatami::consecutive_extractor<true>(&rhs, false, static_cast<RightIndex_>(0), rhs_col);
 
             // Expanding the sparse vector into a dense format for easier mapping by the RHS's sparse vector.
             expand_sparse_range(range, expanded);
