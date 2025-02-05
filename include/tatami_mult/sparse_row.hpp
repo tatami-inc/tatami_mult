@@ -37,7 +37,7 @@ void sparse_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right
         fill_special_index(NC, rhs, specials);
     }
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, true, start, length);
         std::vector<Value_> vbuffer(NC);
         std::vector<Index_> ibuffer(NC);
@@ -73,7 +73,7 @@ void sparse_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std:
         }
     }
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, true, start, length);
         std::vector<Value_> vbuffer(NC);
         std::vector<Index_> ibuffer(NC);
@@ -110,7 +110,7 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
     if constexpr(supports_specials) {
         has_special.resize(rhs_col);
 
-        tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+        tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
             auto rext = tatami::consecutive_extractor<false>(&rhs, false, start, length);
             std::vector<RightValue_> buffer(NC); // remember, NC == right.nrow() here.
             for (RightIndex_ j = start, end = start + length; j < end; ++j) {
@@ -132,7 +132,7 @@ void sparse_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const
         }
     }
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, true, start, length);
         std::vector<Value_> vbuffer(NC);
         std::vector<Index_> ibuffer(NC);
@@ -186,7 +186,7 @@ void sparse_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, cons
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, true, start, length);
         std::vector<Value_> vbuffer(NC);
         std::vector<Index_> ibuffer(NC);

@@ -38,7 +38,7 @@ void sparse_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Ri
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         std::vector<Value_> vbuffer(length);
         std::vector<Index_> ibuffer(length);
@@ -81,7 +81,7 @@ void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const s
     Index_ NC = matrix.ncol();
     size_t num_rhs = rhs.size();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         std::vector<Value_> vbuffer(length);
         std::vector<Index_> ibuffer(length);
@@ -135,7 +135,7 @@ void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, co
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         auto rext = tatami::consecutive_extractor<false>(&rhs, true, static_cast<RightIndex_>(0), static_cast<RightIndex_>(NC)); // remember, NC == rhs.nrow().
         std::vector<Value_> vbuffer(length);
@@ -199,7 +199,7 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         auto rext = tatami::consecutive_extractor<true>(&rhs, true, static_cast<RightIndex_>(0), static_cast<RightIndex_>(NC)); // remember, NC == rhs.nrow().
         std::vector<Value_> vbuffer(length);

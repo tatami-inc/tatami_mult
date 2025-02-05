@@ -16,7 +16,7 @@ void dense_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right_
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(&matrix, true, start, length);
         std::vector<Value_> buffer(NC);
 
@@ -34,7 +34,7 @@ void dense_row_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::
     Index_ NC = matrix.ncol();
     size_t num_rhs = rhs.size();
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(&matrix, true, start, length);
         std::vector<Value_> buffer(NC);
 
@@ -54,7 +54,7 @@ void dense_row_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const 
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(&matrix, true, start, length);
         std::vector<Value_> buffer(NC);
         std::vector<RightValue_> rbuffer(NC);
@@ -79,7 +79,7 @@ void dense_row_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, const
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t, Index_ start, Index_ length) {
+    tatami::parallelize([&](size_t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(&matrix, true, start, length);
         std::vector<Value_> buffer(NC);
         std::vector<RightValue_> vbuffer(NC);
