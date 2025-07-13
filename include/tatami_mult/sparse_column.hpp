@@ -1,12 +1,15 @@
 #ifndef TATAMI_MULT_SPARSE_COLUMN_HPP
 #define TATAMI_MULT_SPARSE_COLUMN_HPP
 
+#include "utils.hpp"
+
 #include <vector>
-#include <cstdint>
+#include <cstddef>
+#include <type_traits>
 
 #include "tatami/tatami.hpp"
 #include "tatami_stats/tatami_stats.hpp"
-#include "utils.hpp"
+#include "sanisizer/sanisizer.hpp"
 
 namespace tatami_mult {
 
@@ -38,10 +41,10 @@ void sparse_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Ri
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
+    tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
-        std::vector<Value_> vbuffer(length);
-        std::vector<Index_> ibuffer(length);
+        auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(length);
+        auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(length);
 
         tatami_stats::LocalOutputBuffer<Value_> store(t, start, length, output);
         auto optr = store.data();
@@ -79,14 +82,21 @@ template<typename Value_, typename Index_, typename Right_, typename Output_>
 void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, const std::vector<Output_*>& output, int num_threads) {
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
-    size_t num_rhs = rhs.size();
+    auto num_rhs = rhs.size();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
+    tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
-        std::vector<Value_> vbuffer(length);
-        std::vector<Index_> ibuffer(length);
+        auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(length);
+        auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(length);
+
         auto getter = [&](Index_ i) -> Output_* { return output[i]; };
-        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(t, output.size(), start, length, std::move(getter));
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(
+            t,
+            sanisizer::cast<std::size_t>(output.size()),
+            start,
+            length,
+            std::move(getter)
+        );
 
         constexpr bool supports_specials = supports_special_values<Right_>();
         typename std::conditional<supports_specials, std::vector<Value_>, bool>::type expanded;
@@ -95,7 +105,7 @@ void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const s
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
             bool has_expanded = false;
 
-            for (size_t j = 0; j < num_rhs; ++j) {
+            for (decltype(num_rhs) j = 0; j < num_rhs; ++j) {
                 auto optr = stores.data(j);
                 Output_ mult = rhs[j][c];
 
@@ -130,7 +140,14 @@ void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const s
 }
 
 template<typename Value_, typename Index_, typename RightValue_, typename RightIndex_, typename Output_>
-void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, size_t row_shift, size_t col_shift, int num_threads) {
+void sparse_column_tatami_dense(
+    const tatami::Matrix<Value_, Index_>& matrix,
+    const tatami::Matrix<RightValue_, RightIndex_>& rhs,
+    Output_* output,
+    RightIndex_ row_shift,
+    Index_ col_shift,
+    int num_threads)
+{
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
@@ -138,14 +155,19 @@ void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, co
     tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         auto rext = tatami::consecutive_extractor<false>(&rhs, true, static_cast<RightIndex_>(0), static_cast<RightIndex_>(NC)); // remember, NC == rhs.nrow().
-        std::vector<Value_> vbuffer(length);
-        std::vector<Index_> ibuffer(length);
-        std::vector<RightValue_> rbuffer(rhs_col);
+        auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(length);
+        auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(length);
+        auto rbuffer = tatami::create_container_of_Index_size<std::vector<RightValue_> >(rhs_col);
 
         bool contiguous_output = (row_shift == 1);
-        size_t mock_thread = (contiguous_output ? t : static_cast<size_t>(-1)); // avoid a direct right if it's not contiguous.
-        auto getter = [&](Index_ i) -> Output_* { return output + static_cast<size_t>(i) * col_shift; };
-        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(mock_thread, rhs_col, start, length, std::move(getter));
+        auto getter = [&](Index_ i) -> Output_* { return output + sanisizer::product_unsafe<std::size_t>(i, col_shift); }; // product must fit in size_t if output is correctly sized.
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(
+            (contiguous_output ? t : num_threads), // avoid a direct right at t = 0 if it's not contiguous.
+            rhs_col, // cast to size_t is known to be safe as per the tatami::Matrix contract.
+            start,
+            length,
+            std::move(getter)
+        );
 
         constexpr bool supports_specials = supports_special_values<RightValue_>();
         typename std::conditional<supports_specials, std::vector<Value_>, bool>::type expanded;
@@ -194,7 +216,14 @@ void sparse_column_tatami_dense(const tatami::Matrix<Value_, Index_>& matrix, co
 }
 
 template<typename Value_, typename Index_, typename RightValue_, typename RightIndex_, typename Output_>
-void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, const tatami::Matrix<RightValue_, RightIndex_>& rhs, Output_* output, size_t row_shift, size_t col_shift, int num_threads) {
+void sparse_column_tatami_sparse(
+    const tatami::Matrix<Value_, Index_>& matrix,
+    const tatami::Matrix<RightValue_, RightIndex_>& rhs,
+    Output_* output,
+    RightIndex_ row_shift,
+    Index_ col_shift,
+    int num_threads)
+{
     Index_ NR = matrix.nrow();
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
@@ -202,15 +231,20 @@ void sparse_column_tatami_sparse(const tatami::Matrix<Value_, Index_>& matrix, c
     tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         auto rext = tatami::consecutive_extractor<true>(&rhs, true, static_cast<RightIndex_>(0), static_cast<RightIndex_>(NC)); // remember, NC == rhs.nrow().
-        std::vector<Value_> vbuffer(length);
-        std::vector<Index_> ibuffer(length);
-        std::vector<RightValue_> rvbuffer(rhs_col);
-        std::vector<RightIndex_> ribuffer(rhs_col);
+        auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(length);
+        auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(length);
+        auto rvbuffer = tatami::create_container_of_Index_size<std::vector<RightValue_> >(rhs_col);
+        auto ribuffer = tatami::create_container_of_Index_size<std::vector<RightIndex_> >(rhs_col);
 
         bool contiguous_output = (row_shift == 1);
-        size_t mock_thread = (contiguous_output ? t : static_cast<size_t>(-1)); // avoid a direct right if it's not contiguous.
         auto getter = [&](Index_ i) -> Output_* { return output + static_cast<size_t>(i) * col_shift; };
-        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(mock_thread, rhs_col, start, length, std::move(getter));
+        tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(
+            (contiguous_output ? t : num_threads), // avoid a direct write at t = 0 if it's not contiguous.
+            rhs_col,
+            start,
+            length,
+            std::move(getter)
+        );
 
         // This time, we're checking for special values in the LHS because
         // we're potentially skipping its columns based on the sparsity of the

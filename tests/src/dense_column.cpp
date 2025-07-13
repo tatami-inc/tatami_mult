@@ -7,7 +7,7 @@
 
 class DenseColumnTest : public ::testing::Test {
 public:
-    inline static size_t NR, NC;
+    inline static int NR, NC;
     inline static std::vector<double> dump;
     inline static std::shared_ptr<tatami::Matrix<double, int> > dense;
 
@@ -38,7 +38,7 @@ TEST_F(DenseColumnTest, Vector) {
 
     // Doing a reference calculation.
     std::vector<double> ref(NR);
-    for (size_t r = 0; r < NR; ++r) {
+    for (int r = 0; r < NR; ++r) {
         ref[r] = std::inner_product(rhs.begin(), rhs.end(), dump.begin() + r * NC, 0.0);
     }
 
@@ -141,7 +141,7 @@ TEST_F(DenseColumnTest, TatamiSparseSpecial) {
     std::shared_ptr<tatami::Matrix<double, int> > dense2;
     {
         auto dump2 = dump;
-        for (size_t r = 0; r < NR; ++r) { 
+        for (int r = 0; r < NR; ++r) { 
             int scenario = r % 3;
             if (scenario == 0 || scenario == 2) { // adding Inf to the start of each row.
                 dump2[r * NC] = std::numeric_limits<double>::infinity();
