@@ -22,7 +22,7 @@ void dense_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Rig
 
     tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(&matrix, false, static_cast<Index_>(0), NC, start, length);
-        auto buffer = tatami::create_container_of_Index_size<std::vector<Value_> >(NC);
+        auto buffer = tatami::create_container_of_Index_size<std::vector<Value_> >(length);
         tatami_stats::LocalOutputBuffer<Value_> store(t, start, length, output);
         auto optr = store.data();
 
