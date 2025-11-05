@@ -2,7 +2,7 @@
 <tagfile doxygen_version="1.12.0">
   <compound kind="file">
     <name>tatami_mult.hpp</name>
-    <path>/github/workspace/include/tatami_mult/</path>
+    <path>tatami_mult/</path>
     <filename>tatami__mult_8hpp.html</filename>
     <class kind="struct">tatami_mult::Options</class>
     <namespace>tatami_mult</namespace>
