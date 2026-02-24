@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['tatami_2ehpp_0',['tatami.hpp',['https://tatami-inc.github.io/tatami/tatami_8hpp.html',1,'']]],
-  ['tatami_5fmult_2ehpp_1',['tatami_mult.hpp',['../tatami__mult_8hpp.html',1,'']]],
-  ['transpose_2ehpp_2',['transpose.hpp',['https://tatami-inc.github.io/tatami/transpose_8hpp.html',1,'']]]
+  ['somenumericarray_2ehpp_0',['SomeNumericArray.hpp',['https://tatami-inc.github.io/tatami/SomeNumericArray_8hpp.html',1,'']]],
+  ['sparserange_2ehpp_1',['SparseRange.hpp',['https://tatami-inc.github.io/tatami/SparseRange_8hpp.html',1,'']]],
+  ['sparsifiedwrapper_2ehpp_2',['SparsifiedWrapper.hpp',['https://tatami-inc.github.io/tatami/SparsifiedWrapper_8hpp.html',1,'']]],
+  ['substitute_5fhelpers_2ehpp_3',['substitute_helpers.hpp',['https://tatami-inc.github.io/tatami/substitute__helpers_8hpp.html',1,'']]]
 ];
