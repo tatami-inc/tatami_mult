@@ -152,7 +152,7 @@ void sparse_column_tatami_dense(
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
+    tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         auto rext = tatami::consecutive_extractor<false>(&rhs, true, static_cast<RightIndex_>(0), static_cast<RightIndex_>(NC)); // remember, NC == rhs.nrow().
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(length);
@@ -162,7 +162,7 @@ void sparse_column_tatami_dense(
         bool contiguous_output = (row_shift == 1);
         auto getter = [&](Index_ i) -> Output_* { return output + sanisizer::product_unsafe<std::size_t>(i, col_shift); }; // product must fit in size_t if output is correctly sized.
         tatami_stats::LocalOutputBuffers<Output_, decltype(getter)> stores(
-            (contiguous_output ? t : num_threads), // avoid a direct right at t = 0 if it's not contiguous.
+            (contiguous_output ? t : num_threads), // avoid a direct write at t = 0 if it's not contiguous.
             rhs_col, // cast to size_t is known to be safe as per the tatami::Matrix contract.
             start,
             length,
@@ -228,7 +228,7 @@ void sparse_column_tatami_sparse(
     Index_ NC = matrix.ncol();
     RightIndex_ rhs_col = rhs.ncol();
 
-    tatami::parallelize([&](size_t t, Index_ start, Index_ length) -> void {
+    tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
         auto rext = tatami::consecutive_extractor<true>(&rhs, true, static_cast<RightIndex_>(0), static_cast<RightIndex_>(NC)); // remember, NC == rhs.nrow().
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(length);
