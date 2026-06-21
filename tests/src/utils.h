@@ -5,14 +5,11 @@
 
 #include <cassert>
 
-inline void expect_equal_with_nan(const std::vector<double>& ref, const std::vector<double>& observed) {
-    ASSERT_EQ(ref.size(), observed.size());
-    size_t n = ref.size();
-    for (size_t i = 0; i < n; ++i) {
-        EXPECT_EQ(std::isnan(ref[i]), std::isnan(observed[i])) << " at position " << i << std::endl;
-        if (!std::isnan(ref[i])) {
-            EXPECT_EQ(ref[i], observed[i]) << " at position " << i << std::endl;
-        }
+inline void expect_almost_equal(const std::vector<double>& ref, const std::vector<double>& observed) {
+    const auto n = ref.size();
+    ASSERT_EQ(n, observed.size());
+    for (std::size_t i = 0; i < n; ++i) {
+        EXPECT_FLOAT_EQ(ref[i], observed[i]) << " at position " << i << std::endl;
     }
 }
 

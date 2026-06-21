@@ -7,17 +7,10 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-  tatami_stats
-  GIT_REPOSITORY https://github.com/tatami-inc/tatami_stats
-  GIT_TAG master # ^v2.0.0
-)
-
-FetchContent_Declare(
   sanisizer
   GIT_REPOSITORY https://github.com/LTLA/sanisizer
   GIT_TAG master # ^v0.1.0
 )
 
 FetchContent_MakeAvailable(tatami)
-FetchContent_MakeAvailable(tatami_stats)
 FetchContent_MakeAvailable(sanisizer)

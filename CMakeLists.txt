@@ -15,11 +15,10 @@ if(TATAMI_MULT_FETCH_EXTERN)
     add_subdirectory(extern)
 else()
     find_package(tatami_tatami 4.0.0 CONFIG REQUIRED)
-    find_package(tatami_tatami_stats 2.0.1 CONFIG REQUIRED)
     find_package(ltla_sanisizer 0.1.0 CONFIG REQUIRED)
 endif()
 
-target_link_libraries(tatami_mult INTERFACE tatami::tatami tatami::tatami_stats ltla::sanisizer)
+target_link_libraries(tatami_mult INTERFACE tatami::tatami ltla::sanisizer)
 
 include(GNUInstallDirs)
 target_include_directories(tatami_mult INTERFACE 
