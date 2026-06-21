@@ -67,15 +67,15 @@ template<typename Value_, typename Index_, typename Right_, typename Output_>
 void multiply(const tatami::Matrix<Value_, Index_>& left, const Right_* right, Output_* output, const Options& opt) {
     if (left.sparse()) {
         if (left.prefer_rows()) {
-            internal::sparse_row_vector(left, right, output, opt.num_threads);
+            sparse_row_vector(left, right, output, opt.num_threads);
         } else {
-            internal::sparse_column_vector(left, right, output, opt.num_threads);
+            sparse_column_vector(left, right, output, opt.num_threads);
         }
     } else {
         if (left.prefer_rows()) {
-            internal::dense_row_vector(left, right, output, opt.num_threads);
+            dense_row_vector(left, right, output, opt.num_threads);
         } else {
-            internal::dense_column_vector(left, right, output, opt.num_threads);
+            dense_column_vector(left, right, output, opt.num_threads);
         }
     }
 }
@@ -100,15 +100,15 @@ void multiply(const Left_* left, const tatami::Matrix<Value_, Index_>& right, Ou
     auto tright = tatami::make_DelayedTranspose(tatami::wrap_shared_ptr(&right));
     if (tright->sparse()) {
         if (tright->prefer_rows()) {
-            internal::sparse_row_vector(*tright, left, output, opt.num_threads);
+            sparse_row_vector(*tright, left, output, opt.num_threads);
         } else {
-            internal::sparse_column_vector(*tright, left, output, opt.num_threads);
+            sparse_column_vector(*tright, left, output, opt.num_threads);
         }
     } else {
         if (tright->prefer_rows()) {
-            internal::dense_row_vector(*tright, left, output, opt.num_threads);
+            dense_row_vector(*tright, left, output, opt.num_threads);
         } else {
-            internal::dense_column_vector(*tright, left, output, opt.num_threads);
+            dense_column_vector(*tright, left, output, opt.num_threads);
         }
     }
 }
@@ -132,15 +132,15 @@ template<typename Value_, typename Index_, typename Right_, typename Output_>
 void multiply(const tatami::Matrix<Value_, Index_>& left, const std::vector<Right_*>& right, const std::vector<Output_*>& output, const Options& opt) {
     if (left.sparse()) {
         if (left.prefer_rows()) {
-            internal::sparse_row_vectors(left, right, output, opt.num_threads);
+            sparse_row_vectors(left, right, output, opt.num_threads);
         } else {
-            internal::sparse_column_vectors(left, right, output, opt.num_threads);
+            sparse_column_vectors(left, right, output, opt.num_threads);
         }
     } else {
         if (left.prefer_rows()) {
-            internal::dense_row_vectors(left, right, output, opt.num_threads);
+            dense_row_vectors(left, right, output, opt.num_threads);
         } else {
-            internal::dense_column_vectors(left, right, output, opt.num_threads);
+            dense_column_vectors(left, right, output, opt.num_threads);
         }
     }
 }
@@ -165,15 +165,15 @@ void multiply(const std::vector<Left_*>& left, const tatami::Matrix<Value_, Inde
     auto tright = tatami::make_DelayedTranspose(tatami::wrap_shared_ptr(&right));
     if (tright->sparse()) {
         if (tright->prefer_rows()) {
-            internal::sparse_row_vectors(*tright, left, output, opt.num_threads);
+            sparse_row_vectors(*tright, left, output, opt.num_threads);
         } else {
-            internal::sparse_column_vectors(*tright, left, output, opt.num_threads);
+            sparse_column_vectors(*tright, left, output, opt.num_threads);
         }
     } else {
         if (tright->prefer_rows()) {
-            internal::dense_row_vectors(*tright, left, output, opt.num_threads);
+            dense_row_vectors(*tright, left, output, opt.num_threads);
         } else {
-            internal::dense_column_vectors(*tright, left, output, opt.num_threads);
+            dense_column_vectors(*tright, left, output, opt.num_threads);
         }
     }
 }
@@ -181,10 +181,8 @@ void multiply(const std::vector<Left_*>& left, const tatami::Matrix<Value_, Inde
 /**
  * @cond
  */
-namespace internal {
-
 template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
-void multiply(const tatami::Matrix<LeftValue_, LeftIndex_>& left, const tatami::Matrix<RightValue_, RightIndex_>& right, Output_* output, bool column_major_out, int num_threads) {
+void multiply_internal(const tatami::Matrix<LeftValue_, LeftIndex_>& left, const tatami::Matrix<RightValue_, RightIndex_>& right, Output_* output, bool column_major_out, int num_threads) {
     RightIndex_ row_shift;
     LeftIndex_ col_shift;
     if (column_major_out) {
@@ -198,34 +196,32 @@ void multiply(const tatami::Matrix<LeftValue_, LeftIndex_>& left, const tatami::
     if (left.sparse()) {
         if (left.prefer_rows()) {
             if (right.sparse()) {
-                internal::sparse_row_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                sparse_row_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
             } else {
-                internal::sparse_row_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                sparse_row_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
             }
         } else {
             if (right.sparse()) {
-                internal::sparse_column_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                sparse_column_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
             } else {
-                internal::sparse_column_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                sparse_column_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
             }
         }
     } else {
         if (left.prefer_rows()) {
             if (right.sparse()) {
-                internal::dense_row_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                dense_row_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
             } else {
-                internal::dense_row_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                dense_row_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
             }
         } else {
             if (right.sparse()) {
-                internal::dense_column_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                dense_column_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
             } else {
-                internal::dense_column_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                dense_column_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
             }
         }
     }
-}
-
 }
 /**
  * @endcond
@@ -253,12 +249,12 @@ void multiply(const tatami::Matrix<LeftValue_, LeftIndex_>& left, const tatami::
         if (sanisizer::is_less_than(left.nrow(), right.ncol())) {
             auto tright = tatami::make_DelayedTranspose(tatami::wrap_shared_ptr(&right));
             auto tleft = tatami::make_DelayedTranspose(tatami::wrap_shared_ptr(&left));
-            internal::multiply(*tright, *tleft, output, !opt.column_major_output, opt.num_threads);
+            multiply_internal(*tright, *tleft, output, !opt.column_major_output, opt.num_threads);
             return;
         }
     }
 
-    internal::multiply(left, right, output, opt.column_major_output, opt.num_threads);
+    multiply_internal(left, right, output, opt.column_major_output, opt.num_threads);
 }
 
 }

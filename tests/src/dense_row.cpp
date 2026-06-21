@@ -44,7 +44,7 @@ TEST_F(DenseRowTest, Vector) {
 
     for (int thread = 1; thread < 4; thread +=2) {
         std::vector<double> output(NR);
-        tatami_mult::internal::dense_row_vector(*dense, rhs.data(), output.data(), thread);
+        tatami_mult::dense_row_vector(*dense, rhs.data(), output.data(), thread);
         EXPECT_EQ(output, ref);
     }
 }
@@ -62,13 +62,13 @@ TEST_F(DenseRowTest, Vectors) {
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::dense_row_vector(*dense, rhs[0], ref.data(), 1);
-    tatami_mult::internal::dense_row_vector(*dense, rhs[1], ref.data() + NR, 1);
+    tatami_mult::dense_row_vector(*dense, rhs[0], ref.data(), 1);
+    tatami_mult::dense_row_vector(*dense, rhs[1], ref.data() + NR, 1);
 
     for (int thread = 1; thread < 4; thread +=2) {
         std::vector<double> output(NR * 2);
         std::vector<double*> out_ptrs{ output.data(), output.data() + NR };
-        tatami_mult::internal::dense_row_vectors(*dense, rhs, out_ptrs, thread);
+        tatami_mult::dense_row_vectors(*dense, rhs, out_ptrs, thread);
         EXPECT_EQ(output, ref);
     }
 }
@@ -88,15 +88,15 @@ TEST_F(DenseRowTest, TatamiDense) {
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
     std::vector<double*> ref_ptrs{ ref.data(), ref.data() + NR };
-    tatami_mult::internal::dense_row_vectors(*dense, rhs_ptrs, ref_ptrs, 1);
+    tatami_mult::dense_row_vectors(*dense, rhs_ptrs, ref_ptrs, 1);
 
     for (int thread = 1; thread < 4; thread += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::dense_row_tatami_dense(*dense, *rhs_dense, output.data(), 1, NR, thread);
+        tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, output.data(), 1, NR, thread);
         EXPECT_EQ(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::internal::dense_row_tatami_dense(*dense, *rhs_dense, toutput.data(), 2, 1, thread);
+        tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, toutput.data(), 2, 1, thread);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
         EXPECT_EQ(output, ref);
@@ -121,15 +121,15 @@ TEST_F(DenseRowTest, TatamiSparse) {
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::dense_row_tatami_dense(*dense, *rhs_dense, ref.data(), 1, NR, 1);
+    tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, ref.data(), 1, NR, 1);
 
     for (int thread = 1; thread < 4; thread += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::dense_row_tatami_sparse(*dense, *rhs_sparse, output.data(), 1, NR, thread);
+        tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, output.data(), 1, NR, thread);
         EXPECT_EQ(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::internal::dense_row_tatami_sparse(*dense, *rhs_sparse, toutput.data(), 2, 1, thread);
+        tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, toutput.data(), 2, 1, thread);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
         EXPECT_EQ(output, ref);
@@ -185,11 +185,11 @@ TEST_F(DenseRowTest, TatamiSparse) {
 //
 //    // Doing a reference calculation.
 //    std::vector<double> ref(NR * 6);
-//    tatami_mult::internal::dense_row_tatami_dense(*dense2, *rhs_dense, ref.data(), 1, NR, 1);
+//    tatami_mult::dense_row_tatami_dense(*dense2, *rhs_dense, ref.data(), 1, NR, 1);
 //
 //    for (int thread = 1; thread < 4; thread += 2) {
 //        std::vector<double> output(NR * 6);
-//        tatami_mult::internal::dense_row_tatami_sparse(*dense2, *rhs_sparse, output.data(), 1, NR, thread);
+//        tatami_mult::dense_row_tatami_sparse(*dense2, *rhs_sparse, output.data(), 1, NR, thread);
 //        expect_equal_with_nan(ref, output);
 //    }
 //}
@@ -224,11 +224,11 @@ TEST_F(DenseRowTest, TatamiSparse) {
 //    }
 //
 //    std::vector<double> ref(NR * 2);
-//    tatami_mult::internal::dense_row_tatami_sparse(*idense, *rhs_sparse, ref.data(), 1, NR, 1);
+//    tatami_mult::dense_row_tatami_sparse(*idense, *rhs_sparse, ref.data(), 1, NR, 1);
 //
 //    for (int thread = 1; thread < 4; thread += 2) {
 //        std::vector<double> output(NR * 2);
-//        tatami_mult::internal::dense_row_tatami_sparse(*idense2, *rhs_sparse, output.data(), 1, NR, thread);
+//        tatami_mult::dense_row_tatami_sparse(*idense2, *rhs_sparse, output.data(), 1, NR, thread);
 //        EXPECT_EQ(ref, output);
 //    }
 //}

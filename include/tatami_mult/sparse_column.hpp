@@ -12,8 +12,6 @@
 
 namespace tatami_mult {
 
-namespace internal {
-
 template<typename Value_, typename Index_, typename Right_, typename Output_>
 void sparse_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right_* rhs, Output_* output, int num_threads) {
     const Index_ NR = matrix.nrow();
@@ -290,8 +288,6 @@ void sparse_column_tatami_sparse(
             }
         }
     }
-}
-
 }
 
 }

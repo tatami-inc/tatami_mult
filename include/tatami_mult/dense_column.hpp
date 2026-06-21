@@ -15,12 +15,10 @@
 
 namespace tatami_mult {
 
-namespace internal {
-
 template<typename Value_, typename Index_, typename Right_, typename Output_>
 void dense_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right_* rhs, Output_* output, int num_threads) {
-    Index_ NR = matrix.nrow();
-    Index_ NC = matrix.ncol();
+    const Index_ NR = matrix.nrow();
+    const Index_ NC = matrix.ncol();
 
     std::optional<std::vector<std::optional<std::vector<Output_> > > > tmp_results;
     const bool do_parallel = num_threads > 1;
@@ -289,8 +287,6 @@ void dense_column_tatami_sparse(
             }
         }
     }
-}
-
 }
 
 }

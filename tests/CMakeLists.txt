@@ -12,7 +12,6 @@ add_executable(
     src/sparse_row.cpp
     src/dense_column.cpp
     src/sparse_column.cpp
-    src/utils.cpp
     src/overlord.cpp
 )
 

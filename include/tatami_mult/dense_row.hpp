@@ -13,8 +13,6 @@
 
 namespace tatami_mult {
 
-namespace internal {
-
 template<typename Value_, typename Index_, typename Right_, typename Output_>
 void dense_row_vector(const tatami::Matrix<Value_, Index_>& matrix, const Right_* rhs, Output_* output, int num_threads) {
     Index_ NR = matrix.nrow();
@@ -103,37 +101,23 @@ void dense_row_tatami_sparse(
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<RightValue_> >(NC);
         auto ibuffer = tatami::create_container_of_Index_size<std::vector<RightIndex_> >(NC);
 
-        constexpr bool supports_specials = supports_special_values<Value_>();
-        typename std::conditional<supports_specials, std::vector<Index_>, bool>::type specials;
-
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto ptr = ext->fetch(buffer.data());
             auto rext = tatami::consecutive_extractor<true>(&rhs, false, static_cast<RightIndex_>(0), rhs_col);
             auto start_offset = sanisizer::product_unsafe<std::size_t>(r, row_shift); // offsets must fit in size_t if output is correctly sized.
 
-            if constexpr(supports_specials) {
-                specials.clear();
-                fill_special_index(NC, ptr, specials);
-            }
-
             for (RightIndex_ j = 0; j < rhs_col; ++j) {
                 auto range = rext->fetch(vbuffer.data(), ibuffer.data());
                 auto cur_offset = start_offset + sanisizer::product_unsafe<std::size_t>(j, col_shift);
-
-                if constexpr(supports_specials) {
-                    if (specials.size()) {
-                        output[cur_offset] = special_dense_sparse_multiply<Output_>(specials, ptr, range);
-                        continue;
-                    }
+                Output_ out = 0;
+                for (Index_ k = 0; k < range.number; ++k) {
+                    out += range.value[k] * ptr[range.index[k]];
                 }
-
-                output[cur_offset] = dense_sparse_multiply<Output_>(ptr, range);
+                output[cur_offset] = out;
             }
         }
 
     }, NR, num_threads);
-}
-
 }
 
 }

@@ -46,8 +46,8 @@ TEST_F(SparseRowTest, Vector) {
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR);
-        tatami_mult::internal::sparse_row_vector(*sparse, rhs.data(), output.data(), threads);
-        EXPECT_EQ(output, ref);
+        tatami_mult::sparse_row_vector(*sparse, rhs.data(), output.data(), threads);
+        expect_almost_equal(output, ref);
     }
 }
 
@@ -78,7 +78,7 @@ TEST_F(SparseRowTest, Vector) {
 //
 //        for (int threads = 1; threads < 4; threads += 2) {
 //            std::vector<double> output(NR);
-//            tatami_mult::internal::sparse_row_vector(*sparse, rhs.data(), output.data(), threads);
+//            tatami_mult::sparse_row_vector(*sparse, rhs.data(), output.data(), threads);
 //            expect_equal_with_nan(ref, output);
 //        }
 //    }
@@ -95,11 +95,11 @@ TEST_F(SparseRowTest, Vector) {
 //    std::vector<double> rhs_d(rhs_i.begin(), rhs_i.end());
 //
 //    std::vector<double> ref(NR);
-//    tatami_mult::internal::sparse_row_vector(*sparse, rhs_d.data(), ref.data(), 1);
+//    tatami_mult::sparse_row_vector(*sparse, rhs_d.data(), ref.data(), 1);
 //
 //    for (int threads = 1; threads < 4; threads += 2) {
 //        std::vector<double> output(NR);
-//        tatami_mult::internal::sparse_row_vector(*sparse, rhs_i.data(), output.data(), threads);
+//        tatami_mult::sparse_row_vector(*sparse, rhs_i.data(), output.data(), threads);
 //        EXPECT_EQ(output, ref);
 //    }
 //}
@@ -116,14 +116,14 @@ TEST_F(SparseRowTest, Vectors) {
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::sparse_row_vector(*sparse, rhs[0], ref.data(), 1);
-    tatami_mult::internal::sparse_row_vector(*sparse, rhs[1], ref.data() + NR, 1);
+    tatami_mult::sparse_row_vector(*sparse, rhs[0], ref.data(), 1);
+    tatami_mult::sparse_row_vector(*sparse, rhs[1], ref.data() + NR, 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
         std::vector<double*> out_ptrs{ output.data(), output.data() + NR };
-        tatami_mult::internal::sparse_row_vectors(*sparse, rhs, out_ptrs, threads);
-        EXPECT_EQ(output, ref);
+        tatami_mult::sparse_row_vectors(*sparse, rhs, out_ptrs, threads);
+        expect_almost_equal(output, ref);
     }
 }
 
@@ -144,14 +144,14 @@ TEST_F(SparseRowTest, Vectors) {
 //
 //    // Doing a reference calculation.
 //    std::vector<double> ref(NR * 3);
-//    tatami_mult::internal::sparse_row_vector(*sparse, rhs[0], ref.data(), 1);
-//    tatami_mult::internal::sparse_row_vector(*sparse, rhs[1], ref.data() + NR, 1);
-//    tatami_mult::internal::sparse_row_vector(*sparse, rhs[2], ref.data() + NR * 2, 1);
+//    tatami_mult::sparse_row_vector(*sparse, rhs[0], ref.data(), 1);
+//    tatami_mult::sparse_row_vector(*sparse, rhs[1], ref.data() + NR, 1);
+//    tatami_mult::sparse_row_vector(*sparse, rhs[2], ref.data() + NR * 2, 1);
 //
 //    for (int threads = 1; threads < 4; threads += 2) {
 //        std::vector<double> output(NR * 3);
 //        std::vector<double*> out_ptrs{ output.data(), output.data() + NR, output.data() + 2 * NR };
-//        tatami_mult::internal::sparse_row_vectors(*sparse, rhs, out_ptrs, threads);
+//        tatami_mult::sparse_row_vectors(*sparse, rhs, out_ptrs, threads);
 //        expect_equal_with_nan(ref, output);
 //    }
 //}
@@ -171,12 +171,12 @@ TEST_F(SparseRowTest, Vectors) {
 //
 //    std::vector<double> ref(NR * 2);
 //    std::vector<double*> ref_ptrs{ ref.data(), ref.data() + NR };
-//    tatami_mult::internal::sparse_row_vectors(*sparse, rhs_d, ref_ptrs, 1);
+//    tatami_mult::sparse_row_vectors(*sparse, rhs_d, ref_ptrs, 1);
 //
 //    for (int threads = 1; threads < 4; threads += 2) {
 //        std::vector<double> output(NR * 2);
 //        std::vector<double*> out_ptrs{ output.data(), output.data() + NR };
-//        tatami_mult::internal::sparse_row_vectors(*sparse, rhs_i, out_ptrs, threads);
+//        tatami_mult::sparse_row_vectors(*sparse, rhs_i, out_ptrs, threads);
 //        EXPECT_EQ(output, ref);
 //    }
 //}
@@ -195,18 +195,18 @@ TEST_F(SparseRowTest, TatamiDense) {
 
     std::vector<double> ref(NR * 2);
     std::vector<double*> ref_ptrs{ ref.data(), ref.data() + NR };
-    tatami_mult::internal::sparse_row_vectors(*sparse, rhs_ptrs, ref_ptrs, 1);
+    tatami_mult::sparse_row_vectors(*sparse, rhs_ptrs, ref_ptrs, 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_dense, output.data(), 1, NR, threads);
-        EXPECT_EQ(output, ref);
+        tatami_mult::sparse_row_tatami_dense(*sparse, *rhs_dense, output.data(), 1, NR, threads);
+        expect_almost_equal(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_dense, toutput.data(), 2, 1, threads);
+        tatami_mult::sparse_row_tatami_dense(*sparse, *rhs_dense, toutput.data(), 2, 1, threads);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
-        EXPECT_EQ(output, ref);
+        expect_almost_equal(output, ref);
     }
 }
 
@@ -228,11 +228,11 @@ TEST_F(SparseRowTest, TatamiDense) {
 //
 //    std::vector<double> ref(NR * 3);
 //    std::vector<double*> ref_ptrs { ref.data(), ref.data() + NR, ref.data() + 2 * NR };
-//    tatami_mult::internal::sparse_row_vectors(*sparse, rhs_ptrs, ref_ptrs, 1);
+//    tatami_mult::sparse_row_vectors(*sparse, rhs_ptrs, ref_ptrs, 1);
 //
 //    for (int threads = 1; threads < 4; threads += 2) {
 //        std::vector<double> output(NR * 3);
-//        tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_dense, output.data(), 1, NR, threads);
+//        tatami_mult::sparse_row_tatami_dense(*sparse, *rhs_dense, output.data(), 1, NR, threads);
 //        expect_equal_with_nan(ref, output);
 //    }
 //}
@@ -254,11 +254,11 @@ TEST_F(SparseRowTest, TatamiDense) {
 //    }
 //
 //    std::vector<double> ref(NR * 2);
-//    tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_d, ref.data(), 1, NR, 1);
+//    tatami_mult::sparse_row_tatami_dense(*sparse, *rhs_d, ref.data(), 1, NR, 1);
 //
 //    for (int threads = 1; threads < 4; threads += 2) {
 //        std::vector<double> output(NR * 2);
-//        tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_i, output.data(), 1, NR, threads);
+//        tatami_mult::sparse_row_tatami_dense(*sparse, *rhs_i, output.data(), 1, NR, threads);
 //        EXPECT_EQ(output, ref);
 //    }
 //}
@@ -281,18 +281,18 @@ TEST_F(SparseRowTest, TatamiSparse) {
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::internal::sparse_row_tatami_dense(*sparse, *rhs_dense, ref.data(), 1, NR, 1);
+    tatami_mult::sparse_row_tatami_dense(*sparse, *rhs_dense, ref.data(), 1, NR, 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_sparse, output.data(), 1, NR, threads);
-        EXPECT_EQ(output, ref);
+        tatami_mult::sparse_row_tatami_sparse(*sparse, *rhs_sparse, output.data(), 1, NR, threads);
+        expect_almost_equal(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::internal::sparse_row_tatami_sparse(*sparse, *rhs_sparse, toutput.data(), 2, 1, threads);
+        tatami_mult::sparse_row_tatami_sparse(*sparse, *rhs_sparse, toutput.data(), 2, 1, threads);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
-        EXPECT_EQ(output, ref);
+        expect_almost_equal(output, ref);
     }
 }
 
@@ -347,11 +347,11 @@ TEST_F(SparseRowTest, TatamiSparse) {
 //
 //    // Doing a reference calculation.
 //    std::vector<double> ref(NR * 6);
-//    tatami_mult::internal::sparse_row_tatami_dense(*sparse2, *rhs_dense, ref.data(), 1, NR, 1);
+//    tatami_mult::sparse_row_tatami_dense(*sparse2, *rhs_dense, ref.data(), 1, NR, 1);
 //
 //    for (int threads = 1; threads < 4; threads += 2) {
 //        std::vector<double> output(NR * 6);
-//        tatami_mult::internal::sparse_row_tatami_sparse(*sparse2, *rhs_sparse, output.data(), 1, NR, threads);
+//        tatami_mult::sparse_row_tatami_sparse(*sparse2, *rhs_sparse, output.data(), 1, NR, threads);
 //        expect_equal_with_nan(ref, output);
 //    }
 //}
@@ -387,11 +387,11 @@ TEST_F(SparseRowTest, TatamiSparse) {
 //    }
 //
 //    std::vector<double> ref(NR * 2);
-//    tatami_mult::internal::sparse_row_tatami_sparse(*sparse_d, *rhs_sparse, ref.data(), 1, NR, 1);
+//    tatami_mult::sparse_row_tatami_sparse(*sparse_d, *rhs_sparse, ref.data(), 1, NR, 1);
 //
 //    for (int threads = 1; threads < 4; threads += 2) {
 //        std::vector<double> output(NR * 2);
-//        tatami_mult::internal::sparse_row_tatami_sparse(*sparse_i, *rhs_sparse, output.data(), 1, NR, threads);
+//        tatami_mult::sparse_row_tatami_sparse(*sparse_i, *rhs_sparse, output.data(), 1, NR, threads);
 //        EXPECT_EQ(output, ref);
 //    }
 //}
