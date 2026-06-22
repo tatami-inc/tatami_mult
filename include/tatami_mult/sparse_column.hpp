@@ -61,69 +61,182 @@ void sparse_column_vector(const tatami::Matrix<Value_, Index_>& matrix, const Ri
     }
 }
 
-template<typename Value_, typename Index_, typename Right_, typename Output_>
-void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs, const std::vector<Output_*>& output, int num_threads) {
+template<typename Value_, typename Index_, typename Right_, typename GetOutput_>
+void sparse_column_dense_vectors_internal(
+    const Index_ start,
+    const Index_ length,
+    tatami::OracularSparseExtractor<Value_, Index_>& ext, 
+    std::vector<Value_>& vbuffer,
+    std::vector<Index_>& ibuffer,
+    const std::size_t num_rhs,
+    const bool rhs_columnar,
+    const std::vector<Right_*>& rhs_ptrs,
+    const bool output_columnar,
+    GetOutput_ get_output
+) {
+    for (Index_ c = 0; c < length; ++c) {
+        const auto range = ext.fetch(vbuffer.data(), ibuffer.data());
+
+        if (!rhs_columnar) {
+            const auto rptr = rhs_ptrs[start + c];
+            if (output_columnar) {
+                for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
+                    auto&& optr = get_output(j);
+                    const auto mult = rptr[j];
+                    for (Index_ x = 0; x < range.number; ++x) {
+                        optr[range.index[x]] += mult * range.value[x];
+                    }
+                }
+
+            } else {
+                for (Index_ x = 0; x < range.number; ++x) {
+                    auto&& optr = get_output(range.index[x]);
+                    const auto mult = range.value[x];
+                    for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
+                        optr[j] += mult * rptr[j];
+                    }
+                }
+            }
+
+        } else {
+            if (output_columnar) {
+                for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
+                    auto&& optr = get_output(j);
+                    const auto mult = rhs_ptrs[j][start + c];
+                    for (Index_ x = 0; x < range.number; ++x) {
+                        optr[range.index[x]] += mult * range.value[x]; 
+                    }
+                }
+
+            } else {
+                // TODO: This is pretty gross, lots of non-contiguous access in the hottest loop.
+                for (Index_ x = 0; x < range.number; ++x) {
+                    auto&& optr = get_output(range.index[x]);
+                    const auto mult = range.value[x];
+                    for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
+                        optr[j] += mult * rhs_ptrs[j][start + c];
+                    }
+                }
+            }
+        }
+    }
+}
+
+template<typename Value_, typename Index_, typename Right_, typename GetOutput_>
+void sparse_column_dense_vectors(
+    const tatami::Matrix<Value_, Index_>& matrix,
+    const std::size_t num_rhs,
+    const bool rhs_columnar,
+    const std::vector<Right_*>& rhs_ptrs,
+    const bool output_columnar,
+    GetOutput_ get_output,
+    const int num_threads
+) {
     const Index_ NR = matrix.nrow();
     const Index_ NC = matrix.ncol();
-    const auto num_rhs = rhs.size();
 
-    const bool do_parallel = num_threads > 1; 
+    typedef I<decltype(get_output(0)[0])> Output_;
+    if (output_columnar) {
+        for (std::size_t c = 0; c < num_rhs; ++c) {
+            std::fill_n(get_output(c), NR, 0);
+        }
+    } else {
+        for (Index_ r = 0; r < NR; ++r) {
+            std::fill_n(get_output(r), num_rhs, 0);
+        }
+    }
+
+    const bool do_parallel = num_threads > 1;
     std::optional<std::vector<std::optional<std::vector<std::vector<Output_> > > > > tmp_results;
     if (do_parallel) {
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(num_threads - 1));
     }
-    for (const auto out : output) {
-        std::fill_n(out, NR, 0);
-    }
 
     const auto num_used = tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
-        auto ext = tatami::consecutive_extractor<true>(&matrix, false, start, length);
+        auto ext = tatami::consecutive_extractor<true>(matrix, false, start, length);
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(NR);
         auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(NR);
 
-        Output_* const * out_super_ptr;
-        std::optional<std::vector<Output_*> > tmp_out_ptrs;
-        std::optional<std::vector<std::vector<Output_> > > tmp_out_vecs;
         if (!do_parallel || t == 0) {
-            out_super_ptr = output.data();
-        } else {
-            tmp_out_ptrs.emplace(sanisizer::cast<I<decltype(tmp_out_ptrs->size())> >(num_rhs));
-            tmp_out_vecs.emplace(sanisizer::cast<I<decltype(tmp_out_vecs->size())> >(num_rhs));
-            for (I<decltype(num_rhs)> r = 0; r < num_rhs; ++r) {
-                tatami::resize_container_to_Index_size((*tmp_out_vecs)[r], NR);
-                (*tmp_out_ptrs)[r] = (*tmp_out_vecs)[r].data();
-            }
-            out_super_ptr = tmp_out_ptrs->data();
+            sparse_column_dense_vectors_internal(
+                start,
+                length,
+                *ext,
+                vbuffer,
+                ibuffer,
+                num_rhs,
+                rhs_columnar,
+                rhs_ptrs,
+                output_columnar,
+                get_output
+            );
+            return;
         }
 
-        for (Index_ c = 0; c < length; ++c) {
-            const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
-                const Output_ mult = rhs[j][start + c];
-                const auto optr = out_super_ptr[j];
-                for (Index_ r = 0; r < range.number; ++r) {
-                    optr[range.index[r]] += mult * range.value[r];
-                }
+        auto tmp_out = sanisizer::create<std::vector<std::vector<Output_> > >(output_columnar ? num_rhs : NR);
+        if (output_columnar) {
+            for (I<decltype(num_rhs)> c = 0; c < num_rhs; ++c) {
+                tatami::resize_container_to_Index_size(tmp_out[c], NR);
+            }
+        } else {
+            for (I<decltype(NR)> r = 0; r < NR; ++r) {
+                tatami::resize_container_to_Index_size(tmp_out[r], num_rhs);
             }
         }
+
+        sparse_column_dense_vectors_internal(
+            start,
+            length,
+            *ext,
+            vbuffer,
+            ibuffer,
+            num_rhs,
+            rhs_columnar,
+            rhs_ptrs,
+            output_columnar,
+            [&](const std::size_t r) -> std::vector<Output_>& { return tmp_out[r]; }
+        );
 
         if (do_parallel && t > 0) {
-            (*tmp_results)[t - 1] = std::move(tmp_out_vecs);
+            (*tmp_results)[t - 1] = std::move(tmp_out);
         }
     }, NC, num_threads);
 
     if (do_parallel) {
         for (int u = 1; u < num_used; ++u) {
             const auto& tmp = *((*tmp_results)[u - 1]);
-            for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
-                const auto tmpvec = tmp[j];
-                const auto outptr = output[j];
+            if (output_columnar) {
+                for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
+                    const auto tmpvec = tmp[j];
+                    const auto outptr = get_output(j);
+                    for (Index_ r = 0; r < NR; ++r) {
+                        outptr[r] += tmpvec[r];
+                    }
+                }
+            } else {
                 for (Index_ r = 0; r < NR; ++r) {
-                    outptr[r] += tmpvec[r];
+                    const auto tmpvec = tmp[r];
+                    const auto outptr = get_output(r);
+                    for (I<decltype(num_rhs)> j = 0; j < num_rhs; ++j) {
+                        outptr[j] += tmpvec[j];
+                    }
                 }
             }
         }
     }
+}
+
+template<typename Value_, typename Index_, typename Right_, typename Output_>
+void sparse_column_vectors(const tatami::Matrix<Value_, Index_>& matrix, const std::vector<Right_*>& rhs_ptrs, const std::vector<Output_*>& output, int num_threads) {
+    sparse_column_dense_vectors(
+        matrix,
+        rhs_ptrs.size(),
+        true,
+        rhs_ptrs,
+        true,
+        [&](const std::size_t r) -> Output_* { return output[r]; },
+        num_threads
+    );
 }
 
 template<typename Value_, typename Index_, typename RightValue_, typename RightIndex_, typename Output_>
@@ -135,76 +248,62 @@ void sparse_column_tatami_dense(
     Index_ col_shift,
     int num_threads
 ) {
-    const Index_ NR = matrix.nrow();
-    const Index_ NC = matrix.ncol();
-    const RightIndex_ rhs_col = rhs.ncol();
-
-    const bool do_parallel = num_threads > 1; 
-    std::optional<std::vector<std::optional<std::vector<Output_> > > > tmp_results;
-    if (do_parallel) {
-        tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(num_threads - 1));
-    }
-
+    const bool output_columnar = (row_shift == 1);
     assert(row_shift == 1 || col_shift == 1);
-    const auto output_size = sanisizer::product_unsafe<std::size_t>(NR, rhs_col);
-    std::fill_n(output, output_size, 0);
+    const auto rhs_row = rhs.nrow();
+    const auto num_rhs = rhs.ncol();
 
-    const auto num_used = tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
-        auto ext = tatami::consecutive_extractor<true>(&matrix, false, start, length);
-        auto rext = tatami::consecutive_extractor<false>(&rhs, true, start, length);
+    // The general strategy here is to drag the (hopefully small-ish) RHS matrix into memory,
+    // avoiding the need to repeatedly use tatami to iterate over it. 
 
-        auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(NC);
-        auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(NC);
-        auto rbuffer = tatami::create_container_of_Index_size<std::vector<RightValue_> >(rhs_col);
+    if (rhs.prefer_rows() || !output_columnar) {
+        // For column-major RHS matrices, we forcibly extract rows if the output is not columnar.
+        // This avoids a suboptimal extraction within sparse_column_dense_vectors(), see the comments above.
+        // we consider a one-time suboptimal extraction to be cheaper than many suboptimal accesses for multiplication itself.
+        auto all_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(rhs_row);
+        auto all_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(rhs_row);
+        populate_dense_buffers(true, rhs_row, num_rhs, rhs, all_buffers, all_ptrs, num_threads);
 
-        Output_* out_ptr;
-        std::optional<std::vector<Output_> > cur_results;
-        if (!do_parallel || t == 0) {
-            out_ptr = output;            
-        } else {
-            cur_results.emplace(sanisizer::cast<I<decltype(cur_results->size())> >(output_size));
-            out_ptr = cur_results->data();
-        }
-
-        if (row_shift == 1) { // i.e., column-major output.
-            for (Index_ c = 0; c < length; ++c) {
-                auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-                auto rptr = rext->fetch(rbuffer.data());
-                for (RightIndex_ j = 0; j < rhs_col; ++j) {
-                    const auto out_col = out_ptr + sanisizer::product_unsafe<std::size_t>(j, NR);
-                    const Output_ mult = rptr[j];
-                    for (Index_ x = 0; x < range.number; ++x) {
-                        out_col[range.index[x]] += mult * range.value[x];
-                    }
-                }
-            }
+        if (output_columnar) {
+            const auto NR = matrix.nrow();
+            sparse_column_dense_vectors(
+                matrix,
+                num_rhs,
+                false,
+                all_ptrs,
+                true,
+                [&](const std::size_t c) -> Output_* { return output + sanisizer::product_unsafe<std::size_t>(c, NR); },
+                num_threads
+            );
 
         } else {
-            for (Index_ c = 0; c < length; ++c) {
-                auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-                auto rptr = rext->fetch(rbuffer.data());
-                for (Index_ x = 0; x < range.number; ++x) {
-                    const auto out_row = out_ptr + sanisizer::product_unsafe<std::size_t>(range.index[x], rhs_col);
-                    const Output_ mult = range.value[x];
-                    for (RightIndex_ j = 0; j < rhs_col; ++j) {
-                        out_row[j] += mult * rptr[j];
-                    }
-                }
-            }
+            sparse_column_dense_vectors(
+                matrix,
+                num_rhs,
+                false,
+                all_ptrs,
+                false,
+                [&](const std::size_t r) -> Output_* { return output + sanisizer::product_unsafe<std::size_t>(r, num_rhs); },
+                num_threads
+            );
         }
 
-        if (do_parallel && t > 0) {
-            (*tmp_results)[t - 1] = std::move(cur_results);
-        }
-    }, NC, num_threads);
+    } else {
+        auto all_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(num_rhs);
+        auto all_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(num_rhs);
+        populate_dense_buffers(false, num_rhs, rhs_row, rhs, all_buffers, all_ptrs, num_threads);
 
-    if (do_parallel) {
-        for (int u = 1; u < num_used; ++u) {
-            const auto& tmp = *((*tmp_results)[u - 1]);
-            for (I<decltype(output_size)> x = 0; x < output_size; ++x) {
-                output[x] += tmp[x];
-            }
-        }
+        assert(output_columnar);
+        const auto NR = matrix.nrow();
+        sparse_column_dense_vectors(
+            matrix,
+            num_rhs,
+            true,
+            all_ptrs,
+            true,
+            [&](const std::size_t c) -> Output_* { return output + sanisizer::product_unsafe<std::size_t>(c, NR); },
+            num_threads
+        );
     }
 }
 
@@ -215,11 +314,26 @@ void sparse_column_tatami_sparse(
     Output_* output,
     RightIndex_ row_shift,
     Index_ col_shift,
-    int num_threads)
-{
+    int num_threads
+) {
+    const bool output_columnar = (row_shift == 1);
+    assert(row_shift == 1 || col_shift == 1);
     const Index_ NR = matrix.nrow();
     const Index_ NC = matrix.ncol();
-    const RightIndex_ rhs_col = rhs.ncol();
+    assert(sanisizer::is_equal(NC, rhs.nrow()));
+    const auto num_rhs = rhs.ncol();
+
+    // The general strategy here is to drag the (hopefully small-ish) RHS matrix into memory,
+    // avoiding the need to repeatedly use tatami to iterate over it. 
+    // We must have a row-major layout for this to work, we can't rely on blocking for a sparse RHS.
+
+    auto all_vbuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(NC);
+    auto all_ibuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightIndex_> > >(NC);
+    auto all_ranges = tatami::create_container_of_Index_size<std::vector<tatami::SparseRange<RightValue_, RightIndex_> > >(NC);
+    populate_sparse_buffers(true, NC, num_rhs, rhs, all_vbuffers, all_ibuffers, all_ranges, num_threads);
+
+    const auto full_size_output = sanisizer::product_unsafe<std::size_t>(NR, num_rhs);
+    std::fill_n(output, full_size_output, 0);
 
     const bool do_parallel = num_threads > 1; 
     std::optional<std::vector<std::optional<std::vector<Output_> > > > tmp_results;
@@ -227,63 +341,53 @@ void sparse_column_tatami_sparse(
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(num_threads - 1));
     }
 
-    assert(row_shift == 1 || col_shift == 1);
-    const auto output_size = sanisizer::product_unsafe<std::size_t>(NR, rhs_col);
-    std::fill_n(output, output_size, 0);
-
     const auto num_used = tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
-        auto ext = tatami::consecutive_extractor<true>(&matrix, false, static_cast<Index_>(0), NC, start, length);
-        auto rext = tatami::consecutive_extractor<true>(&rhs, true, static_cast<RightIndex_>(0), static_cast<RightIndex_>(NC)); // remember, NC == rhs.nrow().
+        auto ext = tatami::consecutive_extractor<true>(matrix, false, start, length);
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(NR);
         auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(NR);
-        auto rvbuffer = tatami::create_container_of_Index_size<std::vector<RightValue_> >(rhs_col);
-        auto ribuffer = tatami::create_container_of_Index_size<std::vector<RightIndex_> >(rhs_col);
 
-        Output_* out_ptr;
-        std::optional<std::vector<Output_> > cur_results;
-        if (!do_parallel || t == 0) {
-            out_ptr = output;            
+        Output_* optr;
+        std::optional<std::vector<Output_> > tmp_out;
+        if (do_parallel && t != 0) {
+            // If a full size array was allocated in 'output', we should be able to allocate a vector... hopefully.
+            tmp_out.emplace(sanisizer::cast<typename std::vector<std::vector<Output_> >::size_type>(full_size_output));
+            optr = tmp_out->data();
         } else {
-            cur_results.emplace(sanisizer::cast<I<decltype(cur_results->size())> >(output_size));
-            out_ptr = cur_results->data();
+            optr = output;
         }
 
-        if (row_shift == 1) { // i.e., column-major output.
-            for (Index_ c = 0; c < NC; ++c) {
-                auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-                auto rhs_range = rext->fetch(rvbuffer.data(), ribuffer.data());
-                for (RightIndex_ rhs_k = 0; rhs_k < rhs_range.number; ++rhs_k) {
-                    const auto out_col = out_ptr + sanisizer::product_unsafe<std::size_t>(rhs_range.index[rhs_k], NR);
-                    const Output_ mult = rhs_range.value[rhs_k];
-                    for (Index_ k = 0; k < range.number; ++k) {
-                        out_col[range.index[k]] += mult * range.value[k];
+        for (Index_ c = 0; c < length; ++c) {
+            const auto mat_range = ext->fetch(vbuffer.data(), ibuffer.data());
+            const auto& rhs_range = all_ranges[start + c];
+
+            if (output_columnar) {
+                for (I<decltype(rhs_range.number)> k = 0; k < rhs_range.number; ++k) {
+                    const auto outcol = rhs_range.index[k];
+                    const auto mult = rhs_range.value[k];
+                    for (Index_ l = 0; l < mat_range.number; ++l) {
+                        optr[sanisizer::nd_offset<std::size_t>(mat_range.index[l], NR, outcol)] += mult * mat_range.value[l];
                     }
                 }
-            }
-
-        } else {
-            for (Index_ c = 0; c < NC; ++c) {
-                auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-                auto rhs_range = rext->fetch(rvbuffer.data(), ribuffer.data());
-                for (Index_ k = 0; k < range.number; ++k) {
-                    const auto out_row = out_ptr + sanisizer::product_unsafe<std::size_t>(range.index[k], rhs_col);
-                    const Output_ mult = range.value[k];
-                    for (RightIndex_ rhs_k = 0; rhs_k < rhs_range.number; ++rhs_k) {
-                        out_row[rhs_range.index[rhs_k]] += mult * rhs_range.value[rhs_k];
+            } else {
+                for (Index_ l = 0; l < mat_range.number; ++l) {
+                    const auto outrow = mat_range.index[l];
+                    const auto mult = mat_range.value[l];
+                    for (I<decltype(rhs_range.number)> k = 0; k < rhs_range.number; ++k) {
+                        optr[sanisizer::nd_offset<std::size_t>(rhs_range.index[k], num_rhs, outrow)] += mult * rhs_range.value[k];
                     }
                 }
             }
         }
 
         if (do_parallel && t > 0) {
-            (*tmp_results)[t - 1] = std::move(cur_results);
+            (*tmp_results)[t - 1] = std::move(tmp_out);
         }
-    }, NR, num_threads);
+    }, NC, num_threads);
 
     if (do_parallel) {
         for (int u = 1; u < num_used; ++u) {
             const auto& tmp = *((*tmp_results)[u - 1]);
-            for (I<decltype(output_size)> x = 0; x < output_size; ++x) {
+            for (std::size_t x = 0; x < full_size_output; ++x) {
                 output[x] += tmp[x];
             }
         }

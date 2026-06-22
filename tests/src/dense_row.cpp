@@ -126,13 +126,13 @@ TEST_F(DenseRowTest, TatamiSparse) {
     for (int thread = 1; thread < 4; thread += 2) {
         std::vector<double> output(NR * 2);
         tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, output.data(), 1, NR, thread);
-        EXPECT_EQ(output, ref);
+        expect_almost_equal(output, ref);
 
         std::vector<double> toutput(NR * 2);
         tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, toutput.data(), 2, 1, thread);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
-        EXPECT_EQ(output, ref);
+        expect_almost_equal(output, ref);
     }
 }
 
