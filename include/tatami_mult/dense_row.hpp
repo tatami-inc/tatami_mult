@@ -112,12 +112,10 @@ template<typename Value_, typename Index_, typename RightValue_, typename RightI
 void dense_row_tatami_dense(
     const tatami::Matrix<Value_, Index_>& matrix,
     const tatami::Matrix<RightValue_, RightIndex_>& rhs,
+    const bool output_columnar,
     Output_* output,
-    RightIndex_ row_shift,
-    Index_ col_shift,
     int num_threads
 ) {
-    assert(row_shift == 1 || col_shift == 1);
     const auto rhs_row = rhs.nrow();
     const auto num_rhs = rhs.ncol();
 
@@ -129,7 +127,7 @@ void dense_row_tatami_dense(
         auto all_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(rhs_row);
         populate_dense_buffers(true, rhs_row, num_rhs, rhs, all_buffers, all_ptrs, num_threads);
 
-        if (row_shift == 1) { // i.e., output is columnar.
+        if (output_columnar) {
             const auto NR = matrix.nrow();
             dense_row_dense_vectors(
                 matrix,
@@ -158,7 +156,7 @@ void dense_row_tatami_dense(
         auto all_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(num_rhs);
         populate_dense_buffers(false, num_rhs, rhs_row, rhs, all_buffers, all_ptrs, num_threads);
 
-        if (row_shift == 1) { // i.e., output is columnar.
+        if (output_columnar) {
             const auto NR = matrix.nrow();
             dense_row_dense_vectors(
                 matrix,
@@ -187,13 +185,10 @@ template<typename Value_, typename Index_, typename RightValue_, typename RightI
 void dense_row_tatami_sparse(
     const tatami::Matrix<Value_, Index_>& matrix,
     const tatami::Matrix<RightValue_, RightIndex_>& rhs,
+    const bool output_columnar,
     Output_* output,
-    RightIndex_ row_shift,
-    Index_ col_shift,
     int num_threads
 ) {
-    const bool output_columnar = (row_shift == 1);
-    assert(row_shift == 1 || col_shift == 1);
     const Index_ NR = matrix.nrow();
     const Index_ NC = matrix.ncol();
     assert(sanisizer::is_equal(NC, rhs.nrow()));

@@ -92,11 +92,11 @@ TEST_F(DenseRowTest, TatamiDense) {
 
     for (int thread = 1; thread < 4; thread += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, output.data(), 1, NR, thread);
+        tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, true, output.data(), thread);
         EXPECT_EQ(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, toutput.data(), 2, 1, thread);
+        tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, false, toutput.data(), thread);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
         EXPECT_EQ(output, ref);
@@ -121,15 +121,15 @@ TEST_F(DenseRowTest, TatamiSparse) {
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, ref.data(), 1, NR, 1);
+    tatami_mult::dense_row_tatami_dense(*dense, *rhs_dense, true, ref.data(), 1);
 
     for (int thread = 1; thread < 4; thread += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, output.data(), 1, NR, thread);
+        tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, true, output.data(), thread);
         expect_almost_equal(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, toutput.data(), 2, 1, thread);
+        tatami_mult::dense_row_tatami_sparse(*dense, *rhs_sparse, false, toutput.data(), thread);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
         expect_almost_equal(output, ref);

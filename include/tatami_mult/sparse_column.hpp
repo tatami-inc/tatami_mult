@@ -243,13 +243,10 @@ template<typename Value_, typename Index_, typename RightValue_, typename RightI
 void sparse_column_tatami_dense(
     const tatami::Matrix<Value_, Index_>& matrix,
     const tatami::Matrix<RightValue_, RightIndex_>& rhs,
-    Output_* output,
-    RightIndex_ row_shift,
-    Index_ col_shift,
+    const bool output_columnar,
+    Output_* const output,
     int num_threads
 ) {
-    const bool output_columnar = (row_shift == 1);
-    assert(row_shift == 1 || col_shift == 1);
     const auto rhs_row = rhs.nrow();
     const auto num_rhs = rhs.ncol();
 
@@ -311,13 +308,10 @@ template<typename Value_, typename Index_, typename RightValue_, typename RightI
 void sparse_column_tatami_sparse(
     const tatami::Matrix<Value_, Index_>& matrix,
     const tatami::Matrix<RightValue_, RightIndex_>& rhs,
-    Output_* output,
-    RightIndex_ row_shift,
-    Index_ col_shift,
+    const bool output_columnar,
+    Output_* const output,
     int num_threads
 ) {
-    const bool output_columnar = (row_shift == 1);
-    assert(row_shift == 1 || col_shift == 1);
     const Index_ NR = matrix.nrow();
     const Index_ NC = matrix.ncol();
     assert(sanisizer::is_equal(NC, rhs.nrow()));

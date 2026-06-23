@@ -110,13 +110,10 @@ template<typename Value_, typename Index_, typename RightValue_, typename RightI
 void sparse_row_tatami_dense(
     const tatami::Matrix<Value_, Index_>& matrix,
     const tatami::Matrix<RightValue_, RightIndex_>& rhs,
-    Output_* output,
-    RightIndex_ row_shift,
-    Index_ col_shift,
+    const bool output_columnar,
+    Output_* const output,
     int num_threads
 ) {
-    const bool output_columnar = (row_shift == 1);
-    assert(row_shift == 1 || col_shift == 1);
     const auto rhs_row = rhs.nrow();
     const auto num_rhs = rhs.ncol();
 
@@ -175,14 +172,13 @@ template<typename Value_, typename Index_, typename RightValue_, typename RightI
 void sparse_row_tatami_sparse(
     const tatami::Matrix<Value_, Index_>& matrix,
     const tatami::Matrix<RightValue_, RightIndex_>& rhs,
-    Output_* output,
-    RightIndex_ row_shift,
-    Index_ col_shift,
+    const bool output_columnar,
+    Output_* const output,
     int num_threads
 ) {
     // We expand each sparse row into a dense format and then iterate over the sparse RHS columns.
     // So, the code is basically the same as that of the dense row-major matrices.
-    dense_row_tatami_sparse(matrix, rhs, output, row_shift, col_shift, num_threads);
+    dense_row_tatami_sparse(matrix, rhs, output_columnar, output, num_threads);
 }
 
 }

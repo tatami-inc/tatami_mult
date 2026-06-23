@@ -183,42 +183,32 @@ void multiply(const std::vector<Left_*>& left, const tatami::Matrix<Value_, Inde
  */
 template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
 void multiply_internal(const tatami::Matrix<LeftValue_, LeftIndex_>& left, const tatami::Matrix<RightValue_, RightIndex_>& right, Output_* output, bool column_major_out, int num_threads) {
-    RightIndex_ row_shift;
-    LeftIndex_ col_shift;
-    if (column_major_out) {
-        row_shift = 1;
-        col_shift = left.nrow();
-    } else {
-        row_shift = right.ncol();
-        col_shift = 1;
-    }
-
     if (left.sparse()) {
         if (left.prefer_rows()) {
             if (right.sparse()) {
-                sparse_row_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                sparse_row_tatami_sparse(left, right, column_major_out, output, num_threads);
             } else {
-                sparse_row_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                sparse_row_tatami_dense(left, right, column_major_out, output, num_threads);
             }
         } else {
             if (right.sparse()) {
-                sparse_column_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                sparse_column_tatami_sparse(left, right, column_major_out, output, num_threads);
             } else {
-                sparse_column_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                sparse_column_tatami_dense(left, right, column_major_out, output, num_threads);
             }
         }
     } else {
         if (left.prefer_rows()) {
             if (right.sparse()) {
-                dense_row_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                dense_row_tatami_sparse(left, right, column_major_out, output, num_threads);
             } else {
-                dense_row_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                dense_row_tatami_dense(left, right, column_major_out, output, num_threads);
             }
         } else {
             if (right.sparse()) {
-                dense_column_tatami_sparse(left, right, output, row_shift, col_shift, num_threads);
+                dense_column_tatami_sparse(left, right, column_major_out, output, num_threads);
             } else {
-                dense_column_tatami_dense(left, right, output, row_shift, col_shift, num_threads);
+                dense_column_tatami_dense(left, right, column_major_out, output, num_threads);
             }
         }
     }

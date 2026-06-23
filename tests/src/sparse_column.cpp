@@ -201,11 +201,11 @@ TEST_F(SparseColumnTest, TatamiDense) {
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::sparse_column_tatami_dense(*sparse, *rhs_dense, output.data(), 1, NR, threads);
+        tatami_mult::sparse_column_tatami_dense(*sparse, *rhs_dense, true, output.data(), threads);
         expect_almost_equal(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::sparse_column_tatami_dense(*sparse, *rhs_dense, toutput.data(), 2, 1, threads);
+        tatami_mult::sparse_column_tatami_dense(*sparse, *rhs_dense, false, toutput.data(), threads);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
         expect_almost_equal(output, ref);
@@ -283,15 +283,15 @@ TEST_F(SparseColumnTest, TatamiSparse) {
 
     // Doing a reference calculation.
     std::vector<double> ref(NR * 2);
-    tatami_mult::sparse_column_tatami_dense(*sparse, *rhs_dense, ref.data(), 1, NR, 1);
+    tatami_mult::sparse_column_tatami_dense(*sparse, *rhs_dense, true, ref.data(), 1);
 
     for (int threads = 1; threads < 4; threads += 2) {
         std::vector<double> output(NR * 2);
-        tatami_mult::sparse_column_tatami_sparse(*sparse, *rhs_sparse, output.data(), 1, NR, threads);
+        tatami_mult::sparse_column_tatami_sparse(*sparse, *rhs_sparse, true, output.data(), threads);
         expect_almost_equal(output, ref);
 
         std::vector<double> toutput(NR * 2);
-        tatami_mult::sparse_column_tatami_sparse(*sparse, *rhs_sparse, toutput.data(), 2, 1, threads);
+        tatami_mult::sparse_column_tatami_sparse(*sparse, *rhs_sparse, false, toutput.data(), threads);
         std::fill(output.begin(), output.end(), 0);
         tatami::transpose(toutput.data(), NR, 2, output.data());
         expect_almost_equal(output, ref);
