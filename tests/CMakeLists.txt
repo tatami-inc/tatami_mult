@@ -8,11 +8,12 @@ FetchContent_MakeAvailable(tatami_test)
 
 add_executable(
     libtest
-    src/dense_row.cpp
-    src/sparse_row.cpp
-    src/dense_column.cpp
-    src/sparse_column.cpp
-    src/overlord.cpp
+    src/dense_dot_product.cpp
+    src/sparse_dot_product.cpp
+    src/single_vector/dense_row.cpp
+    src/single_vector/dense_column.cpp
+    src/single_vector/sparse_row.cpp
+    src/single_vector/sparse_column.cpp
 )
 
 target_link_libraries(
