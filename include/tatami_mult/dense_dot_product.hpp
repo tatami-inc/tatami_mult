@@ -12,7 +12,7 @@ namespace tatami_mult {
 // Fortunately, compilers will stil auto-vectorize a manually-unrolled loop, so this won't be a pessimisation in the long term.
 template<std::size_t counter_ = 0, class Iterator1_, class Iterator2_, typename Output_, std::size_t accumulators_>
 void unrolled_dense_dot_product(const std::size_t idx, Iterator1_ start1, Iterator2_ start2, std::array<Output_, accumulators_>& dots) {
-    dots[counter_] += *(start1 + idx + counter_) * *(start2 + idx + counter_);
+    dots[counter_] += static_cast<Output_>(*(start1 + idx + counter_)) * static_cast<Output_>(*(start2 + idx + counter_));
     if constexpr(counter_ + 1 < accumulators_) {
         unrolled_dense_dot_product<counter_ + 1>(idx, start1, start2, dots);
     }
@@ -23,7 +23,7 @@ Output_ dense_dot_product(const std::size_t len, Iterator1_ start1, Iterator2_ s
     if constexpr(accumulators_ == 1) {
         Output_ dot = initial;
         for (std::size_t i = 0; i < len; ++i) {
-            dot += *(start1 + i) * *(start2 + i);
+            dot += static_cast<Output_>(*(start1 + i)) * static_cast<Output_>(*(start2 + i));
         }
         return dot;
 

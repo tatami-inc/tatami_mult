@@ -12,7 +12,7 @@ namespace tatami_mult {
 // Fortunately, compilers will stil auto-vectorize a manually-unrolled loop, so this won't be a pessimisation in the long term.
 template<std::size_t accumulators_, std::size_t counter_ = 0, class ValueIterator_, class IndexIterator_, typename Dense_, typename Output_>
 void unrolled_sparse_dot_product(const std::size_t idx, ValueIterator_ vptr, IndexIterator_ iptr, Dense_ dense, std::array<Output_, accumulators_>& dots) {
-    dots[counter_] += dense[*(iptr + idx + counter_)] * *(vptr + idx + counter_);
+    dots[counter_] += static_cast<Output_>(dense[*(iptr + idx + counter_)]) * static_cast<Output_>(*(vptr + idx + counter_));
     if constexpr(counter_ + 1 < accumulators_) {
         unrolled_sparse_dot_product<accumulators_, counter_ + 1>(idx, vptr, iptr, dense, dots);
     }
@@ -23,7 +23,7 @@ Output_ sparse_dot_product(const std::size_t num_non_zeros, ValueIterator_ vptr,
     if constexpr(accumulators_ == 1) {
         Output_ dot = initial;
         for (std::size_t i = 0; i < num_non_zeros; ++i) {
-            dot += dense[*(iptr + i)] * *(vptr + i);
+            dot += static_cast<Output_>(dense[*(iptr + i)]) * static_cast<Output_>(*(vptr + i));
         }
         return dot;
 
