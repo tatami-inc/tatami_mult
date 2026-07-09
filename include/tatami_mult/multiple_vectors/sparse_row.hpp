@@ -1,46 +1,75 @@
-#ifndef TATAMI_MULT_MULTIPLE_VECTORS_SPARSE_ROW_INTERNAL_HPP
-#define TATAMI_MULT_MULTIPLE_VECTORS_SPARSE_ROW_INTERNAL_HPP
+#ifndef TATAMI_MULT_MULTIPLE_VECTORS_SPARSE_ROW_HPP
+#define TATAMI_MULT_MULTIPLE_VECTORS_SPARSE_ROW_HPP
 
-#include <vector>
 #include <cstddef>
+#include <vector>
 
 #include "tatami/tatami.hpp"
 
-#include "../../utils.hpp"
-#include "../../sparse_dot_product.hpp"
+#include "../utils.hpp"
+#include "../sparse_dot_product.hpp"
+
+/**
+ * @file public.hpp
+ * @brief Sparse row LHS, multiple vectors RHS.
+ */
 
 namespace tatami_mult {
 
-struct MultiplySparseRowWithSomeVectorsOptions {
+/**
+ * @brief Options for `multiply_sparse_row_with_multiple_vectors()`.
+ */
+struct MultiplySparseRowWithMultipleVectorsOptions {
+    /**
+     * Number of threads to use.
+     */
     int num_threads = 1;
+
+    /**
+     * Block size.
+     */
     int block_size = 16;
 };
 
-template<std::size_t accumulators_, typename Value_, typename Index_, typename Right_, typename GetOutput_>
-void multiply_sparse_row_with_some_vectors(
-    const tatami::Matrix<Value_, Index_>& matrix,
-    const std::vector<Right_*>& rhs_ptrs,
-    GetOutput_ get_output,
-    const MultiplySparseRowWithSomeVectorsOptions& options
+/**
+ * @tparam accumulators_ Number of accumulators for computing the dot product.
+ * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
+ * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.
+ * @tparam Value_ Numeric type of the matrix value.
+ * @tparam Index_ Integer type of the matrix index.
+ * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Output_ Numeric type of the output array.
+ * 
+ * @param left LHS matrix to be multiplied.
+ * This function is optimized for sparse matrices that prefer row access, but will work with all matrices.
+ * @param[in] right Vector of pointers, each of which points to an array of length `left.ncol()`.
+ * Each entry contains a vector with which to multiply `left`.
+ * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * On output, the `i`-th entry stores the product `left * right[i]`.
+ * @param options Further options.
+ */
+template<std::size_t accumulators_ = 4, typename Value_, typename Index_, typename Right_, typename Output_>
+void multiply_sparse_row_with_multiple_vectors(
+    const tatami::Matrix<Value_, Index_>& left,
+    const std::vector<Right_*>& right,
+    const std::vector<Output_*>& output,
+    const MultiplySparseRowWithMultipleVectorsOptions& options
 ) {
-    const Index_ NR = matrix.nrow();
-    const Index_ NC = matrix.ncol();
-    const auto num_rhs = rhs_ptrs.size();
-    typedef I<decltype(get_output(0)[0])> Output;
+    const Index_ NR = left.nrow();
+    const Index_ NC = left.ncol();
+    const auto num_rhs = right.size();
 
     if (options.block_size == 1) {
         tatami::parallelize([&](int, Index_ start, Index_ length) -> void {
-            auto ext = tatami::consecutive_extractor<true>(&matrix, true, start, length);
+            auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
             auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(NC);
             auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(NC);
 
             for (Index_ r = 0; r < length; ++r) {
                 const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
                 for (I<decltype(num_rhs)> h = 0; h < num_rhs; ++h) {
-                    const auto rptr = rhs_ptrs[h];
-                    auto&& optr = get_output(h);
                     // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
-                    optr[start + r] = dense_sparse_dot_product<Output>(rptr, range);
+                    output[h][start + r] = sparse_dot_product<accumulators_>(range.number, range.value, range.index, right[h], static_cast<Output_>(0));
                 }
             }
         }, NR, options.num_threads);
@@ -48,7 +77,7 @@ void multiply_sparse_row_with_some_vectors(
     } else {
         const Index_ block_size = sanisizer::cast<Index_>(options.block_size);
         tatami::parallelize([&](int, Index_ start, Index_ length) -> void {
-            auto ext = tatami::consecutive_extractor<true>(&matrix, true, start, length);
+            auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
 
             // Our blocking strategy is to collect multiple LHS rows so that, for each RHS vector,
             // we can keep it in cache for easy re-use when computing the dot-product for each LHS row.
@@ -74,8 +103,8 @@ void multiply_sparse_row_with_some_vectors(
                 }
 
                 for (I<decltype(num_rhs)> h = 0; h < num_rhs; ++h) {
-                    const auto rcol = rhs_ptrs[h];
-                    auto&& outcol = get_output(h);
+                    const auto rcol = right[h];
+                    const auto outcol = output[h];
                     for (Index_ rcounter = 0; rcounter < rnum; ++rcounter) {
                         const auto& currange = ranges[rcounter];
                         outcol[start + r + rcounter] = sparse_dot_product<accumulators_>(
@@ -83,7 +112,7 @@ void multiply_sparse_row_with_some_vectors(
                             currange.value,
                             currange.index,
                             rcol,
-                            static_cast<Output>(0)
+                            static_cast<Output_>(0)
                         );
                     }
                 }

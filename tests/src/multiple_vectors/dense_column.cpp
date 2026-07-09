@@ -5,7 +5,7 @@
 
 #include "tatami_test/tatami_test.hpp"
 
-#include "tatami_mult/multiple_vectors/dense_column/public.hpp"
+#include "tatami_mult/multiple_vectors/dense_column.hpp"
 
 class MultipleVectorsDenseColumnTest : public ::testing::TestWithParam<std::tuple<int, int, int, std::pair<int, int>, int> > {};
 

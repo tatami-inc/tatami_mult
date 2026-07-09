@@ -1,5 +1,5 @@
-#ifndef TATAMI_MULT_MULTIPLE_VECTORS_DENSE_ROW_PUBLIC_HPP
-#define TATAMI_MULT_MULTIPLE_VECTORS_DENSE_ROW_PUBLIC_HPP
+#ifndef TATAMI_MULT_MULTIPLE_VECTORS_DENSE_ROW_HPP
+#define TATAMI_MULT_MULTIPLE_VECTORS_DENSE_ROW_HPP
 
 #include <cstddef>
 #include <vector>
@@ -94,18 +94,19 @@ void multiply_dense_row_with_multiple_vectors(
         }
         auto lptrs = tatami::create_container_of_Index_size<std::vector<const Value_*> >(max_block_rows);
 
-        // Creating a block of buffers to hold the partial dot products as we iterate over the columns.
+        // Creating a block of buffers to hold the partial dot products for the current set of submatrices as we iterate over the columns.
         // This aims to mitigate false sharing as we update each block's partial dot products.
         // There is still some potential for false sharing when we transfer the results to the output buffers,
-        // but this doesn't occur in the innermost loop so we won't worry about it.
+        // but this is the same as the unblocked case so we won't worry about it.
         std::optional<std::vector<std::vector<Output_> > > tmp_output;
         std::optional<std::vector<Output_*> > tmp_outptrs;
         if (start > 0) {
             const RightIndex max_block_cols = sanisizer::min(num_rhs, primary_block_size);
+            const RightIndex max_block_rows = sanisizer::min(length, primary_block_size);
             tmp_output.emplace();
             tmp_output->reserve(max_block_cols);
             for (RightIndex h = 0; h < max_block_cols; ++h) {
-                tmp_output->emplace_back(tatami::cast_Index_to_container_size<std::vector<Output_> >(max_block_cols));
+                tmp_output->emplace_back(tatami::cast_Index_to_container_size<std::vector<Output_> >(max_block_rows));
             }
             tmp_outptrs.emplace();
             tmp_outptrs->reserve(max_block_cols);

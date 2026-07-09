@@ -5,11 +5,11 @@
 
 #include "tatami_test/tatami_test.hpp"
 
-#include "tatami_mult/multiple_vectors/sparse_row/public.hpp"
+#include "tatami_mult/multiple_vectors/sparse_column.hpp"
 
-class MultipleVectorsSparseRowTest : public ::testing::TestWithParam<std::tuple<int, int, int, int, int> > {};
+class MultipleVectorsSparseColumnTest : public ::testing::TestWithParam<std::tuple<int, int, int, int, int> > {};
 
-TEST_P(MultipleVectorsSparseRowTest, Vector) {
+TEST_P(MultipleVectorsSparseColumnTest, Vector) {
     const auto params = GetParam();
     const int NR = std::get<0>(params);
     const int NC = std::get<1>(params);
@@ -40,11 +40,11 @@ TEST_P(MultipleVectorsSparseRowTest, Vector) {
         rhs_ptrs[h] = rhs.data() + h * NC;
     }
 
-    tatami_mult::MultiplySparseRowWithMultipleVectorsOptions opt;
+    tatami_mult::MultiplySparseColumnWithMultipleVectorsOptions opt;
     opt.num_threads = nthreads;
     opt.block_size = block_size;
 
-    std::vector<std::vector<double> > sr_output1, sr_output4, sc_output1, sc_output4;
+    std::vector<std::vector<double> > sr_output, sc_output;
     auto formulate_ptrs = [&](std::vector<std::vector<double> >& output) -> std::vector<double*> {
         output.resize(NRHS);
         std::vector<double*> ptrs(NRHS);
@@ -55,25 +55,21 @@ TEST_P(MultipleVectorsSparseRowTest, Vector) {
         return ptrs;
     };
 
-    tatami_mult::multiply_sparse_row_with_multiple_vectors<1>(*sparse_row, rhs_ptrs, formulate_ptrs(sr_output1), opt);
-    tatami_mult::multiply_sparse_row_with_multiple_vectors<4>(*sparse_row, rhs_ptrs, formulate_ptrs(sr_output4), opt);
-    tatami_mult::multiply_sparse_row_with_multiple_vectors<1>(*sparse_col, rhs_ptrs, formulate_ptrs(sc_output1), opt);
-    tatami_mult::multiply_sparse_row_with_multiple_vectors<4>(*sparse_col, rhs_ptrs, formulate_ptrs(sc_output4), opt);
+    tatami_mult::multiply_sparse_column_with_multiple_vectors(*sparse_row, rhs_ptrs, formulate_ptrs(sr_output), opt);
+    tatami_mult::multiply_sparse_column_with_multiple_vectors(*sparse_col, rhs_ptrs, formulate_ptrs(sc_output), opt);
 
     for (int h = 0; h < NRHS; ++h) {
         for (int r = 0; r < NR; ++r) {
             const auto ref = std::inner_product(rhs_ptrs[h], rhs_ptrs[h] + NC, dump.begin() + r * NC, 0.0);
-            EXPECT_FLOAT_EQ(ref, sr_output1[h][r]);
-            EXPECT_FLOAT_EQ(ref, sr_output4[h][r]);
-            EXPECT_FLOAT_EQ(ref, sc_output1[h][r]);
-            EXPECT_FLOAT_EQ(ref, sc_output4[h][r]);
+            EXPECT_FLOAT_EQ(ref, sr_output[h][r]);
+            EXPECT_FLOAT_EQ(ref, sc_output[h][r]);
         }
     }
 }
 
 INSTANTIATE_TEST_SUITE_P(
     MultipleVectors,
-    MultipleVectorsSparseRowTest,
+    MultipleVectorsSparseColumnTest,
     ::testing::Combine(
         ::testing::Values(100, 33), // number of rows.
         ::testing::Values(59, 148), // number of columns.
