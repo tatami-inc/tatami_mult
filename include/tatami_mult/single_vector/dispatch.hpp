@@ -49,13 +49,13 @@ void multiply_with_single_vector(
     if (left.is_sparse()) {
         if (left.prefer_rows()) {
             multiply_sparse_row_with_single_vector<accumulators_>(left, right, output, [&](){
-                MultiplySparseRowWithSingleVector opt;
+                MultiplySparseRowWithSingleVectorOptions opt;
                 opt.num_threads = options.num_threads;
                 return opt;
             }());
         } else {
             multiply_sparse_column_with_single_vector(left, right, output, [&](){
-                MultiplySparseColumnWithSingleVector opt;
+                MultiplySparseColumnWithSingleVectorOptions opt;
                 opt.num_threads = options.num_threads;
                 return opt;
             }());
@@ -64,13 +64,13 @@ void multiply_with_single_vector(
     } else {
         if (left.prefer_rows()) {
             multiply_dense_row_with_single_vector<accumulators_>(left, right, output, [&](){
-                MultiplyDenseRowWithSingleVector opt;
+                MultiplyDenseRowWithSingleVectorOptions opt;
                 opt.num_threads = options.num_threads;
                 return opt;
             }());
         } else {
             multiply_dense_column_with_single_vector(left, right, output, [&](){
-                MultiplyDenseColumnWithSingleVector opt;
+                MultiplyDenseColumnWithSingleVectorOptions opt;
                 opt.num_threads = options.num_threads;
                 return opt;
             }());

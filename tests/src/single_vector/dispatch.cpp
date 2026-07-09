@@ -5,7 +5,7 @@
 
 #include "tatami_test/tatami_test.hpp"
 
-#include "tatami_mult/single_vector/sparse_row.hpp"
+#include "tatami_mult/single_vector/dispatch.hpp"
 
 class SingleVectorDispatchTest : public ::testing::TestWithParam<std::tuple<int, int, int> > {};
 
@@ -25,7 +25,7 @@ TEST_P(SingleVectorDispatchTest, Vector) {
     }());
     auto dense_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
     auto dense_col = tatami::convert_to_dense<double, int>(*dense_row, false, {});
-    auto sparse_row = tatami::convert_to_compressed_sparse<double, int>(tatami::DenseRowMatrix<double, int>(NR, NC, dump), true, {});
+    auto sparse_row = tatami::convert_to_compressed_sparse<double, int>(*dense_row, true, {});
     auto sparse_col = tatami::convert_to_compressed_sparse<double, int>(*sparse_row, false, {});
 
     auto rhs = tatami_test::simulate_vector<double>(NC, [&]{
@@ -36,16 +36,13 @@ TEST_P(SingleVectorDispatchTest, Vector) {
         return opt;
     }());
 
-    tatami_mult::MultiplySparseRowWithSingleVectorOptions opt;
+    tatami_mult::MultiplyWithSingleVectorOptions opt;
     opt.num_threads = nthreads;
 
-    std::vector<double> drout(NR);
+    std::vector<double> drout(NR), dcout(NR), srout(NR), scout(NR);
     tatami_mult::multiply_with_single_vector(*dense_row, rhs.data(), drout.data(), opt);
-    std::vector<double> dcout(NR);
     tatami_mult::multiply_with_single_vector(*dense_col, rhs.data(), dcout.data(), opt);
-    std::vector<double> srout(NR);
     tatami_mult::multiply_with_single_vector(*sparse_row, rhs.data(), srout.data(), opt);
-    std::vector<double> scout(NR);
     tatami_mult::multiply_with_single_vector(*sparse_col, rhs.data(), scout.data(), opt);
 
     for (int r = 0; r < NR; ++r) {
