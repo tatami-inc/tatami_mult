@@ -5,7 +5,7 @@
 
 #include "tatami_test/tatami_test.hpp"
 
-#include "tatami_mult/multiple_vectors/dense_row/public.hpp"
+#include "tatami_mult/multiple_vectors/dense_row.hpp"
 
 class MultipleVectorsDenseRowTest : public ::testing::TestWithParam<std::tuple<int, int, int, std::pair<int, int>, int> > {};
 

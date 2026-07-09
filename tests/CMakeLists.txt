@@ -14,7 +14,7 @@ add_executable(
     src/single_vector/dense_column.cpp
     src/single_vector/sparse_row.cpp
     src/single_vector/sparse_column.cpp
-    src/multiple_vectors/dense_row/public.cpp
+    src/multiple_vectors/dense_row.cpp
     src/multiple_vectors/dense_column/public.cpp
     src/multiple_vectors/sparse_row/public.cpp
     src/multiple_vectors/sparse_column/public.cpp
