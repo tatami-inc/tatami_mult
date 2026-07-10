@@ -38,9 +38,18 @@ TEST_P(DenseMatrixDenseRowTest, Vector) {
     auto right_row = tatami::convert_to_dense<double, int>(*right_col, true, {});
 
     tatami_mult::MultiplyDenseRowWithDenseMatrixOptions opt;
-    opt.num_threads = nthreads;
-    opt.primary_block_size = blocks.first;
-    opt.secondary_block_size = blocks.second;
+    opt.column_to_column.num_threads = nthreads;
+    opt.column_to_column.primary_block_size = blocks.first;
+    opt.column_to_column.secondary_block_size = blocks.second;
+    opt.column_to_row.num_threads = nthreads;
+    opt.column_to_row.primary_block_size = blocks.first;
+    opt.column_to_row.secondary_block_size = blocks.second;
+    opt.row_to_column.num_threads = nthreads;
+    opt.row_to_column.primary_block_size = blocks.first;
+    opt.row_to_column.secondary_block_size = blocks.second;
+    opt.row_to_row.num_threads = nthreads;
+    opt.row_to_row.primary_block_size = blocks.first;
+    opt.row_to_row.secondary_block_size = blocks.second;
 
     const auto output_size = NR * NRHS;
     std::vector<double> dr_rc_ro1(output_size), dr_rc_ro4(output_size),
@@ -50,19 +59,19 @@ TEST_P(DenseMatrixDenseRowTest, Vector) {
         dc_rc_ro(output_size), dc_rc_co(output_size);
 
     // Checking different choices of accumulators.
-    tatami_mult::multiply_dense_row_with_dense_matrix<1>(*dense_row, *right_col, true, dr_rc_ro1.data(), opt);
-    tatami_mult::multiply_dense_row_with_dense_matrix<4>(*dense_row, *right_col, true, dr_rc_ro4.data(), opt);
-    tatami_mult::multiply_dense_row_with_dense_matrix<1>(*dense_row, *right_col, false, dr_rc_co1.data(), opt);
-    tatami_mult::multiply_dense_row_with_dense_matrix<4>(*dense_row, *right_col, false, dr_rc_co4.data(), opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix<1>(*dense_row, *right_col, dr_rc_ro1.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix<4>(*dense_row, *right_col, dr_rc_ro4.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix<1>(*dense_row, *right_col, dr_rc_co1.data(), false, opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix<4>(*dense_row, *right_col, dr_rc_co4.data(), false, opt);
 
-    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_row, *right_row, true, dr_rr_ro.data(), opt);
-    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_row, *right_row, false, dr_rr_co.data(), opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_row, *right_row, dr_rr_ro.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_row, *right_row, dr_rr_co.data(), false, opt);
 
     // Checking that it still works for column-major LHS.
-    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_row, true, dc_rr_ro.data(), opt);
-    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_col, true, dc_rc_ro.data(), opt);
-    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_row, false, dc_rr_co.data(), opt);
-    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_col, false, dc_rc_co.data(), opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_row, dc_rr_ro.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_col, dc_rc_ro.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_row, dc_rr_co.data(), false, opt);
+    tatami_mult::multiply_dense_row_with_dense_matrix(*dense_col, *right_col, dc_rc_co.data(), false, opt);
 
     for (int h = 0; h < NRHS; ++h) {
         const auto rptr = rhs.data() + h * NC;

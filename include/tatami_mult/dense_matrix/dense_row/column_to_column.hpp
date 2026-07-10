@@ -9,14 +9,52 @@
 
 #include "../../utils.hpp"
 
+/**
+ * @file column_to_column.hpp
+ * @brief Dense row LHS, dense column-major matrix RHS, column-major output.
+ */
+
 namespace tatami_mult {
 
+/**
+ * @brief Options for `multiply_dense_row_with_dense_column_matrix_to_column_output()`.
+ */
 struct MultiplyDenseRowWithDenseColumnMatrixToColumnOutputOptions {
+    /**
+     * Number of threads to use.
+     */
     int num_threads = 1;
+
+    /**
+     * Primary block size.
+     */
     int primary_block_size = 16;
+
+    /**
+     * Secondary block size.
+     */
     int secondary_block_size = 64;
 };
 
+/**
+ * @tparam accumulators_ Number of accumulators for computing the dot product.
+ * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
+ * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.
+ * @tparam LeftValue_ Numeric type of the left matrix value.
+ * @tparam LeftIndex_ Integer type of the left matrix index.
+ * @tparam RightValue_ Numeric type of the right matrix value.
+ * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam Output_ Numeric type of the output array.
+ * 
+ * @param left LHS matrix to be multiplied.
+ * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
+ * @param right RHS matrix to be multiplied.
+ * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
+ * The number of rows in this matrix should be equal to the number of columns in `left`.
+ * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
+ * On output, this stores the product of `left` and `right` in column-major format.
+ * @param options Further options.
+ */
 template<std::size_t accumulators_ = 4, typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
 void multiply_dense_row_with_dense_column_matrix_to_column_output(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
