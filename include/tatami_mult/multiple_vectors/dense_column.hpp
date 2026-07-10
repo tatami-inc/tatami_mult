@@ -101,9 +101,9 @@ void multiply_dense_column_with_multiple_vectors(
             auto buffer = tatami::create_container_of_Index_size<std::vector<Output_> >(NR);
             for (Index_ c = 0; c < length; ++c) {
                 const auto ptr = ext->fetch(buffer.data());
-                for (std::size_t j = 0; j < num_rhs; ++j) {
-                    const auto optr = outptrs[j];
-                    const Output_ mult = right[j][start + c];
+                for (RightIndex h = 0; h < num_rhs; ++h) {
+                    const auto optr = outptrs[h];
+                    const Output_ mult = right[h][start + c];
                     for (Index_ r = 0; r < NR; ++r) {
                         optr[r] += mult * static_cast<Output_>(ptr[r]);
                     }
@@ -129,10 +129,9 @@ void multiply_dense_column_with_multiple_vectors(
                     ptrs[ccounter] = ext->fetch(buffers[ccounter].data());
                 }
 
-                std::size_t h = 0;
+                RightIndex h = 0;
                 while (h < num_rhs) {
-                    // cast of primary_block_size to size_t is safe as primary_block_size must fit in an Index_ (and thus, by the tatami contract, a size_t).
-                    const std::size_t hend = h + std::min<std::size_t>(primary_block_size, num_rhs - h);
+                    const RightIndex hend = h + sanisizer::min(primary_block_size, num_rhs - h);
                     Index_ r = 0;
                     while (r < NR) {
                         const Index_ rend = r + std::min<Index_>(secondary_block_size, NR - r);

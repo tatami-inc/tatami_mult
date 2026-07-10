@@ -68,7 +68,8 @@ void multiply_sparse_row_with_multiple_vectors(
             for (Index_ r = 0; r < length; ++r) {
                 const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
                 for (I<decltype(num_rhs)> h = 0; h < num_rhs; ++h) {
-                    // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
+                    // Implicit cast of range.number to size_t is safe, as per the tatami contract.
+                    // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
                     output[h][start + r] = sparse_dot_product<accumulators_>(range.number, range.value, range.index, right[h], static_cast<Output_>(0));
                 }
             }
@@ -107,6 +108,7 @@ void multiply_sparse_row_with_multiple_vectors(
                     const auto outcol = output[h];
                     for (Index_ rcounter = 0; rcounter < rnum; ++rcounter) {
                         const auto& currange = ranges[rcounter];
+                        // Implicit cast of range.number to size_t is safe, as per the tatami contract.
                         outcol[start + r + rcounter] = sparse_dot_product<accumulators_>(
                             currange.number,
                             currange.value,

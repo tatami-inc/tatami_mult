@@ -73,6 +73,7 @@ void multiply_dense_row_with_multiple_vectors(
             for (Index_ r = 0; r < length; ++r) {
                 const auto lptr = lext->fetch(lbuffer.data());
                 for (RightIndex h = 0; h < num_rhs; ++h) {
+                    // Implicit cast of NC to std::size_t is safe, as per the tatami contract.
                     output[h][start + r] = dense_dot_product<accumulators_>(NC, lptr, right[h], static_cast<Output_>(0));
                 }
             }
@@ -82,6 +83,14 @@ void multiply_dense_row_with_multiple_vectors(
 
     const auto primary_block_size = sanisizer::cast<Index_>(options.primary_block_size);
     const auto secondary_block_size = sanisizer::cast<Index_>(options.secondary_block_size);
+
+    const bool do_parallel = options.num_threads > 1;
+    if (!do_parallel) {
+        // Zeroing all of the buffers if we're operating on a single thread.
+        for (RightIndex h = 0; h < num_rhs; ++h) {
+            std::fill_n(output[h], NR, 0);
+        }
+    }
 
     tatami::parallelize([&](int, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
@@ -94,23 +103,23 @@ void multiply_dense_row_with_multiple_vectors(
         }
         auto lptrs = tatami::create_container_of_Index_size<std::vector<const Value_*> >(max_block_rows);
 
-        // Creating a block of buffers to hold the partial dot products for the current set of submatrices as we iterate over the columns.
-        // This aims to mitigate false sharing as we update each block's partial dot products.
-        // There is still some potential for false sharing when we transfer the results to the output buffers,
-        // but this is the same as the unblocked case so we won't worry about it.
         std::optional<std::vector<std::vector<Output_> > > tmp_output;
         std::optional<std::vector<Output_*> > tmp_outptrs;
-        if (start > 0) {
-            const RightIndex max_block_cols = sanisizer::min(num_rhs, primary_block_size);
-            const RightIndex max_block_rows = sanisizer::min(length, primary_block_size);
+        if (do_parallel) {
+            // For the multi-threaded case, we create some temporary buffers to hold the partial dot products for the current set of submatrices.
+            // This aims to mitigate false sharing as we update each block's partial dot products in the loop over the common dimension.
+            // There is still some potential for false sharing when we transfer the results to the output buffers,
+            // but this is the same as the unblocked case so we won't worry about it.
+            const auto max_block_cols = sanisizer::min(num_rhs, primary_block_size);
+            const auto max_block_rows = std::min(length, primary_block_size);
             tmp_output.emplace();
             tmp_output->reserve(max_block_cols);
-            for (RightIndex h = 0; h < max_block_cols; ++h) {
+            for (I<decltype(max_block_cols)> h = 0; h < max_block_cols; ++h) {
                 tmp_output->emplace_back(tatami::cast_Index_to_container_size<std::vector<Output_> >(max_block_rows));
             }
             tmp_outptrs.emplace();
             tmp_outptrs->reserve(max_block_cols);
-            for (RightIndex h = 0; h < max_block_cols; ++h) {
+            for (I<decltype(max_block_cols)> h = 0; h < max_block_cols; ++h) {
                 tmp_outptrs->emplace_back((*tmp_output)[h].data());
             }
         }
@@ -124,31 +133,27 @@ void multiply_dense_row_with_multiple_vectors(
 
             RightIndex h = 0;
             while (h < num_rhs) {
-                // cast of primary_block_size to size_t is safe as primary_block_size must fit in an Index_ (and thus, by the tatami contract, a size_t).
-                const auto hnum = std::min<std::size_t>(primary_block_size, num_rhs - h);
+                const RightIndex hnum = sanisizer::min(primary_block_size, num_rhs - h);
 
                 Output_* const * outptrs;
                 Index_ row_offset;
-                if (start > 0) {
+                if (do_parallel) {
                     outptrs = tmp_outptrs->data();
                     row_offset = 0; // no need to add start, as it's ignored when saving to tmp_output.
                 } else {
                     outptrs = output.data() + h;
-                    row_offset = r; // no need to add start, as it's zero. 
-                }
-                // Zeroing all of the buffers prior to accumulation.
-                for (std::size_t hcounter = 0; hcounter < hnum; ++hcounter) {
-                    std::fill_n(outptrs[hcounter] + row_offset, rnum, 0);
+                    row_offset = r; // no need to add start, as it's zero when there's only one thread. 
                 }
 
                 Index_ c = 0;
                 while (c < NC) {
                     const Index_ cnum = std::min<Index_>(secondary_block_size, NC - c);
-                    for (std::size_t hcounter = 0; hcounter < hnum; ++hcounter) {
+                    for (RightIndex hcounter = 0; hcounter < hnum; ++hcounter) {
                         const auto outcol = outptrs[hcounter];
                         const auto& rightcol = right[h + hcounter];
                         for (Index_ rcounter = 0; rcounter < rnum; ++rcounter) {
                             auto& dest = outcol[row_offset + rcounter]; 
+                            // Implicit cast of cnum to std::size_t is safe, as per the tatami contract.
                             dest = dense_dot_product<accumulators_>(
                                 cnum,
                                 rightcol + c,
@@ -160,10 +165,11 @@ void multiply_dense_row_with_multiple_vectors(
                     c += cnum;
                 }
 
-                if (start > 0) {
-                    for (std::size_t hcounter = 0; hcounter < hnum; ++hcounter) {
-                        const auto& src = (*tmp_output)[hcounter];
+                if (do_parallel) {
+                    for (RightIndex hcounter = 0; hcounter < hnum; ++hcounter) {
+                        auto& src = (*tmp_output)[hcounter];
                         std::copy_n(src.begin(), rnum, output[h + hcounter] + start + r);
+                        std::fill_n(src.begin(), rnum, 0);
                     }
                 }
 
