@@ -3,8 +3,10 @@
 
 #include <vector>
 #include <cstddef>
+#include <optional>
 
 #include "tatami/tatami.hpp"
+#include "sanisizer/sanisizer.hpp"
 
 #include "../../utils.hpp"
 
@@ -25,9 +27,6 @@ struct MultiplyDenseRowWithDenseRowMatrixToRowOutputOptions {
 };
 
 /**
- * @tparam accumulators_ Number of accumulators for computing the dot product.
- * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
- * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.
  * @tparam LeftValue_ Numeric type of the left matrix value.
  * @tparam LeftIndex_ Integer type of the left matrix index.
  * @tparam RightValue_ Numeric type of the right matrix value.
@@ -43,38 +42,42 @@ struct MultiplyDenseRowWithDenseRowMatrixToRowOutputOptions {
  * On output, this stores the product of `left` and `right` in row-major format.
  * @param options Further options.
  */
-template< typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
 void multiply_dense_row_with_dense_row_matrix_to_row_output(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
-    const std::vector<const RightValue_*>& right,
-    const RightIndex_ num_rhs,
+    const tatami::Matrix<RightValue_, RightIndex_>& right,
     Output_* const output,
     const MultiplyDenseRowWithDenseRowMatrixToRowOutputOptions& options
 ) {
-    const auto NR = left.nrow();
-    const auto NC = left.ncol();
+    const auto left_NR = left.nrow();
+    const auto common_dim = left.ncol();
+    const auto right_NC = right.ncol();
+
+    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(common_dim);
+    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(common_dim);
+    populate_dense_buffers(true, common_dim, right_NC, right, right_buffers, right_ptrs, options.num_threads);
 
     const bool do_parallel = options.num_threads > 1;
     if (!do_parallel) {
-        std::fill_n(output, sanisizer::product_unsafe<std::size_t>(num_rhs, NR), 0);
+        std::fill_n(output, sanisizer::product_unsafe<std::size_t>(right_NC, left_NR), 0);
     }
 
     if (options.primary_block_size == 1) {
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
             auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
-            auto buffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(NC);
+            auto buffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(common_dim);
 
             // Use a temporary buffer for each output row to mitigate false sharing during updates across all 'c'.
             // There is still some false sharing when we transfer the results to the output row,
             // but this is fine as it is outside of the innermost loop.
             std::optional<std::vector<Output_> > tmp_output;
             if (do_parallel) {
-                tmp_output.emplace(tatami::cast_Index_to_container_size<std::vector<Output_> >(num_rhs));
+                tmp_output.emplace(tatami::cast_Index_to_container_size<std::vector<Output_> >(right_NC));
             }
 
-            for (LeftIndex_ r = 0; r < length; ++r) {
+            for (LeftIndex_ lr = 0; lr < length; ++lr) {
                 const auto left_ptr = ext->fetch(buffer.data());
-                const auto optr = output + sanisizer::product_unsafe<std::size_t>(start + r, num_rhs);
+                const auto optr = output + sanisizer::product_unsafe<std::size_t>(start + lr, right_NC);
 
                 Output_* tmp_optr;
                 if (!do_parallel) {
@@ -83,25 +86,22 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
                     tmp_optr = tmp_output->data();
                 }
 
-                for (LeftIndex_ c = 0; c < NC; ++c) {
-                    const Output_ mult = left_ptr[c];
-                    const auto rightrow = right[c];
-                    for (I<decltype(num_rhs)> h = 0; h < num_rhs; ++h) {
-                        tmp_optr[h] += static_cast<Output_>(rightrow[h]) * mult;
+                for (LeftIndex_ cd = 0; cd < common_dim; ++cd) {
+                    const Output_ mult = left_ptr[cd];
+                    const auto rightrow = right_ptrs[cd];
+                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                        tmp_optr[rc] += static_cast<Output_>(rightrow[rc]) * mult;
                     }
                 }
 
                 if (do_parallel) {
-                    std::copy_n(tmp_optr, num_rhs, optr);
-                    std::fill_n(tmp_optr, num_rhs, 0);
+                    std::copy_n(tmp_optr, right_NC, optr);
+                    std::fill_n(tmp_optr, right_NC, 0);
                 }
             }
-        }, NR, options.num_threads);
+        }, left_NR, options.num_threads);
 
     } else {
-        const auto primary_block_size = sanisizer::cast<LeftIndex_>(options.primary_block_size);
-        const auto secondary_block_size = sanisizer::cast<RightIndex_>(options.secondary_block_size);
-
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
             auto left_ext = tatami::consecutive_extractor<false>(left, true, start, length);
             std::vector<std::vector<LeftValue_> > left_buffers;
@@ -109,10 +109,10 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
 
             std::optional<std::vector<Output_> > tmp_output;
             {
-                const LeftIndex_ max_block_rows = std::min(length, primary_block_size);
+                const LeftIndex_ max_block_rows = sanisizer::min(length, options.primary_block_size);
                 left_buffers.reserve(max_block_rows);
                 for (LeftIndex_  b = 0; b < max_block_rows ; ++b) {
-                    left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(NC));
+                    left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
                 }
                 sanisizer::resize(left_ptrs, max_block_rows);
 
@@ -120,18 +120,18 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
                 // We should be able to hold the block size in a size_t safely here, as this block is no larger than the array referenced by 'output'.
                 // Of course, we might get an error if the vector's size_type is smaller than size_t but that seems a bit pathological.
                 if (do_parallel) {
-                    tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(max_block_rows, num_rhs));
+                    tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(max_block_rows, right_NC));
                 }
             }
 
-            LeftIndex_ l = 0;
-            while (l < length) {
-                const auto lnum = std::min<LeftIndex_>(primary_block_size, length - l);
-                for (LeftIndex_ lcounter = 0; lcounter < lnum; ++lcounter) {
-                    left_ptrs[lcounter] = left_ext->fetch(left_buffers[lcounter].data());
+            LeftIndex_ lr = 0;
+            while (lr < length) {
+                const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
+                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                    left_ptrs[lr_counter] = left_ext->fetch(left_buffers[lr_counter].data());
                 }
 
-                Output_* const optr = output + sanisizer::product_unsafe<std::size_t>(start + l, num_rhs);
+                Output_* const optr = output + sanisizer::product_unsafe<std::size_t>(start + lr, right_NC);
                 Output_* tmp_optr;
                 if (!do_parallel) {
                     tmp_optr = optr;
@@ -139,38 +139,38 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
                     tmp_optr = tmp_output->data();
                 }
 
-                LeftIndex_ c = 0;
-                while (c < NC) { 
-                    const LeftIndex_ cend = c + std::min<LeftIndex_>(primary_block_size, NC - c);
-                    RightIndex_ h = 0;
-                    while (h < num_rhs) { // jump by block to go to the right of the RHS rows as this is most contiguous.
-                        const RightIndex_ hend = h + std::min<RightIndex_>(secondary_block_size, num_rhs - h);
+                LeftIndex_ cd = 0;
+                while (cd < common_dim) { 
+                    const LeftIndex_ cd_end = cd + sanisizer::min(options.primary_block_size, common_dim - cd);
+                    RightIndex_ rc = 0;
+                    while (rc < right_NC) { // jump by block to go to the right of the RHS rows as this is most contiguous.
+                        const RightIndex_ rc_end = rc + sanisizer::min(options.secondary_block_size, right_NC - rc);
 
-                        for (LeftIndex_ lcounter = 0; lcounter < lnum; ++lcounter) {
-                            const auto matrow = left_ptrs[lcounter];
-                            const auto prod = tmp_optr + sanisizer::product_unsafe<std::size_t>(lcounter, num_rhs);
-                            for (auto ccopy = c; ccopy < cend; ++ccopy) {
+                        for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                            const auto matrow = left_ptrs[lr_counter];
+                            const auto prod = tmp_optr + sanisizer::product_unsafe<std::size_t>(lr_counter, right_NC);
+                            for (auto ccopy = cd; ccopy < cd_end; ++ccopy) {
                                 const auto mult = matrow[ccopy];
-                                const auto& rightrow = right[ccopy];
-                                for (auto hcopy = h; hcopy < hend; ++hcopy) {
-                                    prod[hcopy] += mult * rightrow[hcopy];
+                                const auto& rightrow = right_ptrs[ccopy];
+                                for (auto rc_copy = rc; rc_copy < rc_end; ++rc_copy) {
+                                    prod[rc_copy] += mult * rightrow[rc_copy];
                                 }
                             }
                         }
 
-                        h = hend;
+                        rc = rc_end;
                     }
-                    c = cend;
+                    cd = cd_end;
                 }
 
                 if (do_parallel) {
-                    const auto out_space = sanisizer::product_unsafe<std::size_t>(lnum, num_rhs);
+                    const auto out_space = sanisizer::product_unsafe<std::size_t>(lr_num, right_NC);
                     std::copy_n(tmp_optr, out_space, optr);
                     std::fill_n(tmp_optr, out_space, 0);
                 }
-                l += lnum;
+                lr += lr_num;
             }
-        }, NR, options.num_threads);
+        }, left_NR, options.num_threads);
     }
 }
 

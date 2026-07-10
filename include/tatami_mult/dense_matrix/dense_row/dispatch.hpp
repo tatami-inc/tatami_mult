@@ -71,29 +71,18 @@ void multiply_dense_row_with_dense_matrix(
     const bool output_row_major,
     const MultiplyDenseRowWithDenseMatrixOptions& options
 ) {
-    const auto rNR = right.nrow();
-    const auto rNC = right.ncol();
-
     if (right.prefer_rows()) {
-        auto all_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(rNR);
-        auto all_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(rNR);
         if (output_row_major) {
-            populate_dense_buffers(true, rNR, rNC, right, all_buffers, all_ptrs, options.row_to_row.num_threads);
-            multiply_dense_row_with_dense_row_matrix_to_row_output(left, all_ptrs, rNC, output, options.row_to_row);
+            multiply_dense_row_with_dense_row_matrix_to_row_output(left, right, output, options.row_to_row);
         } else {
-            populate_dense_buffers(true, rNR, rNC, right, all_buffers, all_ptrs, options.row_to_column.num_threads);
-            multiply_dense_row_with_dense_row_matrix_to_column_output(left, all_ptrs, rNC, output, options.row_to_column);
+            multiply_dense_row_with_dense_row_matrix_to_column_output(left, right, output, options.row_to_column);
         }
 
     } else {
-        auto all_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(rNC);
-        auto all_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(rNC);
         if (output_row_major) {
-            populate_dense_buffers(false, rNC, rNR, right, all_buffers, all_ptrs, options.column_to_row.num_threads);
-            multiply_dense_row_with_dense_column_matrix_to_row_output(left, all_ptrs, rNC, output, options.column_to_row);
+            multiply_dense_row_with_dense_column_matrix_to_row_output(left, right, output, options.column_to_row);
         } else {
-            populate_dense_buffers(false, rNC, rNR, right, all_buffers, all_ptrs, options.column_to_column.num_threads);
-            multiply_dense_row_with_dense_column_matrix_to_column_output(left, all_ptrs, rNC, output, options.column_to_column);
+            multiply_dense_row_with_dense_column_matrix_to_column_output(left, right, output, options.column_to_column);
         }
     }
 }
