@@ -18,19 +18,24 @@ namespace tatami_mult {
  */
 struct MultiplyWithMultipleVectorsOptions {
     /**
-     * Number of threads to use.
+     * Options to pass to `multiply_dense_row_with_multiple_vectors()`, if `left` is a dense matrix that prefers row access.
      */
-    int num_threads = 1;
+    MultiplyDenseRowWithMultipleVectorsOptions dense_row;
 
     /**
-     * Primary block size.
+     * Options to pass to `multiply_dense_column_with_multiple_vectors()`, if `left` is a dense matrix that prefers column access.
      */
-    int primary_block_size = 16;
+    MultiplyDenseColumnWithMultipleVectorsOptions dense_column;
 
     /**
-     * Secondary block size.
+     * Options to pass to `multiply_sparse_row_with_multiple_vectors()`, if `left` is a sparse matrix that prefers row access.
      */
-    int secondary_block_size = 64;
+    MultiplySparseRowWithMultipleVectorsOptions sparse_row;
+
+    /**
+     * Options to pass to `multiply_sparse_column_with_multiple_vectors()`, if `left` is a sparse matrix that prefers column access.
+     */
+    MultiplySparseColumnWithMultipleVectorsOptions sparse_column;
 };
 
 /**
@@ -58,38 +63,15 @@ void multiply_with_multiple_vectors(
 ) {
     if (left.is_sparse()) {
         if (left.prefer_rows()) {
-            multiply_sparse_row_with_multiple_vectors<accumulators_>(left, right, output, [&](){
-                MultiplySparseRowWithMultipleVectorsOptions opt;
-                opt.num_threads = options.num_threads;
-                opt.block_size = options.primary_block_size;
-                return opt;
-            }());
+            multiply_sparse_row_with_multiple_vectors<accumulators_>(left, right, output, options.sparse_row);
         } else {
-            multiply_sparse_column_with_multiple_vectors(left, right, output, [&](){
-                MultiplySparseColumnWithMultipleVectorsOptions opt;
-                opt.num_threads = options.num_threads;
-                opt.block_size = options.primary_block_size;
-                return opt;
-            }());
+            multiply_sparse_column_with_multiple_vectors(left, right, output, options.sparse_column);
         }
-
     } else {
         if (left.prefer_rows()) {
-            multiply_dense_row_with_multiple_vectors<accumulators_>(left, right, output, [&](){
-                MultiplyDenseRowWithMultipleVectorsOptions opt;
-                opt.num_threads = options.num_threads;
-                opt.primary_block_size = options.primary_block_size;
-                opt.secondary_block_size = options.secondary_block_size;
-                return opt;
-            }());
+            multiply_dense_row_with_multiple_vectors<accumulators_>(left, right, output, options.dense_row);
         } else {
-            multiply_dense_column_with_multiple_vectors(left, right, output, [&](){
-                MultiplyDenseColumnWithMultipleVectorsOptions opt;
-                opt.num_threads = options.num_threads;
-                opt.primary_block_size = options.primary_block_size;
-                opt.secondary_block_size = options.secondary_block_size;
-                return opt;
-            }());
+            multiply_dense_column_with_multiple_vectors(left, right, output, options.dense_column);
         }
     }
 }

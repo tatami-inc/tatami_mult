@@ -18,9 +18,24 @@ namespace tatami_mult {
  */
 struct MultiplyWithSingleVectorOptions {
     /**
-     * Number of threads to use.
+     * Options to pass to `multiply_dense_row_with_single_vector()`, if `left` is a dense matrix that prefers row access.
      */
-    int num_threads = 1;
+    MultiplyDenseRowWithSingleVectorOptions dense_row;
+
+    /**
+     * Options to pass to `multiply_dense_column_with_single_vector()`, if `left` is a dense matrix that prefers column access.
+     */
+    MultiplyDenseColumnWithSingleVectorOptions dense_column;
+
+    /**
+     * Options to pass to `multiply_sparse_row_with_single_vector()`, if `left` is a sparse matrix that prefers row access.
+     */
+    MultiplySparseRowWithSingleVectorOptions sparse_row;
+
+    /**
+     * Options to pass to `multiply_sparse_column_with_single_vector()`, if `left` is a sparse matrix that prefers column access.
+     */
+    MultiplySparseColumnWithSingleVectorOptions sparse_column;
 };
 
 /**
@@ -48,32 +63,15 @@ void multiply_with_single_vector(
 ) {
     if (left.is_sparse()) {
         if (left.prefer_rows()) {
-            multiply_sparse_row_with_single_vector<accumulators_>(left, right, output, [&](){
-                MultiplySparseRowWithSingleVectorOptions opt;
-                opt.num_threads = options.num_threads;
-                return opt;
-            }());
+            multiply_sparse_row_with_single_vector<accumulators_>(left, right, output, options.sparse_row);
         } else {
-            multiply_sparse_column_with_single_vector(left, right, output, [&](){
-                MultiplySparseColumnWithSingleVectorOptions opt;
-                opt.num_threads = options.num_threads;
-                return opt;
-            }());
+            multiply_sparse_column_with_single_vector(left, right, output, options.sparse_column);
         }
-
     } else {
         if (left.prefer_rows()) {
-            multiply_dense_row_with_single_vector<accumulators_>(left, right, output, [&](){
-                MultiplyDenseRowWithSingleVectorOptions opt;
-                opt.num_threads = options.num_threads;
-                return opt;
-            }());
+            multiply_dense_row_with_single_vector<accumulators_>(left, right, output, options.dense_row);
         } else {
-            multiply_dense_column_with_single_vector(left, right, output, [&](){
-                MultiplyDenseColumnWithSingleVectorOptions opt;
-                opt.num_threads = options.num_threads;
-                return opt;
-            }());
+            multiply_dense_column_with_single_vector(left, right, output, options.dense_column);
         }
     }
 }

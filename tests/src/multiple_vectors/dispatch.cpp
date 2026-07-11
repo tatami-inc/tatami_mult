@@ -53,7 +53,10 @@ TEST_P(MultipleVectorsDispatchTest, Vector) {
     };
 
     tatami_mult::MultiplyWithMultipleVectorsOptions opt;
-    opt.num_threads = nthreads;
+    opt.dense_row.num_threads = nthreads;
+    opt.dense_column.num_threads = nthreads;
+    opt.sparse_row.num_threads = nthreads;
+    opt.sparse_column.num_threads = nthreads;
 
     std::vector<std::vector<double> > dr_output, dc_output, sr_output, sc_output;
     tatami_mult::multiply_with_multiple_vectors(*dense_row, rhs_ptrs, formulate_ptrs(dr_output), opt);

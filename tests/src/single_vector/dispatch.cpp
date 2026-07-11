@@ -37,7 +37,10 @@ TEST_P(SingleVectorDispatchTest, Vector) {
     }());
 
     tatami_mult::MultiplyWithSingleVectorOptions opt;
-    opt.num_threads = nthreads;
+    opt.dense_row.num_threads = nthreads;
+    opt.dense_column.num_threads = nthreads;
+    opt.sparse_row.num_threads = nthreads;
+    opt.sparse_column.num_threads = nthreads;
 
     std::vector<double> drout(NR), dcout(NR), srout(NR), scout(NR);
     tatami_mult::multiply_with_single_vector(*dense_row, rhs.data(), drout.data(), opt);
