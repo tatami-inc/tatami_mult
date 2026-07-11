@@ -58,6 +58,7 @@ struct MultiplyDenseRowWithDenseMatrixOptions {
  * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
  * @param right RHS matrix to be multiplied.
  * The number of rows in this matrix should be equal to the number of columns in `left`.
+ * This function is optimized for dense matrices, but will work with all matrices.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
  * On output, this stores the product of `left` and `right` in either row- or column-major format depending on `output_row_major`.
  * @param output_row_major Whether to store the matrix product in row-major format in `output`.
