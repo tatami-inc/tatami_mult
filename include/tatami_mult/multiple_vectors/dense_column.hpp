@@ -58,12 +58,12 @@ void multiply_dense_column_with_multiple_vectors(
     const std::vector<Output_*>& output,
     const MultiplyDenseColumnWithMultipleVectorsOptions& options
 ) {
-    const Index_ NR = left.nrow();
-    const Index_ NC = left.ncol();
-    const auto num_rhs = right.size();
-    typedef I<decltype(num_rhs)> RightIndex;
-    for (RightIndex h = 0; h < num_rhs; ++h) {
-        std::fill_n(output[h], NR, 0);
+    const auto left_NR = left.nrow();
+    const auto common_dim = left.ncol();
+    const auto right_NC = right.size();
+    typedef I<decltype(right_NC)> RightIndex;
+    for (RightIndex rc = 0; rc < right_NC; ++rc) {
+        std::fill_n(output[rc], left_NR, 0);
     }
 
     const bool do_parallel = options.num_threads > 1;
@@ -71,9 +71,6 @@ void multiply_dense_column_with_multiple_vectors(
     if (do_parallel) {
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
     }
-
-    const auto primary_block_size = sanisizer::cast<Index_>(options.primary_block_size);
-    const auto secondary_block_size = sanisizer::cast<Index_>(options.secondary_block_size);
 
     const auto num_used = tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(left, false, start, length);
@@ -85,89 +82,89 @@ void multiply_dense_column_with_multiple_vectors(
             outptrs = output.data();
         } else {
             tmp_output.emplace();
-            tmp_output->reserve(sanisizer::cast<I<decltype(tmp_output->size())> >(num_rhs));
-            for (RightIndex h = 0; h < num_rhs; ++h) {
-                tmp_output->emplace_back(tatami::cast_Index_to_container_size<std::vector<Output_> >(NR));
+            tmp_output->reserve(sanisizer::cast<I<decltype(tmp_output->size())> >(right_NC));
+            for (RightIndex rc = 0; rc < right_NC; ++rc) {
+                tmp_output->emplace_back(tatami::cast_Index_to_container_size<std::vector<Output_> >(left_NR));
             }
             tmp_outptrs.emplace();
-            tmp_outptrs->reserve(sanisizer::cast<I<decltype(tmp_outptrs->size())> >(num_rhs));
-            for (RightIndex h = 0; h < num_rhs; ++h) {
-                tmp_outptrs->emplace_back((*tmp_output)[h].data());
+            tmp_outptrs->reserve(sanisizer::cast<I<decltype(tmp_outptrs->size())> >(right_NC));
+            for (RightIndex rc = 0; rc < right_NC; ++rc) {
+                tmp_outptrs->emplace_back((*tmp_output)[rc].data());
             }
             outptrs = tmp_outptrs->data();
         }
 
-        if (primary_block_size == 1) {
-            auto buffer = tatami::create_container_of_Index_size<std::vector<Output_> >(NR);
-            for (Index_ c = 0; c < length; ++c) {
+        if (options.primary_block_size == 1) {
+            auto buffer = tatami::create_container_of_Index_size<std::vector<Output_> >(left_NR);
+            for (Index_ cd = 0; cd < length; ++cd) {
                 const auto ptr = ext->fetch(buffer.data());
-                for (RightIndex h = 0; h < num_rhs; ++h) {
-                    const auto optr = outptrs[h];
-                    const Output_ mult = right[h][start + c];
-                    for (Index_ r = 0; r < NR; ++r) {
-                        optr[r] += mult * static_cast<Output_>(ptr[r]);
+                for (RightIndex rc = 0; rc < right_NC; ++rc) {
+                    const auto optr = outptrs[rc];
+                    const Output_ mult = right[rc][start + cd];
+                    for (Index_ lr = 0; lr < left_NR; ++lr) {
+                        optr[lr] += mult * static_cast<Output_>(ptr[lr]);
                     }
                 }
             }
 
         } else {
-            std::vector<std::vector<Value_> > buffers;
-            std::vector<const Value_*> ptrs;
+            std::vector<std::vector<Value_> > left_buffers;
+            std::vector<const Value_*> left_ptrs;
             {
-                const Index_ max_block_cols = std::min(length, primary_block_size);
-                buffers.reserve(max_block_cols);
-                for (I<decltype(max_block_cols)> b = 0; b < max_block_cols; ++b) {
-                    buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<Value_> >(NR));
+                const Index_ max_block_cols = sanisizer::min(length, options.primary_block_size);
+                left_buffers.reserve(max_block_cols);
+                for (Index_ cd = 0; cd < max_block_cols; ++cd) {
+                    left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<Value_> >(left_NR));
                 }
-                sanisizer::resize(ptrs, max_block_cols);
+                sanisizer::resize(left_ptrs, max_block_cols);
             }
 
-            Index_ c = 0;
-            while (c < length) {
-                const Index_ cnum = std::min<Index_>(primary_block_size, length - c);
-                for (Index_ ccounter = 0; ccounter < cnum; ++ccounter) {
-                    ptrs[ccounter] = ext->fetch(buffers[ccounter].data());
+            Index_ cd = 0;
+            while (cd < length) {
+                const Index_ cd_num = std::min<Index_>(options.primary_block_size, length - cd);
+                for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                    left_ptrs[cd_counter] = ext->fetch(left_buffers[cd_counter].data());
                 }
 
-                RightIndex h = 0;
-                while (h < num_rhs) {
-                    const RightIndex hend = h + sanisizer::min(primary_block_size, num_rhs - h);
-                    Index_ r = 0;
-                    while (r < NR) {
-                        const Index_ rend = r + std::min<Index_>(secondary_block_size, NR - r);
+                RightIndex rc = 0;
+                while (rc < right_NC) {
+                    const RightIndex rc_end = rc + sanisizer::min(options.primary_block_size, right_NC - rc);
+                    Index_ lr = 0;
+                    while (lr < left_NR) {
+                        const Index_ lr_end = lr + sanisizer::min(options.secondary_block_size, left_NR - lr);
 
-                        for (auto ccounter = 0; ccounter < cnum; ++ccounter) {
-                            const auto matcol = ptrs[ccounter];
-                            for (auto hcopy = h; hcopy < hend; ++hcopy) {
-                                const Output_ mult = right[hcopy][start + c + ccounter];
-                                const auto outcol = outptrs[hcopy];
-                                for (auto rcopy = r; rcopy < rend; ++rcopy) {
-                                    outcol[rcopy] += mult * static_cast<Output_>(matcol[rcopy]);
+                        for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                            const auto matcol = left_ptrs[cd_counter];
+                            for (auto rc_copy = rc; rc_copy < rc_end; ++rc_copy) {
+                                const Output_ mult = right[rc_copy][start + cd + cd_counter];
+                                const auto outcol = outptrs[rc_copy];
+                                for (auto lr_copy = lr; lr_copy < lr_end; ++lr_copy) {
+                                    outcol[lr_copy] += mult * static_cast<Output_>(matcol[lr_copy]);
                                 }
                             }
                         }
 
-                        r = rend;
+                        lr = lr_end;
                     }
-                    h = hend;
+                    rc = rc_end;
                 }
-                c += cnum;
+                cd += cd_num;
             }
         }
 
         if (do_parallel && t > 0) {
             (*tmp_results)[t - 1] = std::move(tmp_output);
         }
-    }, NC, options.num_threads);
+    }, common_dim, options.num_threads);
 
     if (do_parallel) {
         for (int u = 1; u < num_used; ++u) {
             const auto& tmp = *((*tmp_results)[u - 1]);
-            for (RightIndex h = 0; h < num_rhs; ++h) {
-                const auto tmpvec = tmp[h];
-                const auto outptr = output[h];
-                for (Index_ r = 0; r < NR; ++r) {
-                    outptr[r] += tmpvec[r];
+            for (RightIndex rc = 0; rc < right_NC; ++rc) {
+                const auto& tmpvec = tmp[rc];
+                const auto outptr = output[rc];
+                for (Index_ lr = 0; lr < left_NR; ++lr) {
+                    outptr[lr] += tmpvec[lr];
                 }
             }
         }
