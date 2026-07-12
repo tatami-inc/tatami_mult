@@ -19,7 +19,7 @@ TEST_P(SingleVectorDispatchTest, Vector) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.density = 0.1;
+        opt.density = 0.19;
         opt.seed = 69 + nthreads;
         return opt;
     }());

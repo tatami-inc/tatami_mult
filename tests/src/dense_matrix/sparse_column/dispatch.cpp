@@ -22,7 +22,7 @@ TEST_P(DenseMatrixSparseColumnTest, Basic) {
         opt.density = 0.1;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 69 + NR + NC + NRHS + block_size + nthreads;
+        opt.seed = 369 + NR + NC + NRHS + block_size + nthreads;
         return opt;
     }());
     auto sparse_row = tatami::convert_to_compressed_sparse<double, int>(tatami::DenseRowMatrix<double, int>(NR, NC, dump), true, {});
@@ -32,7 +32,7 @@ TEST_P(DenseMatrixSparseColumnTest, Basic) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 42 + NR + NC + block_size + nthreads;
+        opt.seed = 420 + NR + NC + NRHS + block_size + nthreads;
         return opt;
     }());
     auto right_col = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NRHS, rhs);

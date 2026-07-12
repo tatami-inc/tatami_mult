@@ -9,7 +9,7 @@
 
 class MultipleVectorsSparseColumnTest : public ::testing::TestWithParam<std::tuple<int, int, int, int, int> > {};
 
-TEST_P(MultipleVectorsSparseColumnTest, Vector) {
+TEST_P(MultipleVectorsSparseColumnTest, Basic) {
     const auto params = GetParam();
     const int NR = std::get<0>(params);
     const int NC = std::get<1>(params);
@@ -19,9 +19,10 @@ TEST_P(MultipleVectorsSparseColumnTest, Vector) {
 
     auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
         tatami_test::SimulateVectorOptions opt;
+        opt.density = 0.3;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 69 + NR + NC + block_size + nthreads;
+        opt.seed = 67 + NR + NC + block_size + nthreads;
         return opt;
     }());
     auto sparse_row = tatami::convert_to_compressed_sparse<double, int>(tatami::DenseRowMatrix<double, int>(NR, NC, dump), true, {});
@@ -31,7 +32,7 @@ TEST_P(MultipleVectorsSparseColumnTest, Vector) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 42 + NR + NC + block_size + nthreads;
+        opt.seed = 39 + NR + NC + block_size + nthreads;
         return opt;
     }());
 

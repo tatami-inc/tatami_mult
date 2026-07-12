@@ -19,8 +19,8 @@ TEST_P(SingleVectorSparseRowTest, Vector) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.density = 0.1;
-        opt.seed = 69 + nthreads;
+        opt.density = 0.21;
+        opt.seed = 69 + NR + NC + nthreads;
         return opt;
     }());
     auto sparse_row = tatami::convert_to_compressed_sparse<double, int>(tatami::DenseRowMatrix<double, int>(NR, NC, dump), true, {});
@@ -30,7 +30,7 @@ TEST_P(SingleVectorSparseRowTest, Vector) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 42 + nthreads;
+        opt.seed = 43 + NR + NC + nthreads;
         return opt;
     }());
 

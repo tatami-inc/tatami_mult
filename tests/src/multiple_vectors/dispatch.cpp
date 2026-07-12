@@ -9,7 +9,7 @@
 
 class MultipleVectorsDispatchTest : public ::testing::TestWithParam<std::tuple<int, int, int, int> > {};
 
-TEST_P(MultipleVectorsDispatchTest, Vector) {
+TEST_P(MultipleVectorsDispatchTest, Basic) {
     const auto params = GetParam();
     const int NR = std::get<0>(params);
     const int NC = std::get<1>(params);
@@ -18,10 +18,10 @@ TEST_P(MultipleVectorsDispatchTest, Vector) {
 
     auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
         tatami_test::SimulateVectorOptions opt;
+        opt.density = 0.24;
         opt.lower = -10;
         opt.upper = 10;
-        opt.density = 0.1;
-        opt.seed = 69 + NR + NC + NRHS + nthreads;
+        opt.seed = 77 + NR + NC + NRHS + nthreads;
         return opt;
     }());
     auto dense_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
@@ -33,7 +33,7 @@ TEST_P(MultipleVectorsDispatchTest, Vector) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 42 + NR + NC + NRHS + nthreads;
+        opt.seed = 50 + NR + NC + NRHS + nthreads;
         return opt;
     }());
 

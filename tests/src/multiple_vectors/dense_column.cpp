@@ -9,7 +9,7 @@
 
 class MultipleVectorsDenseColumnTest : public ::testing::TestWithParam<std::tuple<int, int, int, std::pair<int, int>, int> > {};
 
-TEST_P(MultipleVectorsDenseColumnTest, Vector) {
+TEST_P(MultipleVectorsDenseColumnTest, Basic) {
     const auto params = GetParam();
     const int NR = std::get<0>(params);
     const int NC = std::get<1>(params);
@@ -21,7 +21,7 @@ TEST_P(MultipleVectorsDenseColumnTest, Vector) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 69 + NR + NC + blocks.first + blocks.second + nthreads;
+        opt.seed = 69 + NR + NC + NRHS + blocks.first + blocks.second + nthreads;
         return opt;
     }());
     auto dense_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
@@ -31,7 +31,7 @@ TEST_P(MultipleVectorsDenseColumnTest, Vector) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 42 + NR + NC + blocks.first + blocks.second + nthreads;
+        opt.seed = 42 + NR + NC + NRHS + blocks.first + blocks.second + nthreads;
         return opt;
     }());
 
