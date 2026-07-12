@@ -98,7 +98,7 @@ void multiply_sparse_row_with_multiple_vectors(
 
             Index_ lr = 0;
             while (lr < length) {
-                const Index_ lr_num = std::min<Index_>(options.block_size, length - lr);
+                const Index_ lr_num = sanisizer::min(options.block_size, length - lr);
                 for (Index_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     left_ranges[lr_counter] = ext->fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());
                 }

@@ -121,7 +121,7 @@ void multiply_dense_column_with_multiple_vectors(
 
             Index_ cd = 0;
             while (cd < length) {
-                const Index_ cd_num = std::min<Index_>(options.primary_block_size, length - cd);
+                const Index_ cd_num = sanisizer::min(options.primary_block_size, length - cd);
                 for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                     left_ptrs[cd_counter] = ext->fetch(left_buffers[cd_counter].data());
                 }
