@@ -128,7 +128,7 @@ void multiply_sparse_column_with_dense_row_matrix_to_column_output(
                     right_ptrs[cd_counter] = right_ext->fetch(right_dbuffers[cd_counter].data());
                 }
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    for (auto cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                    for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                         const auto& currange = left_ranges[cd_counter];
                         const Output_ mult = right_ptrs[cd_counter][rc];
                         for (LeftIndex_ x = 0; x < currange.number; ++x) {

@@ -127,7 +127,7 @@ void multiply_sparse_column_with_multiple_vectors(
                 }
                 for (RightIndex rc = 0; rc < right_NC; ++rc) {
                     const auto outcol = outptrs[rc];
-                    for (auto cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                    for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                         const auto& currange = left_ranges[cd_counter];
                         const Output_ mult = right[rc][start + cd + cd_counter];
                         for (Index_ x = 0; x < currange.number; ++x) {
