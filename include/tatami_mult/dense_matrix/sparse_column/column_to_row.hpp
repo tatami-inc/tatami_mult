@@ -1,0 +1,118 @@
+#ifndef TATAMI_MULT_DENSE_MATRIX_SPARSE_COLUMN_COLUMN_TO_ROW_HPP
+#define TATAMI_MULT_DENSE_MATRIX_SPARSE_COLUMN_COLUMN_TO_ROW_HPP
+
+#include <cstddef>
+#include <vector>
+#include <optional>
+
+#include "tatami/tatami.hpp"
+#include "sanisizer/sanisizer.hpp"
+
+#include "../../utils.hpp"
+
+/**
+ * @file column_to_row.hpp
+ * @brief Sparse column LHS, dense column-major matrix RHS, row-major output.
+ */
+
+namespace tatami_mult {
+
+/**
+ * @brief Options for `multiply_sparse_column_with_dense_column_matrix_to_row_output()`.
+ */
+struct MultiplySparseColumnWithDenseColumnMatrixToRowOutputOptions {
+    /**
+     * Number of threads to use.
+     */
+    int num_threads = 1;
+};
+
+/**
+ * @tparam Value_ Numeric type of the matrix value.
+ * @tparam Index_ Integer type of the matrix index.
+ * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Output_ Numeric type of the output array.
+ * 
+ * @param left LHS matrix to be multiplied.
+ * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
+ * @param right RHS matrix to be multiplied.
+ * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
+ * The number of rows in `right` should be equal to the number of columns in `left`.
+ * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * On output, this contains the product `left * right` in row-major order.
+ * @param options Further options.
+ */
+template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+void multiply_sparse_column_with_dense_column_matrix_to_row_output(
+    const tatami::Matrix<LeftValue_, LeftIndex_>& left,
+    const tatami::Matrix<RightValue_, RightIndex_>& right,
+    Output_* const output,
+    const MultiplySparseColumnWithDenseColumnMatrixToRowOutputOptions& options
+) {
+    const auto left_NR = left.nrow();
+    const auto common_dim = left.ncol();
+    const auto right_NC = right.ncol();
+
+    const bool do_parallel = options.num_threads > 1;
+    std::optional<std::vector<std::optional<std::vector<Output_> > > > tmp_results;
+    if (do_parallel) {
+        tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
+    }
+
+    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
+    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
+    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+
+    const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
+        auto left_ext = tatami::consecutive_extractor<true>(left, false, start, length);
+
+        auto vbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(left_NR);
+        auto ibuffer = tatami::create_container_of_Index_size<std::vector<LeftIndex_> >(left_NR);
+        auto rbuffer = tatami::create_container_of_Index_size<std::vector<RightValue_> >(right_NC);
+
+        std::optional<std::vector<Output_> > tmp_output;
+        Output_* outptr; 
+        if (!do_parallel || t == 0) {
+            outptr = output;
+        } else {
+            tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(left_NR, right_NC));
+            outptr = tmp_output->data();
+        }
+
+        for (LeftIndex_ cd = 0; cd < length; ++cd) {
+            const auto lrange = left_ext->fetch(vbuffer.data(), ibuffer.data());
+            if (lrange.number == 0) {
+                continue;
+            }
+            for (RightIndex_ rc = 0; rc < right_NC; ++rc) { // extracting to a dense buffer for more friendly inner loops.
+                rbuffer[rc] = right_ptrs[rc][start + cd];
+            }
+
+            for (LeftIndex_ x = 0; x < lrange.number; ++x) {
+                const Output_ mult = lrange.value[x];
+                const auto curout = outptr + sanisizer::product_unsafe<std::size_t>(lrange.index[x], right_NC);
+                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                    curout[rc] += mult * static_cast<Output_>(rbuffer[rc]); 
+                }
+            }
+        }
+
+        if (do_parallel && t > 0) {
+            (*tmp_results)[t - 1] = std::move(tmp_output);
+        }
+    }, common_dim, options.num_threads);
+
+    if (do_parallel) {
+        for (int u = 1; u < num_used; ++u) {
+            const auto& tmp = *((*tmp_results)[u - 1]);
+            const auto N = tmp.size();
+            for (I<decltype(N)> x = 0; x < N; ++x) {
+                output[x] += tmp[x];
+            }
+        }
+    }
+}
+
+}
+
+#endif
