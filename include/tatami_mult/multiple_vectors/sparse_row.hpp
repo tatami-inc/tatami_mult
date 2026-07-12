@@ -10,8 +10,8 @@
 #include "../sparse_dot_product.hpp"
 
 /**
- * @file public.hpp
- * @brief Sparse row LHS, multiple vectors RHS.
+ * @file sparse_row.hpp
+ * @brief Sparse row-major LHS, multiple vectors RHS.
  */
 
 namespace tatami_mult {

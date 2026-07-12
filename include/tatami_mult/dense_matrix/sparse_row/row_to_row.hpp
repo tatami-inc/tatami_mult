@@ -12,7 +12,7 @@
 
 /**
  * @file row_to_row.hpp
- * @brief Sparse row LHS, dense row-major RHS, row-major output.
+ * @brief Sparse row-major LHS, dense row-major RHS, row-major output.
  */
 
 namespace tatami_mult {

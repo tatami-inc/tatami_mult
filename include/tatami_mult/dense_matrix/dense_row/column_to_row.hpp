@@ -12,7 +12,7 @@
 
 /**
  * @file column_to_row.hpp
- * @brief Dense row LHS, dense column-major matrix RHS, row-major output.
+ * @brief Dense row-major LHS, dense column-major matrix RHS, row-major output.
  */
 
 namespace tatami_mult {

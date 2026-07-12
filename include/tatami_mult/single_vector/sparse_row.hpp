@@ -10,7 +10,7 @@
 
 /**
  * @file sparse_row.hpp
- * @brief Sparse row LHS, single vector RHS.
+ * @brief Sparse row-major LHS, single vector RHS.
  */
 
 namespace tatami_mult {

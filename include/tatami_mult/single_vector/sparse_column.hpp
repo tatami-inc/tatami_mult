@@ -9,6 +9,11 @@
 
 #include "../utils.hpp"
 
+/**
+ * @file sparse_column.hpp
+ * @brief Sparse column-major LHS, single vector RHS.
+ */
+
 namespace tatami_mult {
 
 /**

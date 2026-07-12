@@ -12,7 +12,7 @@
 
 /**
  * @file column_to_row.hpp
- * @brief Sparse column LHS, dense column-major matrix RHS, row-major output.
+ * @brief Sparse column-major LHS, dense column-major matrix RHS, row-major output.
  */
 
 namespace tatami_mult {
@@ -28,9 +28,10 @@ struct MultiplySparseColumnWithDenseColumnMatrixToRowOutputOptions {
 };
 
 /**
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.

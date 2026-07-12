@@ -10,7 +10,7 @@
 
 /**
  * @file dense_row.hpp
- * @brief Dense row LHS, single vector RHS.
+ * @brief Dense row-major LHS, single vector RHS.
  */
 
 namespace tatami_mult {

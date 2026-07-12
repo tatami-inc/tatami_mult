@@ -11,8 +11,8 @@
 #include "../../utils.hpp"
 
 /**
- * @file column_to_column.hpp
- * @brief Sparse column LHS, dense column-major matrix RHS, column-major output.
+ * @file row_to_column.hpp
+ * @brief Sparse column-major LHS, dense column-major matrix RHS, column-major output.
  */
 
 namespace tatami_mult {

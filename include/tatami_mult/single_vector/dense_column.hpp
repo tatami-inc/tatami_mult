@@ -13,7 +13,7 @@
 
 /**
  * @file dense_column.hpp
- * @brief Dense column LHS, single vector RHS.
+ * @brief Dense column-major LHS, single vector RHS.
  */
 
 namespace tatami_mult {

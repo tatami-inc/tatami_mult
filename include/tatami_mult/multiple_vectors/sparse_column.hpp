@@ -11,7 +11,7 @@
 
 /**
  * @file sparse_column.hpp
- * @brief Sparse column LHS, multiple vectors RHS.
+ * @brief Sparse column-major LHS, multiple vectors RHS.
  */
 
 namespace tatami_mult {

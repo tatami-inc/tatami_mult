@@ -10,7 +10,7 @@
 
 /**
  * @file dispatch.hpp
- * @brief Sparse column LHS, dense matrix RHS.
+ * @brief Sparse column-major LHS, dense matrix RHS.
  */
 
 namespace tatami_mult {
