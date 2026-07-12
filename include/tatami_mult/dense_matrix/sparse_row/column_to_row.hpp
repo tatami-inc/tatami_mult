@@ -1,0 +1,134 @@
+#ifndef TATAMI_MULT_DENSE_MATRIX_SPARSE_ROW_COLUMN_TO_ROW_HPP
+#define TATAMI_MULT_DENSE_MATRIX_SPARSE_ROW_COLUMN_TO_ROW_HPP
+
+#include <cstddef>
+#include <vector>
+
+#include "tatami/tatami.hpp"
+
+#include "../../utils.hpp"
+#include "../../sparse_dot_product.hpp"
+
+/**
+ * @file column_to_row.hpp
+ * @brief Sparse row LHS, dense column-major RHS, row-major output.
+ */
+
+namespace tatami_mult {
+
+/**
+ * @brief Options for `multiply_sparse_row_with_dense_column_matrix_to_row_output()`.
+ */
+struct MultiplySparseRowWithDenseColumnMatrixToRowOutputOptions {
+    /**
+     * Number of threads to use.
+     */
+    int num_threads = 1;
+
+    /**
+     * Block size.
+     */
+    int block_size = 16;
+};
+
+/**
+ * @tparam accumulators_ Number of accumulators for computing the dot product.
+ * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
+ * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.
+ * @tparam LeftValue_ Numeric type of the left matrix value.
+ * @tparam LeftIndex_ Integer type of the left matrix index.
+ * @tparam RightValue_ Numeric type of the right matrix value.
+ * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam Output_ Numeric type of the output array.
+ * 
+ * @param left LHS matrix to be multiplied.
+ * This function is optimized for sparse matrices that prefer row access, but will work with all matrices.
+ * @param right RHS matrix to be multiplied.
+ * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
+ * The number of rows in this matrix should be equal to the number of columns in `left`.
+ * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
+ * On output, this stores the product of `left` and `right` in row-major format.
+ * @param options Further options.
+ */
+template<std::size_t accumulators_, typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+void multiply_sparse_row_with_dense_column_matrix_to_row_output(
+    const tatami::Matrix<LeftValue_, LeftIndex_>& left,
+    const tatami::Matrix<RightValue_, RightIndex_>& right,
+    Output_* const output,
+    const MultiplySparseRowWithDenseColumnMatrixToRowOutputOptions& options
+) {
+    const auto left_NR = left.nrow();
+    const auto common_dim = left.ncol();
+    const auto right_NC = right.ncol();
+
+    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
+    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
+    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+
+    if (options.block_size == 1) {
+        tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
+            auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
+            auto vbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(common_dim);
+            auto ibuffer = tatami::create_container_of_Index_size<std::vector<LeftIndex_> >(common_dim);
+
+            for (LeftIndex_ lr = 0; lr < length; ++lr) {
+                const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
+                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                    // Implicit cast of range.number to size_t is safe, as per the tatami contract.
+                    // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
+                    const auto val = sparse_dot_product<accumulators_>(range.number, range.value, range.index, right_ptrs[rc], static_cast<Output_>(0));
+                    output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr)] = val;
+                }
+            }
+        }, left_NR, options.num_threads);
+
+    } else {
+        tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
+            auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
+
+            // Our blocking strategy is to collect multiple LHS rows so that, for each RHS vector,
+            // we can keep it in cache for easy re-use when computing the dot-product for each LHS row.
+            std::vector<std::vector<LeftValue_> > left_vbuffers;
+            std::vector<std::vector<LeftIndex_> > left_ibuffers;
+            std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
+            {
+                const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
+                left_vbuffers.reserve(max_block_rows);
+                left_ibuffers.reserve(max_block_rows);
+                for (LeftIndex_ lr = 0; lr < max_block_rows; ++lr) {
+                    left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
+                    left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(common_dim));
+                }
+                sanisizer::resize(left_ranges, max_block_rows);
+            }
+
+            LeftIndex_ lr = 0;
+            while (lr < length) {
+                const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
+                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                    left_ranges[lr_counter] = ext->fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());
+                }
+
+                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                    const auto rcol = right_ptrs[rc];
+                    for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                        const auto& currange = left_ranges[lr_counter];
+                        output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr + lr_counter)] = sparse_dot_product<accumulators_>(
+                            currange.number, // Implicit cast of range.number to size_t is safe, as per the tatami contract.
+                            currange.value,
+                            currange.index,
+                            rcol,
+                            static_cast<Output_>(0)
+                        );
+                    }
+                }
+
+                lr += lr_num;
+            }
+        }, left_NR, options.num_threads);
+    }
+}
+
+}
+
+#endif
