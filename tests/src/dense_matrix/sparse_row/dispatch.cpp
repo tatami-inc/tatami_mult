@@ -47,26 +47,26 @@ TEST_P(DenseMatrixSparseRowTest, Basic) {
     opt.row_to_row.num_threads = nthreads;
 
     const auto output_size = NR * NRHS;
-    std::vector<double> dr_rc_ro1(output_size), dr_rc_ro4(output_size),
-        dr_rc_co1(output_size), dr_rc_co4(output_size),
-        dr_rr_ro(output_size), dr_rr_co(output_size),
-        dc_rr_ro(output_size), dc_rr_co(output_size),
-        dc_rc_ro(output_size), dc_rc_co(output_size);
+    std::vector<double> sr_rc_ro1(output_size), sr_rc_ro4(output_size),
+        sr_rc_co1(output_size), sr_rc_co4(output_size),
+        sr_rr_ro(output_size), sr_rr_co(output_size),
+        sc_rr_ro(output_size), sc_rr_co(output_size),
+        sc_rc_ro(output_size), sc_rc_co(output_size);
 
     // Checking different choices of accumulators.
-    tatami_mult::multiply_sparse_row_with_dense_matrix<1>(*sparse_row, *right_col, dr_rc_ro1.data(), true, opt);
-    tatami_mult::multiply_sparse_row_with_dense_matrix<4>(*sparse_row, *right_col, dr_rc_ro4.data(), true, opt);
-    tatami_mult::multiply_sparse_row_with_dense_matrix<1>(*sparse_row, *right_col, dr_rc_co1.data(), false, opt);
-    tatami_mult::multiply_sparse_row_with_dense_matrix<4>(*sparse_row, *right_col, dr_rc_co4.data(), false, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix<1>(*sparse_row, *right_col, sr_rc_ro1.data(), true, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix<4>(*sparse_row, *right_col, sr_rc_ro4.data(), true, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix<1>(*sparse_row, *right_col, sr_rc_co1.data(), false, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix<4>(*sparse_row, *right_col, sr_rc_co4.data(), false, opt);
 
-    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_row, *right_row, dr_rr_ro.data(), true, opt);
-    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_row, *right_row, dr_rr_co.data(), false, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_row, *right_row, sr_rr_ro.data(), true, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_row, *right_row, sr_rr_co.data(), false, opt);
 
     // Checking that it still works for column-major LHS.
-    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_row, dc_rr_ro.data(), true, opt);
-    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_col, dc_rc_ro.data(), true, opt);
-    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_row, dc_rr_co.data(), false, opt);
-    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_col, dc_rc_co.data(), false, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_row, sc_rr_ro.data(), true, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_col, sc_rc_ro.data(), true, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_row, sc_rr_co.data(), false, opt);
+    tatami_mult::multiply_sparse_row_with_dense_matrix(*sparse_col, *right_col, sc_rc_co.data(), false, opt);
 
     for (int h = 0; h < NRHS; ++h) {
         const auto rptr = rhs.data() + h * NC;
@@ -74,18 +74,18 @@ TEST_P(DenseMatrixSparseRowTest, Basic) {
             const auto ref = std::inner_product(rptr, rptr + NC, dump.begin() + r * NC, 0.0);
 
             const auto rm_idx = r * NRHS + h;
-            EXPECT_FLOAT_EQ(ref, dr_rc_ro1[rm_idx]);
-            EXPECT_FLOAT_EQ(ref, dr_rc_ro4[rm_idx]);
-            EXPECT_FLOAT_EQ(ref, dr_rr_ro[rm_idx]);
-            EXPECT_FLOAT_EQ(ref, dc_rc_ro[rm_idx]);
-            EXPECT_FLOAT_EQ(ref, dc_rr_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rc_ro1[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rc_ro4[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rr_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rc_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rr_ro[rm_idx]);
 
             const auto cm_idx = h * NR + r;
-            EXPECT_FLOAT_EQ(ref, dr_rc_co1[cm_idx]);
-            EXPECT_FLOAT_EQ(ref, dr_rc_co4[cm_idx]);
-            EXPECT_FLOAT_EQ(ref, dr_rr_co[cm_idx]);
-            EXPECT_FLOAT_EQ(ref, dc_rc_co[cm_idx]);
-            EXPECT_FLOAT_EQ(ref, dc_rr_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rc_co1[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rc_co4[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rr_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rc_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rr_co[cm_idx]);
         }
     }
 }
