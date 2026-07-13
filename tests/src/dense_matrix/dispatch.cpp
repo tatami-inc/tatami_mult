@@ -7,22 +7,17 @@
 
 #include "tatami_mult/dense_matrix/dispatch.hpp"
 
-class DenseMatrixDispatchTest : public ::testing::TestWithParam<std::tuple<int, int, int, int, int> > {};
-
-TEST_P(DenseMatrixDispatchTest, Basic) {
-    const auto params = GetParam();
-    const int NR = std::get<0>(params);
-    const int NC = std::get<1>(params);
-    const int NRHS = std::get<2>(params);
-    const auto block_size = std::get<3>(params);
-    const auto nthreads = std::get<4>(params);
+TEST(DenseMatrixDispatch, Basic) {
+    const int NR = 100;
+    const int NC = 59;
+    const int NRHS = 74;
 
     auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
         tatami_test::SimulateVectorOptions opt;
         opt.density = 0.25;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 669 + NR + NC + NRHS + block_size + nthreads;
+        opt.seed = 669 + NR + NC + NRHS; 
         return opt;
     }());
     auto dense_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
@@ -34,18 +29,10 @@ TEST_P(DenseMatrixDispatchTest, Basic) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 442 + NR + NC + NRHS + block_size + nthreads;
+        opt.seed = 442 + NR + NC + NRHS;
         return opt;
     }());
     auto right_col = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NRHS, rhs);
-
-    tatami_mult::MultiplyWithDenseMatrixOptions opt;
-//    opt.column_to_column.num_threads = nthreads;
-//    opt.column_to_column.block_size = block_size;
-//    opt.column_to_row.num_threads = nthreads;
-//    opt.column_to_row.block_size = block_size;
-//    opt.row_to_column.num_threads = nthreads;
-//    opt.row_to_row.num_threads = nthreads;
 
     const auto output_size = NR * NRHS;
     std::vector<double> dr_ro(output_size), dr_co(output_size),
@@ -53,15 +40,15 @@ TEST_P(DenseMatrixDispatchTest, Basic) {
         sr_ro(output_size), sr_co(output_size),
         sc_ro(output_size), sc_co(output_size);
 
-    tatami_mult::multiply_with_dense_matrix(*dense_row, *right_col, dr_ro.data(), true, opt);
-    tatami_mult::multiply_with_dense_matrix(*dense_col, *right_col, dc_ro.data(), true, opt);
-    tatami_mult::multiply_with_dense_matrix(*sparse_row, *right_col, sr_ro.data(), true, opt);
-    tatami_mult::multiply_with_dense_matrix(*sparse_col, *right_col, sc_ro.data(), true, opt);
+    tatami_mult::multiply_with_dense_matrix(*dense_row, *right_col, dr_ro.data(), true, {});
+    tatami_mult::multiply_with_dense_matrix(*dense_col, *right_col, dc_ro.data(), true, {});
+    tatami_mult::multiply_with_dense_matrix(*sparse_row, *right_col, sr_ro.data(), true, {});
+    tatami_mult::multiply_with_dense_matrix(*sparse_col, *right_col, sc_ro.data(), true, {});
 
-    tatami_mult::multiply_with_dense_matrix(*dense_row, *right_col, dr_co.data(), false, opt);
-    tatami_mult::multiply_with_dense_matrix(*dense_col, *right_col, dc_co.data(), false, opt);
-    tatami_mult::multiply_with_dense_matrix(*sparse_row, *right_col, sr_co.data(), false, opt);
-    tatami_mult::multiply_with_dense_matrix(*sparse_col, *right_col, sc_co.data(), false, opt);
+    tatami_mult::multiply_with_dense_matrix(*dense_row, *right_col, dr_co.data(), false, {});
+    tatami_mult::multiply_with_dense_matrix(*dense_col, *right_col, dc_co.data(), false, {});
+    tatami_mult::multiply_with_dense_matrix(*sparse_row, *right_col, sr_co.data(), false, {});
+    tatami_mult::multiply_with_dense_matrix(*sparse_col, *right_col, sc_co.data(), false, {});
 
     for (int h = 0; h < NRHS; ++h) {
         const auto rptr = rhs.data() + h * NC;
@@ -83,14 +70,49 @@ TEST_P(DenseMatrixDispatchTest, Basic) {
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    DenseMatrix,
-    DenseMatrixDispatchTest,
-    ::testing::Combine(
-        ::testing::Values(100, 33), // number of rows.
-        ::testing::Values(59, 148), // number of columns.
-        ::testing::Values(12, 74),  // number of RHS vectors.
-        ::testing::Values(1, 4, 8), // block size.
-        ::testing::Values(1, 3)
-    )
-);
+TEST(DenseMatrixDispatch, Options) {
+    tatami_mult::MultiplyWithDenseMatrixOptions opt;
+    tatami_mult::set_num_threads(opt, 13);
+    EXPECT_EQ(opt.dense_row.column_to_column.num_threads, 13);
+    EXPECT_EQ(opt.dense_row.column_to_row.num_threads, 13);
+    EXPECT_EQ(opt.dense_row.row_to_column.num_threads, 13);
+    EXPECT_EQ(opt.dense_row.row_to_row.num_threads, 13);
+    EXPECT_EQ(opt.dense_column.column_to_column.num_threads, 13);
+    EXPECT_EQ(opt.dense_column.column_to_row.num_threads, 13);
+    EXPECT_EQ(opt.dense_column.row_to_column.num_threads, 13);
+    EXPECT_EQ(opt.dense_column.row_to_row.num_threads, 13);
+    EXPECT_EQ(opt.sparse_column.column_to_column.num_threads, 13);
+    EXPECT_EQ(opt.sparse_column.column_to_row.num_threads, 13);
+    EXPECT_EQ(opt.sparse_column.row_to_column.num_threads, 13);
+    EXPECT_EQ(opt.sparse_column.row_to_row.num_threads, 13);
+    EXPECT_EQ(opt.sparse_row.column_to_column.num_threads, 13);
+    EXPECT_EQ(opt.sparse_row.column_to_row.num_threads, 13);
+    EXPECT_EQ(opt.sparse_row.row_to_column.num_threads, 13);
+    EXPECT_EQ(opt.sparse_row.row_to_row.num_threads, 13);
+
+    tatami_mult::set_dense_primary_block_size(opt, 42);
+    EXPECT_EQ(opt.dense_row.column_to_column.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_row.column_to_row.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_row.row_to_column.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_row.row_to_row.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_column.column_to_column.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_column.column_to_row.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_column.row_to_column.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_column.row_to_row.primary_block_size, 42);
+
+    tatami_mult::set_dense_secondary_block_size(opt, 69);
+    EXPECT_EQ(opt.dense_row.column_to_column.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_row.column_to_row.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_row.row_to_column.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_row.row_to_row.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_column.column_to_column.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_column.column_to_row.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_column.row_to_column.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_column.row_to_row.secondary_block_size, 69);
+
+    tatami_mult::set_sparse_block_size(opt, 100);
+    EXPECT_EQ(opt.sparse_row.column_to_column.block_size, 100);
+    EXPECT_EQ(opt.sparse_row.column_to_row.block_size, 100);
+    EXPECT_EQ(opt.sparse_column.column_to_column.block_size, 100);
+    EXPECT_EQ(opt.sparse_column.row_to_column.block_size, 100);
+}

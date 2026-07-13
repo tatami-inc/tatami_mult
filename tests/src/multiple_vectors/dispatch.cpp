@@ -7,21 +7,17 @@
 
 #include "tatami_mult/multiple_vectors/dispatch.hpp"
 
-class MultipleVectorsDispatchTest : public ::testing::TestWithParam<std::tuple<int, int, int, int> > {};
-
-TEST_P(MultipleVectorsDispatchTest, Basic) {
-    const auto params = GetParam();
-    const int NR = std::get<0>(params);
-    const int NC = std::get<1>(params);
-    const int NRHS = std::get<2>(params);
-    const auto nthreads = std::get<3>(params);
+TEST(MultipleVectorsDispatch, Basic) {
+    const int NR = 107;
+    const int NC = 78;
+    const int NRHS = 13;
 
     auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
         tatami_test::SimulateVectorOptions opt;
         opt.density = 0.24;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 77 + NR + NC + NRHS + nthreads;
+        opt.seed = 77 + NR + NC + NRHS; 
         return opt;
     }());
     auto dense_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
@@ -33,7 +29,7 @@ TEST_P(MultipleVectorsDispatchTest, Basic) {
         tatami_test::SimulateVectorOptions opt;
         opt.lower = -10;
         opt.upper = 10;
-        opt.seed = 50 + NR + NC + NRHS + nthreads;
+        opt.seed = 50 + NR + NC + NRHS;
         return opt;
     }());
 
@@ -52,17 +48,11 @@ TEST_P(MultipleVectorsDispatchTest, Basic) {
         return ptrs;
     };
 
-    tatami_mult::MultiplyWithMultipleVectorsOptions opt;
-    opt.dense_row.num_threads = nthreads;
-    opt.dense_column.num_threads = nthreads;
-    opt.sparse_row.num_threads = nthreads;
-    opt.sparse_column.num_threads = nthreads;
-
     std::vector<std::vector<double> > dr_output, dc_output, sr_output, sc_output;
-    tatami_mult::multiply_with_multiple_vectors(*dense_row, rhs_ptrs, formulate_ptrs(dr_output), opt);
-    tatami_mult::multiply_with_multiple_vectors(*dense_col, rhs_ptrs, formulate_ptrs(dc_output), opt);
-    tatami_mult::multiply_with_multiple_vectors(*sparse_row, rhs_ptrs, formulate_ptrs(sr_output), opt);
-    tatami_mult::multiply_with_multiple_vectors(*sparse_col, rhs_ptrs, formulate_ptrs(sc_output), opt);
+    tatami_mult::multiply_with_multiple_vectors(*dense_row, rhs_ptrs, formulate_ptrs(dr_output), {});
+    tatami_mult::multiply_with_multiple_vectors(*dense_col, rhs_ptrs, formulate_ptrs(dc_output), {});
+    tatami_mult::multiply_with_multiple_vectors(*sparse_row, rhs_ptrs, formulate_ptrs(sr_output), {});
+    tatami_mult::multiply_with_multiple_vectors(*sparse_col, rhs_ptrs, formulate_ptrs(sc_output), {});
 
     for (int h = 0; h < NRHS; ++h) {
         for (int r = 0; r < NR; ++r) {
@@ -74,13 +64,23 @@ TEST_P(MultipleVectorsDispatchTest, Basic) {
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    MultipleVectors,
-    MultipleVectorsDispatchTest,
-    ::testing::Combine(
-        ::testing::Values(107, 55),
-        ::testing::Values(36, 78),
-        ::testing::Values(13, 60),
-        ::testing::Values(1, 3)
-    )
-);
+TEST(MultipleVectorsDispatch, Options) {
+    tatami_mult::MultiplyWithMultipleVectorsOptions opt;
+    tatami_mult::set_num_threads(opt, 13);
+    EXPECT_EQ(opt.dense_row.num_threads, 13);
+    EXPECT_EQ(opt.dense_column.num_threads, 13);
+    EXPECT_EQ(opt.sparse_row.num_threads, 13);
+    EXPECT_EQ(opt.sparse_column.num_threads, 13);
+
+    tatami_mult::set_dense_primary_block_size(opt, 42);
+    EXPECT_EQ(opt.dense_row.primary_block_size, 42);
+    EXPECT_EQ(opt.dense_column.primary_block_size, 42);
+
+    tatami_mult::set_dense_secondary_block_size(opt, 69);
+    EXPECT_EQ(opt.dense_row.secondary_block_size, 69);
+    EXPECT_EQ(opt.dense_column.secondary_block_size, 69);
+
+    tatami_mult::set_sparse_block_size(opt, 42);
+    EXPECT_EQ(opt.sparse_row.block_size, 42);
+    EXPECT_EQ(opt.sparse_column.block_size, 42);
+}

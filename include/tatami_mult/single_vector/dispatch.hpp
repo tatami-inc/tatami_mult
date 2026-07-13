@@ -39,6 +39,19 @@ struct MultiplyWithSingleVectorOptions {
 };
 
 /**
+ * Set the number of threads to use in all multiplication functions involving single vector RHS.
+ *
+ * @param options Options to be set.
+ * @param num_threads Number of threads, should be positive.
+ */
+inline void set_num_threads(MultiplyWithSingleVectorOptions& options, int num_threads) {
+    options.dense_row.num_threads = num_threads;
+    options.dense_column.num_threads = num_threads;
+    options.sparse_row.num_threads = num_threads;
+    options.sparse_column.num_threads = num_threads;
+}
+
+/**
  * @tparam accumulators_ Number of accumulators for computing the dot product.
  * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
  * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.

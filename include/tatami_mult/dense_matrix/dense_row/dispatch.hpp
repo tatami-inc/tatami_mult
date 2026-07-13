@@ -45,6 +45,45 @@ struct MultiplyDenseRowWithDenseMatrixOptions {
 };
 
 /**
+ * Set the number of threads to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS.
+ *
+ * @param options Options to be set.
+ * @param num_threads Number of threads, should be positive.
+ */
+inline void set_num_threads(MultiplyDenseRowWithDenseMatrixOptions& options, int num_threads) {
+    options.column_to_column.num_threads = num_threads;
+    options.column_to_row.num_threads = num_threads;
+    options.row_to_column.num_threads = num_threads;
+    options.row_to_row.num_threads = num_threads;
+}
+
+/**
+ * Set the primary block size to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS.
+ *
+ * @param options Options to be set.
+ * @param primary_block_size Primary block size.
+ */
+inline void set_dense_primary_block_size(MultiplyDenseRowWithDenseMatrixOptions& options, int primary_block_size) {
+    options.column_to_column.primary_block_size = primary_block_size;
+    options.column_to_row.primary_block_size = primary_block_size;
+    options.row_to_column.primary_block_size = primary_block_size;
+    options.row_to_row.primary_block_size = primary_block_size;
+}
+
+/**
+ * Set the secondary block size to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS.
+ *
+ * @param options Options to be set.
+ * @param secondary_block_size Secondary block size.
+ */
+inline void set_dense_secondary_block_size(MultiplyDenseRowWithDenseMatrixOptions& options, int secondary_block_size) {
+    options.column_to_column.secondary_block_size = secondary_block_size;
+    options.column_to_row.secondary_block_size = secondary_block_size;
+    options.row_to_column.secondary_block_size = secondary_block_size;
+    options.row_to_row.secondary_block_size = secondary_block_size;
+}
+
+/**
  * @tparam accumulators_ Number of accumulators for computing the dot product.
  * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
  * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.

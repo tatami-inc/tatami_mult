@@ -39,6 +39,52 @@ struct MultiplyWithMultipleVectorsOptions {
 };
 
 /**
+ * Set the number of threads to use in all multiplication functions involving multiple vectors RHS.
+ *
+ * @param options Options to be set.
+ * @param num_threads Number of threads, should be positive.
+ */
+inline void set_num_threads(MultiplyWithMultipleVectorsOptions& options, int num_threads) {
+    options.dense_row.num_threads = num_threads;
+    options.dense_column.num_threads = num_threads;
+    options.sparse_row.num_threads = num_threads;
+    options.sparse_column.num_threads = num_threads;
+}
+
+/**
+ * Set the primary block size to use in all multiplication functions involving a dense matrix LHS and multiple vectors RHS.
+ *
+ * @param options Options to be set.
+ * @param primary_block_size Primary block size.
+ */
+inline void set_dense_primary_block_size(MultiplyWithMultipleVectorsOptions& options, int primary_block_size) {
+    options.dense_row.primary_block_size = primary_block_size;
+    options.dense_column.primary_block_size = primary_block_size;
+}
+
+/**
+ * Set the secondary block size to use in all multiplication functions involving a dense matrix LHS and multiple vectors RHS.
+ *
+ * @param options Options to be set.
+ * @param secondary_block_size Secondary block size.
+ */
+inline void set_dense_secondary_block_size(MultiplyWithMultipleVectorsOptions& options, int secondary_block_size) {
+    options.dense_row.secondary_block_size = secondary_block_size;
+    options.dense_column.secondary_block_size = secondary_block_size;
+}
+
+/**
+ * Set the block size to use in all multiplication functions involving a sparse matrix LHS and multiple vectors RHS.
+ *
+ * @param options Options to be set.
+ * @param block_size Block size.
+ */
+inline void set_sparse_block_size(MultiplyWithMultipleVectorsOptions& options, int block_size) {
+    options.sparse_row.block_size = block_size;
+    options.sparse_column.block_size = block_size;
+}
+
+/**
  * @tparam accumulators_ Number of accumulators for computing the dot product.
  * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
  * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.

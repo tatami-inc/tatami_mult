@@ -45,6 +45,30 @@ struct MultiplySparseRowWithDenseMatrixOptions {
 };
 
 /**
+ * Set the number of threads to use in all multiplication functions involving a sparse row-major LHS and a dense matrix RHS.
+ *
+ * @param options Options to be set.
+ * @param num_threads Number of threads, should be positive.
+ */
+inline void set_num_threads(MultiplySparseRowWithDenseMatrixOptions& options, int num_threads) {
+    options.column_to_column.num_threads = num_threads;
+    options.column_to_row.num_threads = num_threads;
+    options.row_to_column.num_threads = num_threads;
+    options.row_to_row.num_threads = num_threads;
+}
+
+/**
+ * Set the block size to use in all multiplication functions involving a sparse row-major LHS and a dense matrix RHS.
+ *
+ * @param options Options to be set.
+ * @param block_size Block size.
+ */
+inline void set_sparse_block_size(MultiplySparseRowWithDenseMatrixOptions& options, int block_size) {
+    options.column_to_column.block_size = block_size;
+    options.column_to_row.block_size = block_size;
+}
+
+/**
  * @tparam accumulators_ Number of accumulators for computing the dot product.
  * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
  * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.

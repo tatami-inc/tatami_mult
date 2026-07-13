@@ -38,18 +38,9 @@ TEST_P(DenseMatrixDenseColumnTest, Basic) {
     auto right_row = tatami::convert_to_dense<double, int>(*right_col, true, {});
 
     tatami_mult::MultiplyDenseColumnWithDenseMatrixOptions opt;
-    opt.column_to_column.num_threads = nthreads;
-    opt.column_to_column.primary_block_size = blocks.first;
-    opt.column_to_column.secondary_block_size = blocks.second;
-    opt.column_to_row.num_threads = nthreads;
-    opt.column_to_row.primary_block_size = blocks.first;
-    opt.column_to_row.secondary_block_size = blocks.second;
-    opt.row_to_column.num_threads = nthreads;
-    opt.row_to_column.primary_block_size = blocks.first;
-    opt.row_to_column.secondary_block_size = blocks.second;
-    opt.row_to_row.num_threads = nthreads;
-    opt.row_to_row.primary_block_size = blocks.first;
-    opt.row_to_row.secondary_block_size = blocks.second;
+    tatami_mult::set_num_threads(opt, nthreads);
+    tatami_mult::set_dense_primary_block_size(opt, blocks.first);
+    tatami_mult::set_dense_secondary_block_size(opt, blocks.second);
 
     const auto output_size = NR * NRHS;
     std::vector<double> dc_rr_ro(output_size), dc_rr_co(output_size),
@@ -103,3 +94,24 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(1, 3)
     )
 );
+
+TEST(DenseMatrixDenseColumn, Options) {
+    tatami_mult::MultiplyDenseColumnWithDenseMatrixOptions opt;
+    tatami_mult::set_num_threads(opt, 12);
+    EXPECT_EQ(opt.column_to_column.num_threads, 12);
+    EXPECT_EQ(opt.column_to_row.num_threads, 12);
+    EXPECT_EQ(opt.row_to_column.num_threads, 12);
+    EXPECT_EQ(opt.row_to_row.num_threads, 12);
+
+    tatami_mult::set_dense_primary_block_size(opt, 23);
+    EXPECT_EQ(opt.column_to_column.primary_block_size, 23);
+    EXPECT_EQ(opt.column_to_row.primary_block_size, 23);
+    EXPECT_EQ(opt.row_to_column.primary_block_size, 23);
+    EXPECT_EQ(opt.row_to_row.primary_block_size, 23);
+
+    tatami_mult::set_dense_secondary_block_size(opt, 34);
+    EXPECT_EQ(opt.column_to_column.secondary_block_size, 34);
+    EXPECT_EQ(opt.column_to_row.secondary_block_size, 34);
+    EXPECT_EQ(opt.row_to_column.secondary_block_size, 34);
+    EXPECT_EQ(opt.row_to_row.secondary_block_size, 34);
+}

@@ -45,6 +45,30 @@ struct MultiplySparseColumnWithDenseMatrixOptions {
 };
 
 /**
+ * Set the number of threads to use in all multiplication functions involving a sparse column-major LHS and a dense matrix RHS.
+ *
+ * @param options Options to be set.
+ * @param num_threads Number of threads, should be positive.
+ */
+inline void set_num_threads(MultiplySparseColumnWithDenseMatrixOptions& options, int num_threads) {
+    options.column_to_column.num_threads = num_threads;
+    options.column_to_row.num_threads = num_threads;
+    options.row_to_column.num_threads = num_threads;
+    options.row_to_row.num_threads = num_threads;
+}
+
+/**
+ * Set the block size to use in all multiplication functions involving a sparse column-major LHS and a dense matrix RHS.
+ *
+ * @param options Options to be set.
+ * @param block_size Block size.
+ */
+inline void set_sparse_block_size(MultiplySparseColumnWithDenseMatrixOptions& options, int block_size) {
+    options.column_to_column.block_size = block_size;
+    options.row_to_column.block_size = block_size;
+}
+
+/**
  * @tparam LeftValue_ Numeric type of the left matrix value.
  * @tparam LeftIndex_ Integer type of the left matrix index.
  * @tparam RightValue_ Numeric type of the right matrix value.

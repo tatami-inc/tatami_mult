@@ -131,12 +131,8 @@ TEST_P(DenseMatrixSparseColumnEmptyTest, Basic) {
         sc_rc_ro(output_size), sc_rc_co(output_size);
 
     tatami_mult::MultiplySparseColumnWithDenseMatrixOptions opt;
-    opt.column_to_column.num_threads = nthreads;
-    opt.column_to_column.block_size = block_size;
-    opt.column_to_row.num_threads = nthreads;
-    opt.row_to_column.num_threads = nthreads;
-    opt.row_to_column.block_size = block_size;
-    opt.row_to_row.num_threads = nthreads;
+    tatami_mult::set_num_threads(opt, nthreads);
+    tatami_mult::set_sparse_block_size(opt, block_size);
 
     tatami_mult::multiply_sparse_column_with_dense_matrix(*sparse_row, *right_col, sr_rc_ro.data(), true, opt);
     tatami_mult::multiply_sparse_column_with_dense_matrix(*sparse_row, *right_row, sr_rr_ro.data(), true, opt);
@@ -170,3 +166,15 @@ INSTANTIATE_TEST_SUITE_P(
     )
 );
 
+TEST(DenseMatrixSparseColumn, Options) {
+    tatami_mult::MultiplySparseColumnWithDenseMatrixOptions opt;
+    tatami_mult::set_num_threads(opt, 12);
+    EXPECT_EQ(opt.column_to_column.num_threads, 12);
+    EXPECT_EQ(opt.column_to_row.num_threads, 12);
+    EXPECT_EQ(opt.row_to_column.num_threads, 12);
+    EXPECT_EQ(opt.row_to_row.num_threads, 12);
+
+    tatami_mult::set_sparse_block_size(opt, 42);
+    EXPECT_EQ(opt.column_to_column.block_size, 42);
+    EXPECT_EQ(opt.row_to_column.block_size, 42);
+}
