@@ -1,0 +1,180 @@
+#include <gtest/gtest.h>
+
+#include <cstddef>
+#include <vector>
+
+#include "tatami_test/tatami_test.hpp"
+
+#include "tatami_mult/sparse_matrix/dense_row/dispatch.hpp"
+
+class SparseMatrixDenseRowTest : public ::testing::TestWithParam<std::tuple<int, int, int, int, int> > {};
+
+TEST_P(SparseMatrixDenseRowTest, Basic) {
+    const auto params = GetParam();
+    const int NR = std::get<0>(params);
+    const int NC = std::get<1>(params);
+    const int NRHS = std::get<2>(params);
+    const auto block_size = std::get<3>(params);
+    const auto nthreads = std::get<4>(params);
+
+    auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 369 + NR + NC + NRHS + block_size + nthreads;
+        return opt;
+    }());
+    auto dense_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
+    auto dense_col = tatami::convert_to_dense<double, int>(*dense_row, true, {});
+
+    auto rhs = tatami_test::simulate_vector<double>(NC * NRHS, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.density = 0.25;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 420 + NR + NC + NRHS + block_size + nthreads;
+        return opt;
+    }());
+    auto right_col = tatami::convert_to_compressed_sparse<double, int>(tatami::DenseColumnMatrix<double, int>(NC, NRHS, rhs), false, {});
+    auto right_row = tatami::convert_to_compressed_sparse<double, int>(*right_col, true, {});
+
+    tatami_mult::MultiplyDenseRowWithSparseMatrixOptions opt;
+    tatami_mult::set_num_threads(opt, nthreads);
+    tatami_mult::set_sparse_block_size(opt, block_size);
+
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
+    const auto output_size = NR * NRHS;
+    std::vector<double> dr_rc_ro1(output_size, 0.5), dr_rc_ro4(output_size, 1.5),
+        dr_rc_co1(output_size, 2.5), dr_rc_co4(output_size, 3.5),
+        dr_rr_ro(output_size, 4.5), dr_rr_co(output_size, 5.5),
+        dc_rr_ro(output_size, 6.5), dc_rr_co(output_size, 7.5),
+        dc_rc_ro(output_size, 8.5), dc_rc_co(output_size, 9.5);
+
+    // Checking different choices of accumulators.
+    tatami_mult::multiply_dense_row_with_sparse_matrix<1>(*dense_row, *right_col, dr_rc_ro1.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix<4>(*dense_row, *right_col, dr_rc_ro4.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix<1>(*dense_row, *right_col, dr_rc_co1.data(), false, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix<4>(*dense_row, *right_col, dr_rc_co4.data(), false, opt);
+
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_row, *right_row, dr_rr_ro.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_row, *right_row, dr_rr_co.data(), false, opt);
+
+    // Checking that it still works for column-major LHS.
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_col, *right_row, dc_rr_ro.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_col, *right_col, dc_rc_ro.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_col, *right_row, dc_rr_co.data(), false, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_col, *right_col, dc_rc_co.data(), false, opt);
+
+    for (int h = 0; h < NRHS; ++h) {
+        const auto rptr = rhs.data() + h * NC;
+        for (int r = 0; r < NR; ++r) {
+            const auto ref = std::inner_product(rptr, rptr + NC, dump.begin() + r * NC, 0.0);
+
+            const auto rm_idx = r * NRHS + h;
+            EXPECT_FLOAT_EQ(ref, dr_rc_ro1[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, dr_rc_ro4[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, dr_rr_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, dc_rc_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, dc_rr_ro[rm_idx]);
+
+            const auto cm_idx = h * NR + r;
+            EXPECT_FLOAT_EQ(ref, dr_rc_co1[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, dr_rc_co4[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, dr_rr_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, dc_rc_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, dc_rr_co[cm_idx]);
+        }
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    SparseMatrix,
+    SparseMatrixDenseRowTest,
+    ::testing::Combine(
+        ::testing::Values(100, 33), // number of rows.
+        ::testing::Values(59, 148), // number of columns.
+        ::testing::Values(12, 74),  // number of RHS vectors.
+        ::testing::Values(1, 4, 8), // block size.
+        ::testing::Values(1, 3)     // number of threads
+    )
+);
+
+/******************************/
+
+class SparseMatrixDenseRowEmptyTest : public ::testing::TestWithParam<std::tuple<int, int> > {};
+
+TEST_P(SparseMatrixDenseRowEmptyTest, Empty) {
+    const auto params = GetParam();
+    const int NR = 123;
+    const int NC = 44;
+    const int NRHS = 12;
+    const auto block_size = std::get<0>(params);
+    const auto nthreads = std::get<1>(params);
+
+    auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 369 + NR + NC + NRHS + block_size + nthreads;
+        return opt;
+    }());
+    auto dense_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
+
+    // Empty RHS, check that we can handle rows/columns with no non-zeros.
+    std::vector<double> rhs(NC * NRHS);
+    auto right_col = tatami::convert_to_compressed_sparse<double, int>(tatami::DenseColumnMatrix<double, int>(NC, NRHS, rhs), false, {});
+    auto right_row = tatami::convert_to_compressed_sparse<double, int>(*right_col, true, {});
+
+    tatami_mult::MultiplyDenseRowWithSparseMatrixOptions opt;
+    tatami_mult::set_num_threads(opt, nthreads);
+    tatami_mult::set_sparse_block_size(opt, block_size);
+
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
+    const auto output_size = NR * NRHS;
+    std::vector<double> dr_rc_ro1(output_size, 0.5), dr_rc_ro4(output_size, 1.5),
+        dr_rc_co1(output_size, 2.5), dr_rc_co4(output_size, 3.5),
+        dr_rr_ro(output_size, 4.5), dr_rr_co(output_size, 5.5),
+        dc_rr_ro(output_size, 6.5), dc_rr_co(output_size, 7.5),
+        dc_rc_ro(output_size, 8.5), dc_rc_co(output_size, 9.5);
+
+    // Checking different choices of accumulators.
+    tatami_mult::multiply_dense_row_with_sparse_matrix<1>(*dense_row, *right_col, dr_rc_ro1.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix<4>(*dense_row, *right_col, dr_rc_ro4.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix<1>(*dense_row, *right_col, dr_rc_co1.data(), false, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix<4>(*dense_row, *right_col, dr_rc_co4.data(), false, opt);
+
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_row, *right_row, dr_rr_ro.data(), true, opt);
+    tatami_mult::multiply_dense_row_with_sparse_matrix(*dense_row, *right_row, dr_rr_co.data(), false, opt);
+
+    std::vector<double> empty(output_size);
+    EXPECT_EQ(dr_rc_ro1, empty);
+    EXPECT_EQ(dr_rc_ro4, empty);
+    EXPECT_EQ(dr_rc_co1, empty);
+    EXPECT_EQ(dr_rc_co4, empty);
+    EXPECT_EQ(dr_rr_ro, empty);
+    EXPECT_EQ(dr_rr_co, empty);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    SparseMatrix,
+    SparseMatrixDenseRowEmptyTest,
+    ::testing::Combine(
+        ::testing::Values(1, 4), // block size.
+        ::testing::Values(1, 3)  // number of threads
+    )
+);
+
+/******************************/
+
+TEST(SparseMatrixDenseRow, Options) {
+    tatami_mult::MultiplyDenseRowWithSparseMatrixOptions opt;
+    tatami_mult::set_num_threads(opt, 12);
+    EXPECT_EQ(opt.column_to_column.num_threads, 12);
+    EXPECT_EQ(opt.column_to_row.num_threads, 12);
+    EXPECT_EQ(opt.row_to_column.num_threads, 12);
+    EXPECT_EQ(opt.row_to_row.num_threads, 12);
+
+    tatami_mult::set_sparse_block_size(opt, 42);
+    EXPECT_EQ(opt.column_to_column.block_size, 42);
+    EXPECT_EQ(opt.column_to_row.block_size, 42);
+}
