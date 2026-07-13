@@ -24,6 +24,7 @@ add_executable(
     src/dense_matrix/dense_column/dispatch.cpp
     src/dense_matrix/sparse_row/dispatch.cpp
     src/dense_matrix/sparse_column/dispatch.cpp
+    src/dense_matrix/dispatch.cpp
 )
 
 target_link_libraries(
