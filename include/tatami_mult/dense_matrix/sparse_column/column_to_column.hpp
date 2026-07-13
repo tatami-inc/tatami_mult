@@ -69,6 +69,8 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
     auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
     populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
 
+    std::fill_n(output, sanisizer::product<std::size_t>(left_NR, right_NC), 0);
+
     const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(left, false, start, length);
 

@@ -38,9 +38,11 @@ TEST_P(SingleVectorSparseColumnTest, Vector) {
     opt.num_threads = nthreads;
 
     {
-        std::vector<double> output1(NR);
+        // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
+        std::vector<double> output1(NR, 8273);
+        std::vector<double> output4(NR, 6262);
+
         tatami_mult::multiply_sparse_column_with_single_vector(*sparse_row, rhs.data(), output1.data(), opt);
-        std::vector<double> output4(NR);
         tatami_mult::multiply_sparse_column_with_single_vector(*sparse_row, rhs.data(), output4.data(), opt);
 
         for (int r = 0; r < NR; ++r) {
@@ -51,9 +53,10 @@ TEST_P(SingleVectorSparseColumnTest, Vector) {
     }
 
     {
-        std::vector<double> output1(NR);
+        std::vector<double> output1(NR, 238);
+        std::vector<double> output4(NR, 42);
+
         tatami_mult::multiply_sparse_column_with_single_vector(*sparse_col, rhs.data(), output1.data(), opt);
-        std::vector<double> output4(NR);
         tatami_mult::multiply_sparse_column_with_single_vector(*sparse_col, rhs.data(), output4.data(), opt);
 
         for (int r = 0; r < NR; ++r) {

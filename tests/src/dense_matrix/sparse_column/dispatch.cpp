@@ -46,11 +46,12 @@ TEST_P(DenseMatrixSparseColumnTest, Basic) {
     opt.row_to_column.block_size = block_size;
     opt.row_to_row.num_threads = nthreads;
 
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
     const auto output_size = NR * NRHS;
-    std::vector<double> sr_rc_ro(output_size), sr_rc_co(output_size),
-        sr_rr_ro(output_size), sr_rr_co(output_size),
-        sc_rr_ro(output_size), sc_rr_co(output_size),
-        sc_rc_ro(output_size), sc_rc_co(output_size);
+    std::vector<double> sr_rc_ro(output_size, 3.2), sr_rc_co(output_size, 2.1),
+        sr_rr_ro(output_size, 1.0), sr_rr_co(output_size, 0.9),
+        sc_rr_ro(output_size, 9.8), sc_rr_co(output_size, 8.7),
+        sc_rc_ro(output_size, 7.6), sc_rc_co(output_size, 6.5);
 
     tatami_mult::multiply_sparse_column_with_dense_matrix(*sparse_row, *right_col, sr_rc_ro.data(), true, opt);
     tatami_mult::multiply_sparse_column_with_dense_matrix(*sparse_row, *right_row, sr_rr_ro.data(), true, opt);
@@ -124,11 +125,12 @@ TEST_P(DenseMatrixSparseColumnEmptyTest, Basic) {
     auto right_col = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NRHS, rhs);
     auto right_row = tatami::convert_to_dense<double, int>(*right_col, true, {});
 
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
     const auto output_size = NR * NRHS;
-    std::vector<double> sr_rc_ro(output_size), sr_rc_co(output_size),
-        sr_rr_ro(output_size), sr_rr_co(output_size),
-        sc_rr_ro(output_size), sc_rr_co(output_size),
-        sc_rc_ro(output_size), sc_rc_co(output_size);
+    std::vector<double> sr_rc_ro(output_size, 5.5), sr_rc_co(output_size, 4.4),
+        sr_rr_ro(output_size, 3.3), sr_rr_co(output_size, 2.2),
+        sc_rr_ro(output_size, 1.1), sc_rr_co(output_size, 9.9),
+        sc_rc_ro(output_size, 8.8), sc_rc_co(output_size, 7.7);
 
     tatami_mult::MultiplySparseColumnWithDenseMatrixOptions opt;
     tatami_mult::set_num_threads(opt, nthreads);
@@ -165,6 +167,8 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(1, 3)
     )
 );
+
+/************************************/
 
 TEST(DenseMatrixSparseColumn, Options) {
     tatami_mult::MultiplySparseColumnWithDenseMatrixOptions opt;

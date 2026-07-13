@@ -60,6 +60,8 @@ void multiply_sparse_column_with_dense_row_matrix_to_row_output(
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
     }
 
+    std::fill_n(output, sanisizer::product<std::size_t>(left_NR, right_NC), 0);
+
     const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         auto left_ext = tatami::consecutive_extractor<true>(left, false, start, length);
         auto right_ext = tatami::consecutive_extractor<false>(right, true, start, length);

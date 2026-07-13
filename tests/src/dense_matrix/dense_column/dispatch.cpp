@@ -42,11 +42,12 @@ TEST_P(DenseMatrixDenseColumnTest, Basic) {
     tatami_mult::set_dense_primary_block_size(opt, blocks.first);
     tatami_mult::set_dense_secondary_block_size(opt, blocks.second);
 
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
     const auto output_size = NR * NRHS;
-    std::vector<double> dc_rr_ro(output_size), dc_rr_co(output_size),
-        dc_rc_ro(output_size), dc_rc_co(output_size),
-        dr_rr_ro(output_size), dr_rr_co(output_size),
-        dr_rc_ro(output_size), dr_rc_co(output_size);
+    std::vector<double> dc_rr_ro(output_size, 1.2), dc_rr_co(output_size, 1.2),
+        dc_rc_ro(output_size, 2.3), dc_rc_co(output_size, 2.3),
+        dr_rr_ro(output_size, 3.4), dr_rr_co(output_size, 3.4),
+        dr_rc_ro(output_size, 4.5), dr_rc_co(output_size, 4.5);
 
     tatami_mult::multiply_dense_column_with_dense_matrix(*dense_col, *right_col, dc_rc_ro.data(), true, opt);
     tatami_mult::multiply_dense_column_with_dense_matrix(*dense_col, *right_col, dc_rc_co.data(), false, opt);

@@ -37,9 +37,11 @@ TEST_P(SingleVectorDenseRowTest, Vector) {
     opt.num_threads = nthreads;
 
     {
-        std::vector<double> output1(NR);
+        // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
+        std::vector<double> output1(NR, 124);
+        std::vector<double> output4(NR, 34587);
+
         tatami_mult::multiply_dense_row_with_single_vector<1>(*dense_row, rhs.data(), output1.data(), opt);
-        std::vector<double> output4(NR);
         tatami_mult::multiply_dense_row_with_single_vector<4>(*dense_row, rhs.data(), output4.data(), opt);
 
         for (int r = 0; r < NR; ++r) {
@@ -50,9 +52,10 @@ TEST_P(SingleVectorDenseRowTest, Vector) {
     }
 
     {
-        std::vector<double> output1(NR);
+        std::vector<double> output1(NR, 12376);
+        std::vector<double> output4(NR, 930);
+
         tatami_mult::multiply_dense_row_with_single_vector<1>(*dense_col, rhs.data(), output1.data(), opt);
-        std::vector<double> output4(NR);
         tatami_mult::multiply_dense_row_with_single_vector<4>(*dense_col, rhs.data(), output4.data(), opt);
 
         for (int r = 0; r < NR; ++r) {

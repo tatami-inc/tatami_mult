@@ -42,11 +42,12 @@ TEST_P(DenseMatrixDenseRowTest, Basic) {
     tatami_mult::set_dense_primary_block_size(opt, blocks.first);
     tatami_mult::set_dense_secondary_block_size(opt, blocks.second);
 
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
     const auto output_size = NR * NRHS;
-    std::vector<double> dr_rc_ro1(output_size), dr_rc_ro4(output_size),
-        dr_rc_co1(output_size), dr_rc_co4(output_size),
-        dr_rr_ro(output_size), dr_rr_co(output_size),
-        dc_rr_ro(output_size), dc_rr_co(output_size),
+    std::vector<double> dr_rc_ro1(output_size, 1.2), dr_rc_ro4(output_size, 1.2),
+        dr_rc_co1(output_size, 2.3), dr_rc_co4(output_size, 2.3),
+        dr_rr_ro(output_size, 3.4), dr_rr_co(output_size, 3.4),
+        dc_rr_ro(output_size, 4.5), dc_rr_co(output_size, 4.5),
         dc_rc_ro(output_size), dc_rc_co(output_size);
 
     // Checking different choices of accumulators.

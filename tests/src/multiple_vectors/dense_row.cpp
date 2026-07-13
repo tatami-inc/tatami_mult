@@ -50,7 +50,8 @@ TEST_P(MultipleVectorsDenseRowTest, Basic) {
         output.resize(NRHS);
         std::vector<double*> ptrs(NRHS);
         for (int h = 0; h < NRHS; ++h) {
-            output[h].resize(NR);
+            // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
+            output[h].resize(NR, 231 + h);
             ptrs[h] = output[h].data();
         }
         return ptrs;

@@ -42,12 +42,13 @@ TEST_P(DenseMatrixSparseRowTest, Basic) {
     tatami_mult::set_num_threads(opt, nthreads);
     tatami_mult::set_sparse_block_size(opt, block_size);
 
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
     const auto output_size = NR * NRHS;
-    std::vector<double> sr_rc_ro1(output_size), sr_rc_ro4(output_size),
-        sr_rc_co1(output_size), sr_rc_co4(output_size),
-        sr_rr_ro(output_size), sr_rr_co(output_size),
-        sc_rr_ro(output_size), sc_rr_co(output_size),
-        sc_rc_ro(output_size), sc_rc_co(output_size);
+    std::vector<double> sr_rc_ro1(output_size, 0.5), sr_rc_ro4(output_size, 1.5),
+        sr_rc_co1(output_size, 2.5), sr_rc_co4(output_size, 3.5),
+        sr_rr_ro(output_size, 4.5), sr_rr_co(output_size, 5.5),
+        sc_rr_ro(output_size, 6.5), sc_rr_co(output_size, 7.5),
+        sc_rc_ro(output_size, 8.5), sc_rc_co(output_size, 9.5);
 
     // Checking different choices of accumulators.
     tatami_mult::multiply_sparse_row_with_dense_matrix<1>(*sparse_row, *right_col, sr_rc_ro1.data(), true, opt);

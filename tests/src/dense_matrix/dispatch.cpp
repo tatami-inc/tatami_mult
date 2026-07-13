@@ -34,11 +34,12 @@ TEST(DenseMatrixDispatch, Basic) {
     }());
     auto right_col = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NRHS, rhs);
 
+    // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
     const auto output_size = NR * NRHS;
-    std::vector<double> dr_ro(output_size), dr_co(output_size),
-        dc_ro(output_size), dc_co(output_size),
-        sr_ro(output_size), sr_co(output_size),
-        sc_ro(output_size), sc_co(output_size);
+    std::vector<double> dr_ro(output_size, 7.8), dr_co(output_size, 8.9),
+        dc_ro(output_size, 9.0), dc_co(output_size, 0.1),
+        sr_ro(output_size, 1.2), sr_co(output_size, 2.3),
+        sc_ro(output_size, 3.4), sc_co(output_size, 4.5);
 
     tatami_mult::multiply_with_dense_matrix(*dense_row, *right_col, dr_ro.data(), true, {});
     tatami_mult::multiply_with_dense_matrix(*dense_col, *right_col, dc_ro.data(), true, {});

@@ -32,7 +32,9 @@ TEST(SingleVectorDispatch, Vector) {
         return opt;
     }());
 
+    // Setting an arbitrary initial value for all output vectors, to check that they are properly zeroed.
     std::vector<double> drout(NR), dcout(NR), srout(NR), scout(NR);
+
     tatami_mult::multiply_with_single_vector(*dense_row, rhs.data(), drout.data(), {});
     tatami_mult::multiply_with_single_vector(*dense_col, rhs.data(), dcout.data(), {});
     tatami_mult::multiply_with_single_vector(*sparse_row, rhs.data(), srout.data(), {});

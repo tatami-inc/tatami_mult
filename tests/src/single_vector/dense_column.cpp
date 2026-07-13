@@ -37,7 +37,8 @@ TEST_P(SingleVectorDenseColumnTest, Vector) {
     opt.num_threads = nthreads;
 
     {
-        std::vector<double> output(NR);
+        // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
+        std::vector<double> output(NR, 69696);
         tatami_mult::multiply_dense_column_with_single_vector(*dense_row, rhs.data(), output.data(), opt);
         for (int r = 0; r < NR; ++r) {
             const auto ref = std::inner_product(rhs.begin(), rhs.end(), dump.begin() + r * NC, 0.0);
@@ -46,7 +47,7 @@ TEST_P(SingleVectorDenseColumnTest, Vector) {
     }
 
     {
-        std::vector<double> output(NR);
+        std::vector<double> output(NR, 12323);
         tatami_mult::multiply_dense_column_with_single_vector(*dense_col, rhs.data(), output.data(), opt);
         for (int r = 0; r < NR; ++r) {
             const auto ref = std::inner_product(rhs.begin(), rhs.end(), dump.begin() + r * NC, 0.0);
