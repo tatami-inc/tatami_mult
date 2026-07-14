@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['for_20tatami_0',['Matrix multiplication for tatami',['../index.html',1,'']]]
+  ['accumulators_0',['Multiple accumulators',['../multiple-accumulators.html',1,'']]]
 ];

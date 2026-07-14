@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['matrix_20multiplication_20for_20tatami_0',['Matrix multiplication for tatami',['../index.html',1,'']]],
-  ['multiplication_20for_20tatami_1',['Matrix multiplication for tatami',['../index.html',1,'']]]
+  ['blocking_20for_20dense_20matrices_0',['Blocking for dense matrices',['../dense-blocking.html',1,'']]],
+  ['blocking_20for_20sparse_20matrices_1',['Blocking for sparse matrices',['../sparse-blocking.html',1,'']]]
 ];

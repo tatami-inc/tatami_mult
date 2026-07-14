@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['tatami_0',['Matrix multiplication for tatami',['../index.html',1,'']]]
+  ['dense_20matrices_0',['Blocking for dense matrices',['../dense-blocking.html',1,'']]]
 ];
