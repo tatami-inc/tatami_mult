@@ -32,7 +32,7 @@ Output_ dense_dot_product(const std::size_t len, Iterator1_ start1, Iterator2_ s
         const std::size_t remainder = len % accumulators_;
         std::array<Output_, accumulators_> dots{};
 
-        // One might think to initialize the array with the first cycle of the dot products, like:
+        // One might think to create a peeling iteration to initialize the array with the first cycle of the dot products, like:
         // 
         // for (std::size_t i = 0; i < accumulators_; ++i) {
         //     dots[i] = *(start1 + i) * *(start2 + i);
@@ -44,14 +44,20 @@ Output_ dense_dot_product(const std::size_t len, Iterator1_ start1, Iterator2_ s
         // I would guess that the time saved by skipping the addition is offset by the increased size of the program.
 
         for (std::size_t c = 0; c < cycles; ++c) {
-            // Product is fine as it is less than 'len', which must fit in a std::size_t.
-            unrolled_dense_dot_product(c * accumulators_, start1, start2, dots);
+            unrolled_dense_dot_product(
+                c * accumulators_, // this is less than 'len' and so must fit in a std::size_t.
+                start1,
+                start2,
+                dots
+            );
         }
 
+        // Keep adding to 'dots' to provide more opportunities for auto-vectorization.
         for (std::size_t i = 0; i < remainder; ++i) {
             const auto idx = cycles * accumulators_ + i;
-            initial += *(start1 + idx) * *(start2 + idx);
+            dots[i] += *(start1 + idx) * *(start2 + idx);
         }
+
         return std::accumulate(dots.begin(), dots.end(), initial);
     }
 }

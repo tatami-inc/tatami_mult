@@ -32,16 +32,25 @@ Output_ sparse_dot_product(const std::size_t num_non_zeros, ValueIterator_ vptr,
         const std::size_t cycles = num_non_zeros / accumulators_;
         const std::size_t remainder = num_non_zeros % accumulators_;
 
+        // See comments in dense_dot_product.hpp about why we skip peeling.
+
         for (std::size_t c = 0; c < cycles; ++c) {
-            unrolled_sparse_dot_product(c * accumulators_, vptr, iptr, dense, dots);
+            unrolled_sparse_dot_product(
+                c * accumulators_, // must be less than 'num_non_zeros' and thus must fit into a size_t.
+                vptr,
+                iptr,
+                dense,
+                dots
+            );
         }
 
-        Output_ extras = initial;
+        // Keep adding to 'dots' to provide more opportunities for auto-vectorization.
         for (std::size_t i = 0; i < remainder; ++i) {
             const auto idx = cycles * accumulators_ + i;
-            extras += dense[*(iptr + idx)] * *(vptr + idx);
+            dots[i] += dense[*(iptr + idx)] * *(vptr + idx);
         }
-        return std::accumulate(dots.begin(), dots.end(), extras);
+
+        return std::accumulate(dots.begin(), dots.end(), initial);
     }
 }
 
