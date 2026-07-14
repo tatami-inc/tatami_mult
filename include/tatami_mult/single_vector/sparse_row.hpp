@@ -26,9 +26,8 @@ struct MultiplySparseRowWithSingleVectorOptions {
 };
 
 /**
- * @tparam accumulators_ Number of accumulators for computing the dot product.
- * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
- * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.
+ * @tparam accumulators_ Number of accumulators for computing the dot product,
+ * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam Value_ Numeric type of the matrix value.
  * @tparam Index_ Integer type of the matrix index.
  * @tparam Right_ Numeric type of the vector on the right hand side.

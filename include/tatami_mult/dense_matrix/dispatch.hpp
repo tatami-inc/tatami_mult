@@ -85,6 +85,8 @@ inline void set_sparse_block_size(MultiplyWithDenseMatrixOptions& options, int b
 }
 
 /**
+ * @tparam accumulators_ Number of accumulators for computing the dot product,
+ * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam LeftValue_ Numeric type of the left matrix value.
  * @tparam LeftIndex_ Integer type of the left matrix index.
  * @tparam RightValue_ Numeric type of the right matrix value.
@@ -100,7 +102,7 @@ inline void set_sparse_block_size(MultiplyWithDenseMatrixOptions& options, int b
  * @param output_row_major Whether to store the matrix product in row-major format in `output`.
  * @param options Further options.
  */
-template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+template<std::size_t accumulators_ = 4, typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
 void multiply_with_dense_matrix(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
     const tatami::Matrix<RightValue_, RightIndex_>& right,
@@ -110,13 +112,13 @@ void multiply_with_dense_matrix(
 ) {
     if (left.is_sparse()) {
         if (left.prefer_rows()) {
-            multiply_sparse_row_with_dense_matrix(left, right, output, output_row_major, options.sparse_row);
+            multiply_sparse_row_with_dense_matrix<accumulators_>(left, right, output, output_row_major, options.sparse_row);
         } else {
             multiply_sparse_column_with_dense_matrix(left, right, output, output_row_major, options.sparse_column);
         }
     } else {
         if (left.prefer_rows()) {
-            multiply_dense_row_with_dense_matrix(left, right, output, output_row_major, options.dense_row);
+            multiply_dense_row_with_dense_matrix<accumulators_>(left, right, output, output_row_major, options.dense_row);
         } else {
             multiply_dense_column_with_dense_matrix(left, right, output, output_row_major, options.dense_column);
         }

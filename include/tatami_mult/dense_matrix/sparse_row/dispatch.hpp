@@ -70,9 +70,8 @@ inline void set_sparse_block_size(MultiplySparseRowWithDenseMatrixOptions& optio
 }
 
 /**
- * @tparam accumulators_ Number of accumulators for computing the dot product.
- * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
- * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.
+ * @tparam accumulators_ Number of accumulators for computing the dot product,
+ * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam LeftValue_ Numeric type of the left matrix value.
  * @tparam LeftIndex_ Integer type of the left matrix index.
  * @tparam RightValue_ Numeric type of the right matrix value.

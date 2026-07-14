@@ -86,9 +86,8 @@ inline void set_dense_secondary_block_size(MultiplyDenseRowWithDenseMatrixOption
 }
 
 /**
- * @tparam accumulators_ Number of accumulators for computing the dot product.
- * This should be positive and is very often a power of 2, with values of 2-8 typically providing some performance improvement on modern CPUs.
- * Different numbers of accumulators may result in slight changes to the output due to changes in floating-point round-off error.
+ * @tparam accumulators_ Number of accumulators for computing the dot product,
+ * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam LeftValue_ Numeric type of the left matrix value.
  * @tparam LeftIndex_ Integer type of the left matrix index.
  * @tparam RightValue_ Numeric type of the right matrix value.
@@ -122,9 +121,9 @@ void multiply_dense_row_with_dense_matrix(
 
     } else {
         if (output_row_major) {
-            multiply_dense_row_with_dense_column_matrix_to_row_output(left, right, output, options.column_to_row);
+            multiply_dense_row_with_dense_column_matrix_to_row_output<accumulators_>(left, right, output, options.column_to_row);
         } else {
-            multiply_dense_row_with_dense_column_matrix_to_column_output(left, right, output, options.column_to_column);
+            multiply_dense_row_with_dense_column_matrix_to_column_output<accumulators_>(left, right, output, options.column_to_column);
         }
     }
 }
