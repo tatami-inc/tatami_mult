@@ -27,12 +27,15 @@ struct MultiplyDenseColumnWithMultipleVectorsOptions {
     int num_threads = 1;
 
     /**
-     * Primary block size.
+     * Primary block size, i.e., the number of LHS columns to be loaded at once.
+     * This is also used to define the number of RHS columns in each block.
+     * See the \f$B\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
      */
     int primary_block_size = 16;
 
     /**
-     * Secondary block size.
+     * Secondary block size, i.e., the number of LHS rows to be processed in each block.
+     * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
      */
     int secondary_block_size = 64;
 };

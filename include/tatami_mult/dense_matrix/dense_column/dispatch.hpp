@@ -59,6 +59,7 @@ inline void set_num_threads(MultiplyDenseColumnWithDenseMatrixOptions& options, 
 
 /**
  * Set the primary block size to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS.
+ * See the \f$B\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
  *
  * @param options Options to be set.
  * @param primary_block_size Primary block size.
@@ -72,6 +73,7 @@ inline void set_dense_primary_block_size(MultiplyDenseColumnWithDenseMatrixOptio
 
 /**
  * Set the secondary block size to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS.
+ * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
  *
  * @param options Options to be set.
  * @param secondary_block_size Secondary block size.

@@ -59,6 +59,8 @@ inline void set_num_threads(MultiplyDenseRowWithSparseMatrixOptions& options, in
 
 /**
  * Set the block size to use in all multiplication functions involving a dense row-major LHS and a sparse matrix RHS.
+ * See @ref sparse-blocking "Blocking for sparse matrices" section for more details;
+ * the exact interpretation depends on the specific function called by `multiply_dense_row_with_sparse_matrix()`.
  *
  * @param options Options to be set.
  * @param block_size Block size.

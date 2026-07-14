@@ -27,7 +27,9 @@ struct MultiplyDenseRowWithSparseRowMatrixToColumnOutputOptions {
     int num_threads = 1;
 
     /**
-     * Block size.
+     * Block size, i.e., number of LHS rows to be loaded at once.
+     * We use this block to populate a contiguous array with a part of each LHS column that can be used in a fast vector multiply-add to the column-major output.
+     * Larger values improve speed at the cost of increased memory usage.
      */
     int block_size = 16;
 };
@@ -173,10 +175,13 @@ void multiply_dense_row_with_sparse_row_matrix_to_column_output(
                     if (rrange.number == 0) {
                         continue;
                     }
+
                     // Transfer this block of the 'cd'-th LHS column into a single buffer for a faster vector multiply-add in the inner loop.
+                    // This rationale is unique to this function and is unlike any of the explanations in the sparse-blocking documentation.
                     for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                         colbuffer[lr_counter] = lptrs[lr_counter][cd];
                     }
+
                     for (RightIndex_ x = 0; x < rrange.number; ++x) {
                         const Output_ mult = rrange.value[x];
                         for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {

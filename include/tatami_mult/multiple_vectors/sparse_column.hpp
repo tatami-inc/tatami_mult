@@ -26,7 +26,8 @@ struct MultiplySparseColumnWithMultipleVectorsOptions {
     int num_threads = 1;
 
     /**
-     * Block size.
+     * Block size, i.e., the number of LHS columns to be loaded at once.
+     * See the \f$B\f$ parameter in the @ref sparse-blocking "Blocking for sparse matrices" section for more details.
      */
     int block_size = 16;
 };
