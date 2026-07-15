@@ -145,10 +145,10 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Index_&gt;</div>
 <div class="foldopen" id="foldopen00044" data-start="{" data-end="};">
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="structtatami__mult_1_1FetchNonEmptySparseBlockInfo.html">   44</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structtatami__mult_1_1FetchNonEmptySparseBlockInfo.html">FetchNonEmptySparseBlockInfo</a> {</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_struct" href="structtatami__mult_1_1FetchNonEmptySparseBlockInfo.html">FetchNonEmptySparseBlockInfo</a>(<span class="keyword">const</span> Index_ position, <span class="keyword">const</span> Index_ num_non_empty, <span class="keyword">const</span> <span class="keywordtype">bool</span> consecutive) : </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        position(position), num_non_empty(num_non_empty), consecutive(consecutive) {}</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <a class="code hl_struct" href="structtatami__mult_1_1FetchNonEmptySparseBlockInfo.html">FetchNonEmptySparseBlockInfo</a>(<span class="keyword">const</span> Index_ position, <span class="keyword">const</span> Index_ num_non_empty, <span class="keyword">const</span> <span class="keywordtype">bool</span> all_non_empty) : </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        position(position), num_non_empty(num_non_empty), all_non_empty(all_non_empty) {}</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    Index_ position, num_non_empty;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="keywordtype">bool</span> consecutive;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    <span class="keywordtype">bool</span> all_non_empty;</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>};</div>
 </div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
@@ -166,7 +166,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>) { </div>
 <div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    non_empty.clear();</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    Index_ num_non_empty = 0;</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">bool</span> consecutive = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">bool</span> all_non_empty = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="comment">// We assume that a check for remaining dimension elements was performed before continuing the blocked loop.</span></div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    assert(position &lt; length);</div>
@@ -175,7 +175,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        <span class="keyword">auto</span> lrange = ext.<a class="code hl_functionRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1OracularSparseExtractor.html#ab934cfb30f9169a125fd746e15578975">fetch</a>(vbuffers[num_non_empty].data(), ibuffers[num_non_empty].data());</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        <span class="keywordflow">if</span> (lrange.number == 0) {</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>            zero(position);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            consecutive = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>            all_non_empty = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>            ++position;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>            <span class="keywordflow">continue</span>;</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        }</div>
@@ -190,7 +190,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        }</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    } <span class="keywordflow">while</span> (position &lt; length);</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keywordflow">return</span> FetchNonEmptySparseBlockInfo(position, num_non_empty, consecutive);</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keywordflow">return</span> FetchNonEmptySparseBlockInfo(position, num_non_empty, all_non_empty);</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>}</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Output_, <span class="keyword">typename</span> DenseValue_, <span class="keyword">typename</span> Value_, <span class="keyword">typename</span> Index_&gt;</div>
