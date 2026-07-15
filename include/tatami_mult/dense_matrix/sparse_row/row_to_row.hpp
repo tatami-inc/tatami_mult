@@ -87,8 +87,14 @@ void multiply_sparse_row_with_dense_row_matrix_to_row_output(
             }
 
             if (do_parallel) {
-                std::copy_n(tmp_output->data(), right_NC, optr);
-                std::fill_n(tmp_output->data(), right_NC, 0);
+                if (range.number == 0) {
+                    // If it's empty, we would have never modified the temporary buffer,
+                    // so we can proceed to directly zeroing the output array.
+                    std::fill_n(optr, right_NC, 0);
+                } else {
+                    std::copy_n(tmp_output->data(), right_NC, optr);
+                    std::fill_n(tmp_output->data(), right_NC, 0);
+                }
             }
         }
     }, left_NR, options.num_threads);

@@ -7,8 +7,8 @@
 #include "tatami/tatami.hpp"
 #include "sanisizer/sanisizer.hpp"
 
+#include "../utils.hpp"
 #include "../../utils.hpp"
-#include "../../sparse_dot_product.hpp"
 
 /**
  * @file row_to_row.hpp
@@ -65,6 +65,12 @@ void multiply_dense_row_with_sparse_row_matrix_to_row_output(
     auto right_ranges = tatami::create_container_of_Index_size<std::vector<tatami::SparseRange<RightValue_, RightIndex_> > >(common_dim);
     populate_sparse_buffers(true, common_dim, right_NC, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
 
+    // If there are any empty RHS rows, we only iterate over the non-empty ones in the loop for each LHS row.
+    auto right_non_empty = filter_non_empty_sparse(
+        right_ranges,
+        [&](RightIndex_) -> void {}
+    );
+
     const bool do_parallel = options.num_threads > 1;
     if (!do_parallel) {
         std::fill_n(output, sanisizer::product_unsafe<std::size_t>(left_NR, right_NC), 0);
@@ -74,7 +80,7 @@ void multiply_dense_row_with_sparse_row_matrix_to_row_output(
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
             auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
             auto dbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(common_dim);
-            
+
             std::optional<std::vector<Output_> > tmp_row;
             if (do_parallel) {
                 tmp_row.emplace(tatami::cast_Index_to_container_size<std::vector<Output_> >(right_NC));
@@ -85,11 +91,21 @@ void multiply_dense_row_with_sparse_row_matrix_to_row_output(
                 const auto optr = output + sanisizer::product_unsafe<std::size_t>(start + lr, right_NC);
                 const auto tmp_optr = (do_parallel ? tmp_row->data() : optr);
 
-                for (LeftIndex_ cd = 0; cd < common_dim; ++cd) {
+                auto loop_body = [&](LeftIndex_ cd) -> void {
                     const auto rrange = right_ranges[cd];
                     const Output_ mult = lptr[cd];
                     for (RightIndex_ x = 0; x < rrange.number; ++x) {
                         tmp_optr[rrange.index[x]] += mult * static_cast<Output_>(rrange.value[x]);
+                    }
+                };
+
+                if (right_non_empty.has_value()) {
+                    for (const auto cd : *right_non_empty) {
+                        loop_body(cd);
+                    }
+                } else {
+                    for (LeftIndex_ cd = 0; cd < common_dim; ++cd) {
+                        loop_body(cd);
                     }
                 }
 
@@ -97,7 +113,10 @@ void multiply_dense_row_with_sparse_row_matrix_to_row_output(
                     std::copy_n(tmp_optr, right_NC, optr);
 
                     // Technically, we only have to reset the positions at which there is at least one non-zero across all RHS rows.
-                    // However, the union of all non-zero positions is probably quite dense, so it'll likely be faster to just zero it as if it were dense.
+                    // However, the union of all non-zero positions across all RHS rows is probably quite dense.
+                    // It'll likely be faster to just zero the entire buffer rather than trying to zero specific positions;
+                    // for example, one 64-byte cache line contains 8 doubles, so you'd need a density below ~10% to even avoid loading every cache line.
+                    // And that's not even considering further optimizations in the memset call.
                     std::fill_n(tmp_optr, right_NC, 0);
                 }
             }
@@ -129,23 +148,30 @@ void multiply_dense_row_with_sparse_row_matrix_to_row_output(
                 const auto optr = output + sanisizer::product_unsafe<std::size_t>(start + lr, right_NC);
                 const auto tmp_optr = (do_parallel ? tmp_rows->data() : optr);
 
-                for (LeftIndex_ cd = 0; cd < common_dim; ++cd) {
+                auto loop_body = [&](LeftIndex_ cd) -> void {
                     const auto rrange = right_ranges[cd];
-                    if (rrange.number == 0) {
-                        continue;
-                    }
                     for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                         const Output_ mult = lptrs[lr_counter][cd];
                         for (RightIndex_ x = 0; x < rrange.number; ++x) {
                             tmp_optr[sanisizer::nd_offset<std::size_t>(rrange.index[x], right_NC, lr_counter)] += mult * static_cast<Output_>(rrange.value[x]);
                         }
                     }
+                };
+
+                if (right_non_empty.has_value()) {
+                    for (const auto cd : *right_non_empty) {
+                        loop_body(cd);
+                    }
+                } else {
+                    for (LeftIndex_ cd = 0; cd < common_dim; ++cd) {
+                        loop_body(cd);
+                    }
                 }
 
                 if (do_parallel) {
                     const auto output_size = sanisizer::product_unsafe<std::size_t>(lr_num, right_NC);
                     std::copy_n(tmp_optr, output_size, optr);
-                    std::fill_n(tmp_optr, output_size, 0); // see comments in the block_size == 1 case about zeroing the temporary buffer.
+                    std::fill_n(tmp_optr, output_size, 0);
                 }
 
                 lr += lr_num;

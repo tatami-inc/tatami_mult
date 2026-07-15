@@ -68,10 +68,22 @@ void multiply_sparse_row_with_multiple_vectors(
 
             for (Index_ lr = 0; lr < length; ++lr) {
                 const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
+                if (range.number == 0) {
+                    for (RightIndex rc = 0; rc < right_NC; ++rc) {
+                        output[rc][start + lr] = 0;
+                    }
+                    continue;
+                }
+
                 for (RightIndex rc = 0; rc < right_NC; ++rc) {
-                    // Implicit cast of range.number to size_t is safe, as per the tatami contract.
-                    // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
-                    output[rc][start + lr] = sparse_dot_product<accumulators_>(range.number, range.value, range.index, right[rc], static_cast<Output_>(0));
+                    // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
+                    output[rc][start + lr] = sparse_dot_product<accumulators_>(
+                        range.number, // Implicit cast to size_t is safe, as per the tatami contract.
+                        range.value,
+                        range.index,
+                        right[rc],
+                        static_cast<Output_>(0)
+                    );
                 }
             }
         }, left_NR, options.num_threads);
@@ -98,6 +110,9 @@ void multiply_sparse_row_with_multiple_vectors(
 
             Index_ lr = 0;
             while (lr < length) {
+                // No point skipping the LHS rows with no structural non-zeros.
+                // We still need to set the corresponding entry of 'outcol' to zero, so we'd end up having to loop through the LHS rows anyway.
+                // We might as well just let it be set to zero naturally in the existing loop below.
                 const Index_ lr_num = sanisizer::min(options.block_size, length - lr);
                 for (Index_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     left_ranges[lr_counter] = ext->fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());

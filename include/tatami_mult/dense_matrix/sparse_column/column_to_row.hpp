@@ -87,7 +87,9 @@ void multiply_sparse_column_with_dense_column_matrix_to_row_output(
             if (lrange.number == 0) {
                 continue;
             }
-            for (RightIndex_ rc = 0; rc < right_NC; ++rc) { // extracting to a dense buffer for more friendly inner loops.
+
+            // Extracting to a dense buffer for more friendly inner loops.
+            for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                 rbuffer[rc] = right_ptrs[rc][start + cd];
             }
 

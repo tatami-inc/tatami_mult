@@ -70,6 +70,8 @@ void multiply_sparse_column_with_multiple_vectors(
     const auto num_used = tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(left, false, start, length);
 
+        // We reduce by adding the outer products across threads, so we need to allocate some
+        // space to store each outer product before returning to the serial section.
         std::optional<std::vector<std::vector<Output_> > > tmp_output;
         std::optional<std::vector<Output_*> > tmp_outptrs;
         Output_* const* outptrs; 
@@ -94,6 +96,10 @@ void multiply_sparse_column_with_multiple_vectors(
             auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(left_NR);
             for (Index_ cd = 0; cd < length; ++cd) {
                 const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
+                if (range.number == 0) {
+                    continue;
+                }
+
                 for (RightIndex rc = 0; rc < right_NC; ++rc) {
                     const auto optr = outptrs[rc];
                     const Output_ mult = right[rc][start + cd];
@@ -109,6 +115,7 @@ void multiply_sparse_column_with_multiple_vectors(
             std::vector<std::vector<Value_> > left_vbuffers;
             std::vector<std::vector<Index_> > left_ibuffers;
             std::vector<tatami::SparseRange<Value_, Index_> > left_ranges;
+            std::vector<Index_> left_non_empty;
             {
                 const Index_ max_block_cols = sanisizer::min(length, options.block_size);
                 left_vbuffers.reserve(max_block_cols);
@@ -118,25 +125,64 @@ void multiply_sparse_column_with_multiple_vectors(
                     left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<Index_> >(left_NR));
                 }
                 sanisizer::resize(left_ranges, max_block_cols);
+                left_non_empty.reserve(max_block_cols);
             }
 
             Index_ cd = 0;
             while (cd < length) {
-                const Index_ cd_num = sanisizer::min(options.block_size, length - cd);
-                for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
-                    left_ranges[cd_counter] = ext->fetch(left_vbuffers[cd_counter].data(), left_ibuffers[cd_counter].data());
+                // Only considering the LHS columns with at least one structural non-zero.
+                // Thus, our block consists of 'options.block_size' non-empty LHS columns, rather than fixed column-wise chunks of the LHS matrix.
+                // This ensures that we don't waste iterations on LHS columns that don't contribute anything to the product.
+                const auto left_block_info = fetch_non_empty_sparse_block(
+                    *ext,
+                    left_vbuffers,
+                    left_ibuffers,
+                    left_ranges,
+                    left_non_empty,
+                    cd,
+                    length,
+                    options.block_size,
+                    /* zero = */ [](Index_) -> void {} // (No need to worry about zeroing as the buffers have already been zeroed.)
+                );
+                cd = left_block_info.position;
+
+                const auto cd_num = left_block_info.num_non_empty;
+                if (cd_num == 0) {
+                    break;
                 }
-                for (RightIndex rc = 0; rc < right_NC; ++rc) {
-                    const auto outcol = outptrs[rc];
-                    for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
-                        const auto& currange = left_ranges[cd_counter];
-                        const Output_ mult = right[rc][start + cd + cd_counter];
-                        for (Index_ x = 0; x < currange.number; ++x) {
-                            outcol[currange.index[x]] += mult * static_cast<Output_>(currange.value[x]);
+
+                // If the LHS columns are consecutive, we can speed up the loops by just using a simple counter to get the column indices.
+                // Otherwise, we'll have to access the 'left_non_empty' vector to figure out the indices of each non-empty column.
+                if (left_block_info.consecutive) {
+                    const Index_ cd_base = start + left_non_empty.front();
+                    for (RightIndex rc = 0; rc < right_NC; ++rc) {
+                        const auto outcol = outptrs[rc];
+                        const auto rightcol = right[rc];
+                        for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                            const auto& currange = left_ranges[cd_counter];
+                            const Output_ mult = rightcol[cd_base + cd_counter];
+                            for (Index_ x = 0; x < currange.number; ++x) {
+                                outcol[currange.index[x]] += mult * static_cast<Output_>(currange.value[x]);
+                            }
+                        }
+                    }
+
+                } else {
+                    for (auto& cdne : left_non_empty) {
+                        cdne += start;
+                    }
+                    for (RightIndex rc = 0; rc < right_NC; ++rc) {
+                        const auto outcol = outptrs[rc];
+                        const auto rightcol = right[rc];
+                        for (Index_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                            const auto& currange = left_ranges[cd_counter];
+                            const Output_ mult = rightcol[left_non_empty[cd_counter]];
+                            for (Index_ x = 0; x < currange.number; ++x) {
+                                outcol[currange.index[x]] += mult * static_cast<Output_>(currange.value[x]);
+                            }
                         }
                     }
                 }
-                cd += cd_num;
             }
         }
 

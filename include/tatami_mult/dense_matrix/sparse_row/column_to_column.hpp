@@ -82,52 +82,55 @@ void multiply_sparse_row_with_dense_column_matrix_to_column_output(
                 }
             }
         }, left_NR, options.num_threads);
-
-    } else {
-        tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
-            auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
-
-            // Our blocking strategy is to collect multiple LHS rows so that, for each RHS vector,
-            // we can keep it in cache for easy re-use when computing the dot-product for each LHS row.
-            std::vector<std::vector<LeftValue_> > left_vbuffers;
-            std::vector<std::vector<LeftIndex_> > left_ibuffers;
-            std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
-            {
-                const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
-                left_vbuffers.reserve(max_block_rows);
-                left_ibuffers.reserve(max_block_rows);
-                for (LeftIndex_ lr = 0; lr < max_block_rows; ++lr) {
-                    left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
-                    left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(common_dim));
-                }
-                sanisizer::resize(left_ranges, max_block_rows);
-            }
-
-            LeftIndex_ lr = 0;
-            while (lr < length) {
-                const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                    left_ranges[lr_counter] = ext->fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());
-                }
-
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const auto rcol = right_ptrs[rc];
-                    for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                        const auto& currange = left_ranges[lr_counter];
-                        output[sanisizer::nd_offset<std::size_t>(start + lr + lr_counter, left_NR, rc)] = sparse_dot_product<accumulators_>(
-                            currange.number, // Implicit cast of range.number to size_t is safe, as per the tatami contract.
-                            currange.value,
-                            currange.index,
-                            rcol,
-                            static_cast<Output_>(0)
-                        );
-                    }
-                }
-
-                lr += lr_num;
-            }
-        }, left_NR, options.num_threads);
+        return;
     }
+
+    tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
+        auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
+
+        // Our blocking strategy is to collect multiple LHS rows so that, for each RHS vector,
+        // we can keep it in cache for easy re-use when computing the dot-product for each LHS row.
+        std::vector<std::vector<LeftValue_> > left_vbuffers;
+        std::vector<std::vector<LeftIndex_> > left_ibuffers;
+        std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
+        {
+            const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
+            left_vbuffers.reserve(max_block_rows);
+            left_ibuffers.reserve(max_block_rows);
+            for (LeftIndex_ lr = 0; lr < max_block_rows; ++lr) {
+                left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
+                left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(common_dim));
+            }
+            sanisizer::resize(left_ranges, max_block_rows);
+        }
+
+        LeftIndex_ lr = 0;
+        while (lr < length) {
+            // No point skipping the LHS rows with no structural non-zeros.
+            // We still need to set the corresponding entry of 'output' to zero, so we'd end up having to loop through the LHS rows anyway.
+            // We might as well just let it be set to zero naturally in the existing loop below.
+            const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
+            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                left_ranges[lr_counter] = ext->fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());
+            }
+
+            for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                const auto rcol = right_ptrs[rc];
+                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                    const auto& currange = left_ranges[lr_counter];
+                    output[sanisizer::nd_offset<std::size_t>(start + lr + lr_counter, left_NR, rc)] = sparse_dot_product<accumulators_>(
+                        currange.number, // Implicit cast of range.number to size_t is safe, as per the tatami contract.
+                        currange.value,
+                        currange.index,
+                        rcol,
+                        static_cast<Output_>(0)
+                    );
+                }
+            }
+
+            lr += lr_num;
+        }
+    }, left_NR, options.num_threads);
 }
 
 }

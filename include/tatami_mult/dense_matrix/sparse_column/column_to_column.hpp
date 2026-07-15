@@ -103,6 +103,7 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
             std::vector<std::vector<LeftValue_> > left_vbuffers;
             std::vector<std::vector<LeftIndex_> > left_ibuffers;
             std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
+            std::vector<LeftIndex_> left_non_empty;
             {
                 const LeftIndex_ max_block_cols = sanisizer::min(length, options.block_size);
                 left_vbuffers.reserve(max_block_cols);
@@ -116,21 +117,55 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
 
             LeftIndex_ cd = 0;
             while (cd < length) {
-                const LeftIndex_ cd_num = sanisizer::min(options.block_size, length - cd);
-                for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
-                    left_ranges[cd_counter] = ext->fetch(left_vbuffers[cd_counter].data(), left_ibuffers[cd_counter].data());
+                // We only consider the LHS rows with at least one structural non-zero.
+                // Thus, our block consists of 'options.block_size' non-empty LHS rows, rather than fixed row-wise chunks of the LHS matrix.
+                // This ensures that we don't waste iterations on LHS rows that will only have zeros in the output matrix (and are filled as such).
+                const auto left_block_info = fetch_non_empty_sparse_block(
+                    *ext,
+                    left_vbuffers,
+                    left_ibuffers,
+                    left_ranges,
+                    left_non_empty,
+                    cd,
+                    length,
+                    options.block_size,
+                    /* zero = */ [&](const LeftIndex_) -> void {} // buffers should already be zeroed.
+                );
+                cd = left_block_info.position;
+
+                const auto cd_num = left_block_info.num_non_empty;
+                if (cd_num == 0) {
+                    break;
                 }
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const auto rightcol = right_ptrs[rc];
-                    for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
-                        const auto& currange = left_ranges[cd_counter];
-                        const Output_ mult = rightcol[start + cd + cd_counter];
-                        for (LeftIndex_ x = 0; x < currange.number; ++x) {
-                            outptr[sanisizer::nd_offset<std::size_t>(currange.index[x], left_NR, rc)] += mult * static_cast<Output_>(currange.value[x]);
+
+                if (left_block_info.consecutive) {
+                    const LeftIndex_ cd_base = start + left_non_empty.front();
+                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                        const auto rightcol = right_ptrs[rc];
+                        for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                            const auto& currange = left_ranges[cd_counter];
+                            const Output_ mult = rightcol[cd_base + cd_counter];
+                            for (LeftIndex_ x = 0; x < currange.number; ++x) {
+                                outptr[sanisizer::nd_offset<std::size_t>(currange.index[x], left_NR, rc)] += mult * static_cast<Output_>(currange.value[x]);
+                            }
+                        }
+                    }
+
+                } else {
+                    for (auto& cdne : left_non_empty) {
+                        cdne += start;
+                    }
+                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                        const auto rightcol = right_ptrs[rc];
+                        for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                            const auto& currange = left_ranges[cd_counter];
+                            const Output_ mult = rightcol[left_non_empty[cd_counter]];
+                            for (LeftIndex_ x = 0; x < currange.number; ++x) {
+                                outptr[sanisizer::nd_offset<std::size_t>(currange.index[x], left_NR, rc)] += mult * static_cast<Output_>(currange.value[x]);
+                            }
                         }
                     }
                 }
-                cd += cd_num;
             }
         }
 

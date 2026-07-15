@@ -62,10 +62,16 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
         auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(common_dim);
         auto ibuffer = tatami::create_container_of_Index_size<std::vector<LeftIndex_> >(common_dim);
+
         auto tmp_output = tatami::create_container_of_Index_size<std::vector<Output_> >(right_NC);
+        std::vector<LeftIndex_> left_empty;
 
         for (LeftIndex_ lr = 0; lr < length; ++lr) {
             const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
+            if (range.number == 0) {
+                left_empty.push_back(lr);
+                continue;
+            }
 
             for (LeftIndex_ x = 0; x < range.number; ++x) {
                 const auto rightrow = right_ptrs[range.index[x]];
@@ -79,6 +85,16 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
             for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                 output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = tmp_output[rc];
                 tmp_output[rc] = 0;
+            }
+        }
+
+        if (left_empty.size()) {
+            // Zeroing the empty rows that we previously skipped. This is done with near-contiguous memory,
+            // so if there are many empty LHS rows, their special-casing should improve efficiency.
+            for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                for (const auto lr : left_empty) {
+                    output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = 0;
+                }
             }
         }
     }, left_NR, options.num_threads);

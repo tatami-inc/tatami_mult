@@ -7,6 +7,7 @@
 #include "tatami/tatami.hpp"
 #include "sanisizer/sanisizer.hpp"
 
+#include "../utils.hpp"
 #include "../../utils.hpp"
 #include "../../sparse_dot_product.hpp"
 
@@ -68,6 +69,14 @@ void multiply_dense_row_with_sparse_column_matrix_to_column_output(
     auto right_ranges = tatami::create_container_of_Index_size<std::vector<tatami::SparseRange<RightValue_, RightIndex_> > >(right_NC);
     populate_sparse_buffers(false, right_NC, common_dim, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
 
+    // If there are any empty RHS columns, we only iterate over the non-empty ones in the loop for each LHS row.
+    auto right_non_empty = filter_non_empty_sparse(
+        right_ranges,
+        [&](const RightIndex_ rc) -> void {
+            std::fill_n(output + sanisizer::product_unsafe<std::size_t>(left_NR, rc), left_NR, 0);
+        }
+    );
+
     if (options.block_size == 1) {
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
             auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
@@ -75,57 +84,77 @@ void multiply_dense_row_with_sparse_column_matrix_to_column_output(
 
             for (LeftIndex_ lr = 0; lr < length; ++lr) {
                 const auto lptr = ext->fetch(dbuffer.data());
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+
+                auto loop_body = [&](RightIndex_ rc) -> void {
                     const auto rrange = right_ranges[rc];
+                    // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
+                    output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = sparse_dot_product<accumulators_>(
+                        rrange.number, // Implicit cast to size_t is safe, as per the tatami contract.
+                        rrange.value,
+                        rrange.index,
+                        lptr,
+                        static_cast<Output_>(0)
+                    );
+                };
+
+                if (right_non_empty.has_value()) {
+                    for (const auto rc : *right_non_empty) {
+                        loop_body(rc);
+                    }
+                } else {
+                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                        loop_body(rc);
+                    }
+                }
+            }
+        }, left_NR, options.num_threads);
+        return;
+    }
+
+    tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
+        auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
+
+        const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
+        std::vector<std::vector<LeftValue_> > lbuffers;
+        lbuffers.reserve(max_block_rows);
+        for (LeftIndex_ b = 0; b < max_block_rows; ++b) {
+            lbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
+        }
+        auto lptrs = tatami::create_container_of_Index_size<std::vector<const LeftValue_*> >(max_block_rows);
+
+        LeftIndex_ lr = 0;
+        while (lr < length) {
+            const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
+            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                lptrs[lr_counter] = ext->fetch(lbuffers[lr_counter].data());
+            }
+
+            // Deliberately iterating over the (non-empty) sparse RHS columns in the outer loop and the dense LHS rows in the inner loop.
+            // This aims to keep the entirety of the dense LHS block in cache across multiple RHS columns, provided common_dim is small.
+            // If we did it the other way around, it would just be the same as the block_size == 1 case, but with more looping overhead. 
+            auto loop_body = [&](RightIndex_ rc) -> void {
+                const auto rrange = right_ranges[rc];
+                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     // Implicit cast of range.number to size_t is safe, as per the tatami contract.
                     // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
-                    const auto val = sparse_dot_product<accumulators_>(rrange.number, rrange.value, rrange.index, lptr, static_cast<Output_>(0));
-                    output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = val;
+                    const auto val = sparse_dot_product<accumulators_>(rrange.number, rrange.value, rrange.index, lptrs[lr_counter], static_cast<Output_>(0));
+                    output[sanisizer::nd_offset<std::size_t>(start + lr + lr_counter, left_NR, rc)] = val;
                 }
-            }
-        }, left_NR, options.num_threads);
+            };
 
-    } else {
-        tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
-            auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
-
-            const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
-            std::vector<std::vector<LeftValue_> > lbuffers;
-            lbuffers.reserve(max_block_rows);
-            for (LeftIndex_ b = 0; b < max_block_rows; ++b) {
-                lbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
-            }
-            auto lptrs = tatami::create_container_of_Index_size<std::vector<const LeftValue_*> >(max_block_rows);
-
-            LeftIndex_ lr = 0;
-            while (lr < length) {
-                const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                    lptrs[lr_counter] = ext->fetch(lbuffers[lr_counter].data());
+            if (right_non_empty.has_value()) {
+                for (const auto rc : *right_non_empty) {
+                    loop_body(rc);
                 }
-
-                // Deliberately iterating over the (non-empty) sparse RHS columns in the outer loop and the dense LHS rows in the inner loop.
-                // This aims to keep the entirety of the dense LHS block in cache across multiple RHS columns, provided common_dim is small.
-                // If we did it the other way around, it would just be the same as the block_size == 1 case, but with more looping overhead. 
+            } else {
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const auto rrange = right_ranges[rc];
-                    if (rrange.number == 0) {
-                        std::fill_n(output + sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc), lr_num, 0);
-                        continue;
-                    }
-
-                    for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                        // Implicit cast of range.number to size_t is safe, as per the tatami contract.
-                        // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
-                        const auto val = sparse_dot_product<accumulators_>(rrange.number, rrange.value, rrange.index, lptrs[lr_counter], static_cast<Output_>(0));
-                        output[sanisizer::nd_offset<std::size_t>(start + lr + lr_counter, left_NR, rc)] = val;
-                    }
+                    loop_body(rc);
                 }
-
-                lr += lr_num;
             }
-        }, left_NR, options.num_threads);
-    }
+
+            lr += lr_num;
+        }
+    }, left_NR, options.num_threads);
 }
 
 }

@@ -93,6 +93,13 @@ void multiply_sparse_column_with_dense_row_matrix_to_column_output(
             for (LeftIndex_ cd = 0; cd < length; ++cd) {
                 const auto lrange = left_ext->fetch(vbuffer.data(), ibuffer.data());
                 const auto rptr = right_ext->fetch(dbuffer.data());
+
+                // This skip must be done after right_ext->fetch(), otherwise the two extractors won't be in sync along the common dimension.
+                // No need to zero anything as the output buffer should already be zeroed at this point.
+                if (lrange.number == 0) {
+                    continue;
+                }
+
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                     const Output_ mult = rptr[rc];
                     for (LeftIndex_ x = 0; x < lrange.number; ++x) {
@@ -119,17 +126,35 @@ void multiply_sparse_column_with_dense_row_matrix_to_column_output(
                     left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(left_NR));
                     right_dbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<RightValue_> >(right_NC));
                 }
-                sanisizer::resize(left_ranges, max_block_cols);
-                sanisizer::resize(right_ptrs, max_block_cols);
+                tatami::resize_container_to_Index_size(left_ranges, max_block_cols);
+                tatami::resize_container_to_Index_size(right_ptrs, max_block_cols);
             }
 
             LeftIndex_ cd = 0;
             while (cd < length) {
-                const LeftIndex_ cd_num = sanisizer::min(options.block_size, length - cd);
-                for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
-                    left_ranges[cd_counter] = left_ext->fetch(left_vbuffers[cd_counter].data(), left_ibuffers[cd_counter].data());
-                    right_ptrs[cd_counter] = right_ext->fetch(right_dbuffers[cd_counter].data());
-                }
+                // Only processing LHS columns (and the corresponding RHS rows) if the LHS column has some structural non-zeros.
+                // If not, we just skip it altogether; no need to zero or do anything else, as we're skipping the corresponding RHS row too.
+                LeftIndex_ cd_num = 0;
+                do {
+                    auto lrange = left_ext->fetch(left_vbuffers[cd_num].data(), left_ibuffers[cd_num].data());
+                    auto rptr = right_ext->fetch(right_dbuffers[cd_num].data());
+
+                    // Again, this skip must be done after the RHS row is fetched, otherwise the extractors will be out of sync.
+                    if (lrange.number == 0) {
+                        ++cd;
+                        continue;
+                    }
+
+                    left_ranges[cd_num] = std::move(lrange);
+                    right_ptrs[cd_num] = rptr;
+                    ++cd_num;
+                    ++cd;
+
+                    if (sanisizer::is_equal(cd_num, options.block_size)) {
+                        break;
+                    }
+                } while (cd < length);
+
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                     for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                         const auto& currange = left_ranges[cd_counter];
@@ -139,7 +164,6 @@ void multiply_sparse_column_with_dense_row_matrix_to_column_output(
                         }
                     }
                 }
-                cd += cd_num;
             }
         }
 

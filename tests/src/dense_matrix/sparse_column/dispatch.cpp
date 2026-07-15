@@ -7,6 +7,8 @@
 
 #include "tatami_mult/dense_matrix/sparse_column/dispatch.hpp"
 
+#include "../../utils.h"
+
 class DenseMatrixSparseColumnTest : public ::testing::TestWithParam<std::tuple<int, int, int, int, int> > {};
 
 TEST_P(DenseMatrixSparseColumnTest, Basic) {
@@ -92,26 +94,24 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(59, 148), // number of columns.
         ::testing::Values(12, 74),  // number of RHS vectors.
         ::testing::Values(1, 4, 8), // block size.
-        ::testing::Values(1, 3)
+        ::testing::Values(1, 3) // number of threads.
     )
 );
 
 /************************************/
 
-class DenseMatrixSparseColumnEmptyTest : public ::testing::TestWithParam<std::tuple<int, int> > {};
+class DenseMatrixSparseColumnEmptyTest : public ::testing::TestWithParam<std::tuple<int, int, int, int, int, int> > {};
 
 TEST_P(DenseMatrixSparseColumnEmptyTest, Basic) {
-    const int NR = 72;
-    const int NC = 123;
-    const int NRHS = 11;
-
     const auto params = GetParam();
-    const auto block_size = std::get<0>(params);
-    const auto nthreads = std::get<1>(params);
+    const int NR = std::get<0>(params);
+    const int NC = std::get<1>(params);
+    const int NRHS = std::get<2>(params);
+    const auto stride = std::get<3>(params);
+    const auto block_size = std::get<4>(params);
+    const auto nthreads = std::get<5>(params);
 
-    // Getting some code coverage for an empty sparse matrix (i.e., all values are zero),
-    // where column-to-row has some special code to avoid extra work if an LHS column has no non-zeros.
-    std::vector<double> dump(NR * NC);
+    auto dump = simulate_strided_sparse_matrix(NR, NC, stride, /* seed = */ 923 + NR + NC + NRHS + block_size + nthreads);
     auto sparse_row = tatami::convert_to_compressed_sparse<double, int>(tatami::DenseRowMatrix<double, int>(NR, NC, dump), true, {});
     auto sparse_col = tatami::convert_to_compressed_sparse<double, int>(*sparse_row, false, {});
 
@@ -147,24 +147,36 @@ TEST_P(DenseMatrixSparseColumnEmptyTest, Basic) {
     tatami_mult::multiply_sparse_column_with_dense_matrix(*sparse_col, *right_row, sc_rr_co.data(), false, opt);
     tatami_mult::multiply_sparse_column_with_dense_matrix(*sparse_col, *right_col, sc_rc_co.data(), false, opt);
 
-    std::vector<double> zeroed(output_size);
-    EXPECT_EQ(sr_rc_ro, zeroed);
-    EXPECT_EQ(sr_rc_co, zeroed);
-    EXPECT_EQ(sr_rr_ro, zeroed);
-    EXPECT_EQ(sr_rr_co, zeroed);
+    for (int h = 0; h < NRHS; ++h) {
+        const auto rptr = rhs.data() + h * NC;
+        for (int r = 0; r < NR; ++r) {
+            const auto ref = std::inner_product(rptr, rptr + NC, dump.begin() + r * NC, 0.0);
 
-    EXPECT_EQ(sc_rc_ro, zeroed);
-    EXPECT_EQ(sc_rc_co, zeroed);
-    EXPECT_EQ(sc_rr_ro, zeroed);
-    EXPECT_EQ(sc_rr_co, zeroed);
+            const auto rm_idx = r * NRHS + h;
+            EXPECT_FLOAT_EQ(ref, sr_rc_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rr_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rc_ro[rm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rr_ro[rm_idx]);
+
+            const auto cm_idx = h * NR + r;
+            EXPECT_FLOAT_EQ(ref, sr_rc_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sr_rr_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rc_co[cm_idx]);
+            EXPECT_FLOAT_EQ(ref, sc_rr_co[cm_idx]);
+        }
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(
     DenseMatrix,
     DenseMatrixSparseColumnEmptyTest,
     ::testing::Combine(
-        ::testing::Values(1, 4, 8), // block size.
-        ::testing::Values(1, 3)
+        ::testing::Values(96, 35), // number of rows.
+        ::testing::Values(56, 133), // number of columns.
+        ::testing::Values(21, 80),  // number of RHS vectors.
+        ::testing::Values(0, 3, 10), // non-empty stride.
+        ::testing::Values(1, 4), // block size.
+        ::testing::Values(1, 3) // number of threads.
     )
 );
 

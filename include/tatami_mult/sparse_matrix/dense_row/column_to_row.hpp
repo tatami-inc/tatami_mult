@@ -7,6 +7,7 @@
 #include "tatami/tatami.hpp"
 #include "sanisizer/sanisizer.hpp"
 
+#include "../utils.hpp"
 #include "../../utils.hpp"
 #include "../../sparse_dot_product.hpp"
 
@@ -75,12 +76,20 @@ void multiply_dense_row_with_sparse_column_matrix_to_row_output(
 
             for (LeftIndex_ lr = 0; lr < length; ++lr) {
                 const auto lptr = ext->fetch(dbuffer.data());
+
+                // No point looping over the non-empty RHS columns, as we still need to zero the output columns corresponding to empty RHS columns.
+                // So, we might as well handle the zeroing in the same loop and save ourselves the trouble.
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                     const auto rrange = right_ranges[rc];
-                    // Implicit cast of range.number to size_t is safe, as per the tatami contract.
-                    // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
-                    const auto val = sparse_dot_product<accumulators_>(rrange.number, rrange.value, rrange.index, lptr, static_cast<Output_>(0));
-                    output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr)] = val;
+
+                    // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
+                    output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr)] = sparse_dot_product<accumulators_>(
+                        rrange.number, // Implicit cast to size_t is safe, as per the tatami contract.
+                        rrange.value,
+                        rrange.index,
+                        lptr,
+                        static_cast<Output_>(0)
+                    );
                 }
             }
         }, left_NR, options.num_threads);
@@ -104,7 +113,7 @@ void multiply_dense_row_with_sparse_column_matrix_to_row_output(
                     lptrs[lr_counter] = ext->fetch(lbuffers[lr_counter].data());
                 }
 
-                // Deliberately iterating over the (non-empty) sparse RHS columns in the outer loop and the dense LHS rows in the inner loop.
+                // Deliberately iterating over the sparse RHS columns in the outer loop and the dense LHS rows in the inner loop.
                 // This aims to keep the entirety of the dense LHS block in cache across multiple RHS columns, provided common_dim is small.
                 // If we did it the other way around, it would just be the same as the block_size == 1 case, but with more looping overhead. 
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
@@ -117,10 +126,14 @@ void multiply_dense_row_with_sparse_column_matrix_to_row_output(
                     }
 
                     for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                        // Implicit cast of range.number to size_t is safe, as per the tatami contract.
-                        // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
-                        const auto val = sparse_dot_product<accumulators_>(rrange.number, rrange.value, rrange.index, lptrs[lr_counter], static_cast<Output_>(0));
-                        output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr + lr_counter)] = val;
+                        // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
+                        output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr + lr_counter)] = sparse_dot_product<accumulators_>(
+                            rrange.number, // Implicit cast to size_t is safe, as per the tatami contract.
+                            rrange.value,
+                            rrange.index,
+                            lptrs[lr_counter],
+                            static_cast<Output_>(0)
+                        );
                     }
                 }
 

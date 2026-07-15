@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <vector>
+#include <cassert>
 
 #include "tatami/tatami.hpp"
 #include "sanisizer/sanisizer.hpp"
@@ -39,40 +40,53 @@ void populate_dense_buffers(
     }, primary, num_threads);
 }
 
-template<typename Value_, typename Index_>
-void populate_sparse_buffers(
-    const bool row,
-    const Index_ primary,
-    const Index_ secondary,
-    const tatami::Matrix<Value_, Index_>& matrix,
-    std::vector<std::vector<Value_> >& all_vbuffers,
-    std::vector<std::vector<Index_> >& all_ibuffers,
-    std::vector<tatami::SparseRange<Value_, Index_> >& all_ranges,
-    int num_threads
-) {
-    tatami::parallelize([&](int, Index_ start, Index_ length) -> void {
-        std::vector<Value_> tmp_v;
-        sanisizer::reserve(tmp_v, secondary);
-        std::vector<Index_> tmp_i;
-        sanisizer::reserve(tmp_i, secondary);
+template<typename Index_>
+struct FetchNonEmptySparseBlockInfo {
+    FetchNonEmptySparseBlockInfo(const Index_ position, const Index_ num_non_empty, const bool consecutive) : 
+        position(position), num_non_empty(num_non_empty), consecutive(consecutive) {}
+    Index_ position, num_non_empty;
+    bool consecutive;
+};
 
-        auto ext = tatami::consecutive_extractor<true>(matrix, row, start, length);
-        for (Index_ i = start, end = start + length; i < end; ++i) {
-            tmp_v.resize(secondary); // reserve is safe, so should resize.
-            tmp_i.resize(secondary);
+template<typename Value_, typename Index_, class Zero_>
+FetchNonEmptySparseBlockInfo<Index_> fetch_non_empty_sparse_block(
+    tatami::OracularSparseExtractor<Value_, Index_>& ext,
+    std::vector<std::vector<Value_> >& vbuffers,
+    std::vector<std::vector<Index_> >& ibuffers,
+    std::vector<tatami::SparseRange<Value_, Index_> >& ranges,
+    std::vector<Index_>& non_empty,
+    Index_ position,
+    const Index_ length,
+    const int block_size,
+    Zero_ zero
+) { 
+    non_empty.clear();
+    Index_ num_non_empty = 0;
+    bool consecutive = true;
 
-            auto range = ext->fetch(tmp_v.data(), tmp_i.data());
-            if (range.value == tmp_v.data()) {
-                all_vbuffers[i].swap(tmp_v);
-                range.value = all_vbuffers[i].data();
-            }
-            if (range.index == tmp_i.data()) {
-                all_ibuffers[i].swap(tmp_i);
-                range.index = all_ibuffers[i].data();
-            }
-            all_ranges[i] = range;
+    // We assume that a check for remaining dimension elements was performed before continuing the blocked loop.
+    assert(position < length);
+
+    do {
+        auto lrange = ext.fetch(vbuffers[num_non_empty].data(), ibuffers[num_non_empty].data());
+        if (lrange.number == 0) {
+            zero(position);
+            consecutive = false;
+            ++position;
+            continue;
         }
-    }, primary, num_threads);
+
+        ranges[num_non_empty] = std::move(lrange);
+        non_empty.push_back(position);
+        ++num_non_empty;
+        ++position;
+
+        if (sanisizer::is_equal(num_non_empty, block_size)) {
+            break;
+        }
+    } while (position < length);
+
+    return FetchNonEmptySparseBlockInfo(position, num_non_empty, consecutive);
 }
 
 template<typename Output_, typename DenseValue_, typename Value_, typename Index_>
