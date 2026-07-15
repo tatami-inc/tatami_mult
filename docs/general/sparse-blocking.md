@@ -16,3 +16,6 @@ For each sparse vector, we iterate over the dense vectors in this block to perfo
 We then repeat this with a new sparse vector but re-using the same block of dense vectors.
 The idea is that the dense block is small enough that all of its vectors can be completely cached for quick re-use.
 Obviously, this has pretty limited applicability with regards to the matrix shape.
+
+Both \f$B\f$ and \f$C\f$ should be positive.
+If either is equal to 1, no blocking will be performed.

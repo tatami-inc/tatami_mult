@@ -1,6 +1,8 @@
 # Blocking for dense matrices {#dense-blocking}
 
-When computing the product of two dense matrices, we use blocking to improve cache utilization.
+## Overview 
+
+When computing the product of two dense matrices, we can use blocking to improve cache utilization.
 This involves splitting each matrix into smaller submatrices and computing the matrix product for pairs of submatrices.
 Each of the submatrices should be small enough to be stored in L1 cache for fast re-use of rows/columns. 
 
@@ -10,6 +12,8 @@ If the extent of the shared dimension is large enough to trigger cache evictions
 each LHS row or RHS column (depending on the iteration pattern) would need to be reloaded from memory on every use.
 With blocking, we can reuse cached parts of multiple LHS rows with cached parts of multiple RHS columns to compute partial dot products.
 We repeat this for each pair of submatrices and aggregate the results to obtain the full matrix product.
+
+## Parameters
 
 The exact blocking strategy depends on the layout of the the RHS, LHS and output matrices,
 but we generally expect to operate on two \f$B\f$-by-\f$C\f$ (or \f$C\f$-by-\f$B\f$) matrices and one \f$B\f$-by-\f$B\f$ matrix:
@@ -23,10 +27,19 @@ but we generally expect to operate on two \f$B\f$-by-\f$C\f$ (or \f$C\f$-by-\f$B
 
 In this framework, \f$2BC + B^2\f$ is the number of elements to be held in cache at any given time, plus sundries based on the granularity of the cache lines.
 For a given cache size, a larger \f$B\f$ will improve cache re-use but increase the overhead from loop restarts due to a lower \f$C\f$.
-A larger \f$B\f$ also increases main memory usage as more dimension elements need to be realized by **tatami**.
 
 The best choice of \f$B\f$ and \f$C\f$ depends on the size of the cache and the size of the data type.
 If we're working with double-precision types, requiring \f$BC = 1024\f$ and enforcing \f$B \leq C\f$ will use 16-24 kb, which should easily fit into a typical 32 kb L1 cache.
-We recommend choosing a multiple of 2 for \f$B\f$ and \f$C\f$ as this provides a chance to exploit existing data alignment and vectorization. 
+
+## Further considerations 
+
+Both \f$B\f$ and \f$C\f$ should be positive.
+
+We recommend choosing a power of 2 for both \f$B\f$ and \f$C\f$ as this gives us a chance to exploit existing data alignment and vectorization. 
 Indeed, blocking can be combined with @ref multiple-accumulators "multiple accumulators",
 in which case \f$C\f$ should be a multiple of the number of accumulators to minimize entry into the epilogue loop.
+
+A larger \f$B\f$ increases memory usage as more dimension elements need to be realized by **tatami**.
+
+If the primary block size is set to 1 in any **tatami_mult** function, no blocking will be performed.
+In this case, the choice of secondary block size will have no effect, i.e., \f$C\f$ is ignored.

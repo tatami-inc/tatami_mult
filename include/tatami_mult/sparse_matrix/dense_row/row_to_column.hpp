@@ -29,7 +29,10 @@ struct MultiplyDenseRowWithSparseRowMatrixToColumnOutputOptions {
     /**
      * Block size, i.e., number of LHS rows to be loaded at once.
      * We use this block to populate a contiguous array with a part of each LHS column that can be used in a fast vector multiply-add to the column-major output.
+     *
+     * The block size should be positive.
      * Larger values improve speed at the cost of increased memory usage.
+     * If this is set to 1, no blocking is performed.
      */
     int block_size = 16;
 };
