@@ -42,10 +42,10 @@ void populate_dense_buffers(
 
 template<typename Index_>
 struct FetchNonEmptySparseBlockInfo {
-    FetchNonEmptySparseBlockInfo(const Index_ position, const Index_ num_non_empty, const bool consecutive) : 
-        position(position), num_non_empty(num_non_empty), consecutive(consecutive) {}
+    FetchNonEmptySparseBlockInfo(const Index_ position, const Index_ num_non_empty, const bool all_non_empty) : 
+        position(position), num_non_empty(num_non_empty), all_non_empty(all_non_empty) {}
     Index_ position, num_non_empty;
-    bool consecutive;
+    bool all_non_empty;
 };
 
 template<typename Value_, typename Index_, class Zero_>
@@ -62,7 +62,7 @@ FetchNonEmptySparseBlockInfo<Index_> fetch_non_empty_sparse_block(
 ) { 
     non_empty.clear();
     Index_ num_non_empty = 0;
-    bool consecutive = true;
+    bool all_non_empty = true;
 
     // We assume that a check for remaining dimension elements was performed before continuing the blocked loop.
     assert(position < length);
@@ -71,7 +71,7 @@ FetchNonEmptySparseBlockInfo<Index_> fetch_non_empty_sparse_block(
         auto lrange = ext.fetch(vbuffers[num_non_empty].data(), ibuffers[num_non_empty].data());
         if (lrange.number == 0) {
             zero(position);
-            consecutive = false;
+            all_non_empty = false;
             ++position;
             continue;
         }
@@ -86,7 +86,7 @@ FetchNonEmptySparseBlockInfo<Index_> fetch_non_empty_sparse_block(
         }
     } while (position < length);
 
-    return FetchNonEmptySparseBlockInfo(position, num_non_empty, consecutive);
+    return FetchNonEmptySparseBlockInfo(position, num_non_empty, all_non_empty);
 }
 
 template<typename Output_, typename DenseValue_, typename Value_, typename Index_>

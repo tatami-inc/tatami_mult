@@ -123,18 +123,12 @@ void multiply_sparse_row_with_dense_column_matrix_to_row_output(
                     std::fill_n(output + sanisizer::product_unsafe<std::size_t>(start + lr_copy, right_NC), right_NC, 0);
                 }
             );
-            lr = left_block_info.position;
-
             const auto lr_num = left_block_info.num_non_empty;
-            if (lr_num == 0) {
-                break;
-            }
 
-            // If the LHS columns are consecutive, we can speed up the loops by just using a simple counter to get the column indices.
+            // If the LHS columns are all non-empty, we can speed up the loops by just using a simple counter to get the column indices.
             // Otherwise, we'll have to access the 'left_non_empty' vector to figure out the indices of each non-empty column.
-            if (left_block_info.consecutive) {
-                const auto lr_base = start + left_non_empty.front();
-
+            if (left_block_info.all_non_empty) {
+                const auto lr_base = lr + start; 
                 // Yes, we deliberately iterate over the RHS columns in the outer loop to keep the dense column in cache across multiple LHS vectors.
                 // If we did it the other way around, this would defeat the purpose of blocking.
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
@@ -169,6 +163,8 @@ void multiply_sparse_row_with_dense_column_matrix_to_row_output(
                     }
                 }
             }
+
+            lr = left_block_info.position;
         }
     }, left_NR, options.num_threads);
 }

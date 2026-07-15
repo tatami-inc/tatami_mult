@@ -131,15 +131,12 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
                     options.block_size,
                     /* zero = */ [&](const LeftIndex_) -> void {} // buffers should already be zeroed.
                 );
-                cd = left_block_info.position;
-
                 const auto cd_num = left_block_info.num_non_empty;
-                if (cd_num == 0) {
-                    break;
-                }
 
-                if (left_block_info.consecutive) {
-                    const LeftIndex_ cd_base = start + left_non_empty.front();
+                // If the LHS rows are all non-empty, we can speed up the loops by just using a simple counter to get the column indices.
+                // Otherwise, we'll have to access the 'left_non_empty' vector to figure out the indices of each non-empty column.
+                if (left_block_info.all_non_empty) {
+                    const LeftIndex_ cd_base = cd + start; 
                     for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                         const auto rightcol = right_ptrs[rc];
                         for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
@@ -166,6 +163,8 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
                         }
                     }
                 }
+
+                cd = left_block_info.position;
             }
         }
 

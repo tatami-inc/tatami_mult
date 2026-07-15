@@ -144,17 +144,12 @@ void multiply_sparse_column_with_multiple_vectors(
                     options.block_size,
                     /* zero = */ [](Index_) -> void {} // (No need to worry about zeroing as the buffers have already been zeroed.)
                 );
-                cd = left_block_info.position;
-
                 const auto cd_num = left_block_info.num_non_empty;
-                if (cd_num == 0) {
-                    break;
-                }
 
-                // If the LHS columns are consecutive, we can speed up the loops by just using a simple counter to get the column indices.
+                // If the LHS columns are all non-empty, we can speed up the loops by just using a simple counter to get the column indices.
                 // Otherwise, we'll have to access the 'left_non_empty' vector to figure out the indices of each non-empty column.
-                if (left_block_info.consecutive) {
-                    const Index_ cd_base = start + left_non_empty.front();
+                if (left_block_info.all_non_empty) {
+                    const Index_ cd_base = start + cd;
                     for (RightIndex rc = 0; rc < right_NC; ++rc) {
                         const auto outcol = outptrs[rc];
                         const auto rightcol = right[rc];
@@ -183,6 +178,8 @@ void multiply_sparse_column_with_multiple_vectors(
                         }
                     }
                 }
+
+                cd = left_block_info.position;
             }
         }
 
