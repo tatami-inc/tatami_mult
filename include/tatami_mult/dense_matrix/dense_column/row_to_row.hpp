@@ -67,10 +67,6 @@ void multiply_dense_column_with_dense_row_matrix_to_row_output(
     const auto right_NC = right.ncol();
     std::fill_n(output, sanisizer::product_unsafe<std::size_t>(left_NR, right_NC), 0);
 
-    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
-    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
-    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
-
     const bool do_parallel = options.num_threads > 1;
     std::optional<std::vector<std::optional<std::vector<Output_> > > > tmp_results;
     if (do_parallel) {
