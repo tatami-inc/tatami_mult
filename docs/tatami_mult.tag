@@ -268,6 +268,11 @@
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="struct">
+    <name>tatami_mult::FetchNonEmptySparseBlockInfo</name>
+    <filename>structtatami__mult_1_1FetchNonEmptySparseBlockInfo.html</filename>
+    <templarg>typename Index_</templarg>
+  </compound>
+  <compound kind="struct">
     <name>tatami_mult::MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions</name>
     <filename>structtatami__mult_1_1MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions.html</filename>
     <member kind="variable">
@@ -1069,6 +1074,7 @@
   <compound kind="namespace">
     <name>tatami_mult</name>
     <filename>namespacetatami__mult.html</filename>
+    <class kind="struct">tatami_mult::FetchNonEmptySparseBlockInfo</class>
     <class kind="struct">tatami_mult::MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplyDenseColumnWithDenseColumnMatrixToRowOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplyDenseColumnWithDenseMatrixOptions</class>
