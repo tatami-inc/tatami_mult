@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.12.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>tatami_mult: tatami_mult/sparse_matrix/dense_column Directory Reference</title>
+<title>tatami_mult: tatami_mult/sparse_matrix/dense_column/row_to_row.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -97,29 +97,47 @@ $(function(){ initResizable(false); });
 </div><!-- top -->
 <div id="doc-content">
 <div class="header">
-  <div class="headertitle"><div class="title">dense_column Directory Reference</div></div>
+  <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">row_to_row.hpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Dense row-major LHS, sparse row-major RHS, row-major output.  
+<a href="#details">More...</a></p>
+<div class="textblock"><code>#include &lt;cstddef&gt;</code><br />
+<code>#include &lt;vector&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
+<code>#include &quot;<a class="elRef" href="https://tatami-inc.github.io/tatami/tatami_8hpp.html">tatami/tatami.hpp</a>&quot;</code><br />
+<code>#include &quot;sanisizer/sanisizer.hpp&quot;</code><br />
+<code>#include &quot;../utils.hpp&quot;</code><br />
+<code>#include &quot;../../utils.hpp&quot;</code><br />
+</div>
+<p><a href="sparse__matrix_2dense__column_2row__to__row_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="files" name="files"></a>
-Files</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="sparse__matrix_2dense__column_2column__to__column_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sparse__matrix_2dense__column_2column__to__column_8hpp.html">column_to_column.hpp</a></td></tr>
-<tr class="memdesc:sparse__matrix_2dense__column_2column__to__column_8hpp"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dense row-major LHS, sparse column-major RHS, column-major output. <br /></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions.html">tatami_mult::MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> for <code><a class="el" href="namespacetatami__mult.html#a9195f90a79d71417eb292795dcf460ed">multiply_dense_column_with_sparse_row_matrix_to_row_output()</a></code>.  <a href="structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="sparse__matrix_2dense__column_2column__to__row_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sparse__matrix_2dense__column_2column__to__row_8hpp.html">column_to_row.hpp</a></td></tr>
-<tr class="memdesc:sparse__matrix_2dense__column_2column__to__row_8hpp"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dense column-major LHS, sparse column-major RHS, row-major output. <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html">tatami_mult</a></td></tr>
+<tr class="memdesc:namespacetatami__mult"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiplication of <b>tatami</b> matrices. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="sparse__matrix_2dense__column_2dispatch_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sparse__matrix_2dense__column_2dispatch_8hpp.html">dispatch.hpp</a></td></tr>
-<tr class="memdesc:sparse__matrix_2dense__column_2dispatch_8hpp"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dense column-major LHS, dense matrix RHS. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="sparse__matrix_2dense__column_2row__to__column_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sparse__matrix_2dense__column_2row__to__column_8hpp.html">row_to_column.hpp</a></td></tr>
-<tr class="memdesc:sparse__matrix_2dense__column_2row__to__column_8hpp"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dense row-major LHS, sparse row-major RHS, column-major output. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="sparse__matrix_2dense__column_2row__to__row_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sparse__matrix_2dense__column_2row__to__row_8hpp.html">row_to_row.hpp</a></td></tr>
-<tr class="memdesc:sparse__matrix_2dense__column_2row__to__row_8hpp"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dense row-major LHS, sparse row-major RHS, row-major output. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a9195f90a79d71417eb292795dcf460ed" id="r_a9195f90a79d71417eb292795dcf460ed"><td class="memTemplParams" colspan="2">template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
+<tr class="memitem:a9195f90a79d71417eb292795dcf460ed"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a9195f90a79d71417eb292795dcf460ed">tatami_mult::multiply_dense_column_with_sparse_row_matrix_to_row_output</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const <a class="el" href="structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions.html">MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions</a> &amp;options)</td></tr>
+<tr class="separator:a9195f90a79d71417eb292795dcf460ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Dense row-major LHS, sparse row-major RHS, row-major output. </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.12.0
