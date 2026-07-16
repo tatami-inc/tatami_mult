@@ -10,7 +10,7 @@
 
 /**
  * @file dispatch.hpp
- * @brief Dense row-major LHS, dense matrix RHS.
+ * @brief Sparse row-major LHS, dense matrix RHS.
  */
 
 namespace tatami_mult {
@@ -45,7 +45,7 @@ struct MultiplySparseRowWithSparseMatrixOptions {
 };
 
 /**
- * Set the number of threads to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS.
+ * Set the number of threads to use in all multiplication functions involving a sparse row-major LHS and a sparse matrix RHS.
  *
  * @param options Options to be set.
  * @param num_threads Number of threads, should be positive.
@@ -58,7 +58,7 @@ inline void set_num_threads(MultiplySparseRowWithSparseMatrixOptions& options, i
 }
 
 /**
- * Set the block size to use in all multiplication functions involving a dense row-major LHS and a sparse matrix RHS.
+ * Set the block size to use in all multiplication functions involving a sparse row-major LHS and a sparse matrix RHS.
  * See the $C$ parameter in @ref sparse-blocking "Blocking for sparse matrices" section for more details.
  *
  * @param options Options to be set.
@@ -79,7 +79,7 @@ inline void set_sparse_block_size(MultiplySparseRowWithSparseMatrixOptions& opti
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
- * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
+ * This function is optimized for sparse matrices that prefer row access, but will work with all matrices.
  * @param right RHS matrix to be multiplied.
  * The number of rows in this matrix should be equal to the number of columns in `left`.
  * This function is optimized for sparse matrices, but will work with all matrices.

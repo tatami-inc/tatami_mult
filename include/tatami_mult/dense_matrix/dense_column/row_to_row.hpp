@@ -52,7 +52,7 @@ struct MultiplyDenseColumnWithDenseRowMatrixToRowOutputOptions {
  * @param right RHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
- * On output, this contains the product `left * right` in row-major order.
+ * On output, this contains the product `left * right` in row-major format.
  * @param options Further options.
  */
 template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>

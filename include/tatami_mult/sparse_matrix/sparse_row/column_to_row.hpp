@@ -13,7 +13,7 @@
 
 /**
  * @file column_to_row.hpp
- * @brief Dense row-major LHS, sparse column-major RHS, row-major output.
+ * @brief Sparse row-major LHS, sparse column-major RHS, row-major output.
  */
 
 namespace tatami_mult {
@@ -46,7 +46,7 @@ struct MultiplySparseRowWithSparseColumnMatrixToRowOutputOptions {
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
- * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
+ * This function is optimized for sparse matrices that prefer row access, but will work with all matrices.
  * @param right RHS matrix to be multiplied.
  * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
  * The number of rows in this matrix should be equal to the number of columns in `left`.

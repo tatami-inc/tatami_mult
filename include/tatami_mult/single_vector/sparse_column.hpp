@@ -33,7 +33,7 @@ struct MultiplySparseColumnWithSingleVectorOptions {
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
- * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
+ * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
  * @param[in] right Pointer to an array of length equal to the number of columns of `left`,
  * containing the RHS vector.
  * @param[out] output Pointer to an array of length equal to the number of rows of `left`.

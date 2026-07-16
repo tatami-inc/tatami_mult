@@ -11,8 +11,8 @@
 #include "../../utils.hpp"
 
 /**
- * @file row_to_row.hpp
- * @brief Dense row-major LHS, sparse row-major RHS, row-major output.
+ * @file row_to_column.hpp
+ * @brief Dense row-major LHS, sparse row-major RHS, column-major output.
  */
 
 namespace tatami_mult {
@@ -28,7 +28,7 @@ struct MultiplyDenseRowWithSparseRowMatrixToColumnOutputOptions {
 
     /**
      * Block size, i.e., number of LHS rows to be loaded at once.
-     * We use this block to populate a contiguous array with a part of each LHS column that can be used in a fast vector multiply-add to the column-major output.
+     * This is used to transpose the row-major LHS for more efficient operation with column-major output.
      *
      * The block size should be positive.
      * Larger values improve speed at the cost of increased memory usage.
@@ -47,10 +47,10 @@ struct MultiplyDenseRowWithSparseRowMatrixToColumnOutputOptions {
  * @param left LHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
  * @param right RHS matrix to be multiplied.
- * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
+ * This function is optimized for sparse matrices that prefer row access, but will work with all matrices.
  * The number of rows in this matrix should be equal to the number of columns in `left`.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
- * On output, this stores the product of `left` and `right` in row-major format.
+ * On output, this stores the product of `left` and `right` in column-major format.
  * @param options Further options.
  */
 template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>

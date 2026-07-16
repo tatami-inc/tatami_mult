@@ -40,7 +40,7 @@ struct MultiplySparseColumnWithDenseRowMatrixToRowOutputOptions {
  * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
  * The number of rows in `right` should be equal to the number of columns in `left`.
  * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
- * On output, this contains the product `left * right` in row-major order.
+ * On output, this contains the product `left * right` in row-major format.
  * @param options Further options.
  */
 template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
