@@ -1,48 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile doxygen_version="1.12.0">
   <compound kind="file">
-    <name>dense_column.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2dense__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseColumnWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dense_column.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2dense__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSingleVectorOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dense_row.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2dense__row_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseRowWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dense_row.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2dense__row_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseRowWithSingleVectorOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>sparse_column.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2sparse__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplySparseColumnWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>sparse_column.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2sparse__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplySparseColumnWithSingleVectorOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
     <name>column_to_column.hpp</name>
     <path>tatami_mult/dense_matrix/dense_column/</path>
     <filename>dense__matrix_2dense__column_2column__to__column_8hpp.html</filename>
@@ -68,6 +26,13 @@
     <path>tatami_mult/dense_matrix/sparse_row/</path>
     <filename>dense__matrix_2sparse__row_2column__to__column_8hpp.html</filename>
     <class kind="struct">tatami_mult::MultiplySparseRowWithDenseColumnMatrixToColumnOutputOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>column_to_column.hpp</name>
+    <path>tatami_mult/sparse_matrix/dense_column/</path>
+    <filename>sparse__matrix_2dense__column_2column__to__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseColumnMatrixToColumnOutputOptions</class>
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="file">
@@ -182,6 +147,14 @@
   </compound>
   <compound kind="file">
     <name>dispatch.hpp</name>
+    <path>tatami_mult/sparse_matrix/dense_column/</path>
+    <filename>sparse__matrix_2dense__column_2dispatch_8hpp.html</filename>
+    <includes id="sparse__matrix_2dense__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
     <path>tatami_mult/sparse_matrix/dense_row/</path>
     <filename>sparse__matrix_2dense__row_2dispatch_8hpp.html</filename>
     <includes id="sparse__matrix_2dense__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
@@ -244,6 +217,48 @@
     <path>tatami_mult/sparse_matrix/dense_row/</path>
     <filename>sparse__matrix_2dense__row_2row__to__row_8hpp.html</filename>
     <class kind="struct">tatami_mult::MultiplyDenseRowWithSparseRowMatrixToRowOutputOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dense_column.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2dense__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dense_column.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2dense__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dense_row.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2dense__row_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseRowWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dense_row.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2dense__row_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseRowWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>sparse_column.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2sparse__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplySparseColumnWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>sparse_column.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2sparse__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplySparseColumnWithSingleVectorOptions</class>
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="file">
@@ -437,6 +452,96 @@
       <name>num_threads</name>
       <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSingleVectorOptions.html</anchorfile>
       <anchor>a2af37bdf38b29850e1d635a58f5dd8e6</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>tatami_mult::MultiplyDenseColumnWithSparseColumnMatrixToColumnOutputOptions</name>
+    <filename>structtatami__mult_1_1MultiplyDenseColumnWithSparseColumnMatrixToColumnOutputOptions.html</filename>
+    <member kind="variable">
+      <type>int</type>
+      <name>num_threads</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseColumnMatrixToColumnOutputOptions.html</anchorfile>
+      <anchor>aabeedac29a3c47c94a33955f9cf71d44</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>tatami_mult::MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions</name>
+    <filename>structtatami__mult_1_1MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions.html</filename>
+    <member kind="variable">
+      <type>int</type>
+      <name>num_threads</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions.html</anchorfile>
+      <anchor>a782c5c659aa4cec976dfb54de6e88bf1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>block_size</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions.html</anchorfile>
+      <anchor>a22d8af8f248d69323d9521f866b73553</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>tatami_mult::MultiplyDenseColumnWithSparseMatrixOptions</name>
+    <filename>structtatami__mult_1_1MultiplyDenseColumnWithSparseMatrixOptions.html</filename>
+    <member kind="variable">
+      <type>MultiplyDenseColumnWithSparseColumnMatrixToColumnOutputOptions</type>
+      <name>column_to_column</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseMatrixOptions.html</anchorfile>
+      <anchor>ada5d1e1401971e5f1ff3099bff54e1fe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions</type>
+      <name>column_to_row</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseMatrixOptions.html</anchorfile>
+      <anchor>a3bac04f70054089cca1ea38dd5806298</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>MultiplyDenseColumnWithSparseRowMatrixToColumnOutputOptions</type>
+      <name>row_to_column</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseMatrixOptions.html</anchorfile>
+      <anchor>af3218b25316c1b2a22eceeef29c7c93c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions</type>
+      <name>row_to_row</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseMatrixOptions.html</anchorfile>
+      <anchor>ac1e291a20935341a0434fea36ced2e21</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>tatami_mult::MultiplyDenseColumnWithSparseRowMatrixToColumnOutputOptions</name>
+    <filename>structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToColumnOutputOptions.html</filename>
+    <member kind="variable">
+      <type>int</type>
+      <name>num_threads</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToColumnOutputOptions.html</anchorfile>
+      <anchor>a90265fdf019f4608b51c6a5c7e422f77</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>tatami_mult::MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions</name>
+    <filename>structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions.html</filename>
+    <member kind="variable">
+      <type>int</type>
+      <name>num_threads</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions.html</anchorfile>
+      <anchor>a23d7643ba8448804bf17042611814503</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>block_size</name>
+      <anchorfile>structtatami__mult_1_1MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions.html</anchorfile>
+      <anchor>af33294c9b9e3677f6edd960edf6d0795</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -1082,6 +1187,11 @@
     <class kind="struct">tatami_mult::MultiplyDenseColumnWithDenseRowMatrixToRowOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplyDenseColumnWithMultipleVectorsOptions</class>
     <class kind="struct">tatami_mult::MultiplyDenseColumnWithSingleVectorOptions</class>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseColumnMatrixToColumnOutputOptions</class>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions</class>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseMatrixOptions</class>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseRowMatrixToColumnOutputOptions</class>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplyDenseRowWithDenseColumnMatrixToColumnOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplyDenseRowWithDenseColumnMatrixToRowOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplyDenseRowWithDenseMatrixOptions</class>
@@ -1461,6 +1571,55 @@
       <anchorfile>namespacetatami__mult.html</anchorfile>
       <anchor>a707fa56d64fb88069856289a715a5ae8</anchor>
       <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const MultiplySparseRowWithSingleVectorOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_sparse_column_matrix_to_column_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a0cdbef4d71f4eb932d3f37918c3e4d9c</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const MultiplyDenseColumnWithSparseColumnMatrixToColumnOutputOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_sparse_column_matrix_to_row_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>ab3241b84eb733673ce24e1e58fbdab2b</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_num_threads</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>ad1fbc9633da249009a5f36bc87568dda</anchor>
+      <arglist>(MultiplyDenseColumnWithSparseMatrixOptions &amp;options, int num_threads)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_sparse_block_size</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a3ca1fdb2d48c6b66b35ad1b8d1145a99</anchor>
+      <arglist>(MultiplyDenseColumnWithSparseMatrixOptions &amp;options, int block_size)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_sparse_matrix</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>aff67c79b3d546d5c8259e54f45c3f950</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const bool output_row_major, const MultiplyDenseColumnWithSparseMatrixOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_sparse_row_matrix_to_column_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a45732486dab1c73dc4fa4221fa39866a</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const MultiplyDenseColumnWithSparseRowMatrixToColumnOutputOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_sparse_row_matrix_to_row_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a9195f90a79d71417eb292795dcf460ed</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>

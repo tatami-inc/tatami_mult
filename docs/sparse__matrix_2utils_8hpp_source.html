@@ -176,9 +176,39 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordflow">return</span> output;</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>}</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>}</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Index_, <span class="keyword">class</span> Zero_&gt;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>std::optional&lt;std::vector&lt;Index_&gt; &gt; filter_non_empty_sparse(</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keyword">const</span> std::vector&lt;std::vector&lt;Index_&gt; &gt;&amp; all_index,</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    Zero_ zerofun</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>) {</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordtype">bool</span> all_non_empty = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; indices : all_index) {</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keywordflow">if</span> (indices.empty() == 0) {</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            all_non_empty = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        }</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    }</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    std::optional&lt;std::vector&lt;Index_&gt; &gt; output;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keywordflow">if</span> (!all_non_empty) {</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        <span class="keyword">const</span> <span class="keyword">auto</span> num = all_index.size();</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        output.emplace();</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        output-&gt;reserve(num);</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <span class="keywordflow">for</span> (I&lt;<span class="keyword">decltype</span>(num)&gt; i = 0; i &lt; num; ++i) {</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            <span class="keywordflow">if</span> (all_index[i].size() &gt; 0) {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>                output-&gt;push_back(i);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>                zerofun(i);</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>            }</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        }</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    }</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordflow">return</span> output;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>}</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>}</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></div></div>
 <div class="ttc" id="anamespacetatami__mult_html"><div class="ttname"><a href="namespacetatami__mult.html">tatami_mult</a></div><div class="ttdoc">Multiplication of tatami matrices.</div><div class="ttdef"><b>Definition</b> dense_column.hpp:16</div></div>
 <div class="ttc" id="anamespacetatami_html_a9c3979c60e3d7e066be533f7ee3a2f97"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/namespacetatami.html#a9c3979c60e3d7e066be533f7ee3a2f97">tatami::parallelize</a></div><div class="ttdeci">int parallelize(Function_ fun, const Index_ tasks, const int workers)</div></div>
