@@ -108,9 +108,9 @@ void multiply_dense_row_with_sparse_matrix(
 
     } else {
         if (output_row_major) {
-            multiply_dense_row_with_sparse_column_matrix_to_row_output(left, right, output, options.column_to_row);
+            multiply_dense_row_with_sparse_column_matrix_to_row_output<accumulators_>(left, right, output, options.column_to_row);
         } else {
-            multiply_dense_row_with_sparse_column_matrix_to_column_output(left, right, output, options.column_to_column);
+            multiply_dense_row_with_sparse_column_matrix_to_column_output<accumulators_>(left, right, output, options.column_to_column);
         }
     }
 }
