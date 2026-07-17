@@ -21,5 +21,6 @@ var searchData=
   ['fragmentedsparsematrixoptions_18',['FragmentedSparseMatrixOptions',['https://tatami-inc.github.io/tatami/structtatami_1_1FragmentedSparseMatrixOptions.html',1,'tatami']]],
   ['fragmentedsparserowmatrix_19',['FragmentedSparseRowMatrix',['https://tatami-inc.github.io/tatami/classtatami_1_1FragmentedSparseRowMatrix.html',1,'tatami::FragmentedSparseRowMatrix&lt; typename Value_, typename Index_, class ValueVectorStorage_, class IndexVectorStorage_ &gt;'],['https://tatami-inc.github.io/tatami/classtatami_1_1FragmentedSparseRowMatrix.html#a6dd64418cc9fd8561a045006e91dcd1b',1,'tatami::FragmentedSparseRowMatrix::FragmentedSparseRowMatrix()']]],
   ['fullsparsifiedwrapper_20',['FullSparsifiedWrapper',['https://tatami-inc.github.io/tatami/classtatami_1_1FullSparsifiedWrapper.html',1,'tatami::FullSparsifiedWrapper&lt; bool oracle_, typename Value_, typename Index_ &gt;'],['https://tatami-inc.github.io/tatami/classtatami_1_1FullSparsifiedWrapper.html#a96aa1d5f7956bf32c288d8d0a83ab6db',1,'tatami::FullSparsifiedWrapper::FullSparsifiedWrapper()']]],
-  ['further_20considerations_21',['Further considerations',['../dense-blocking.html#autotoc_md9',1,'']]]
+  ['further_20comments_21',['Further comments',['../sparse-blocking.html#autotoc_md13',1,'']]],
+  ['further_20considerations_22',['Further considerations',['../dense-blocking.html#autotoc_md9',1,'']]]
 ];

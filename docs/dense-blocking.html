@@ -115,6 +115,7 @@ Further considerations</h1>
 <p>Both \(B\) and \(C\) should be positive.</p>
 <p>We recommend choosing a power of 2 for both \(B\) and \(C\) as this gives us a chance to exploit existing data alignment and vectorization. Indeed, blocking can be combined with <a class="el" href="multiple-accumulators.html">multiple accumulators</a>, in which case \(C\) should be a multiple of the number of accumulators to minimize entry into the epilogue loop.</p>
 <p>A larger \(B\) increases memory usage as more dimension elements need to be realized by <b>tatami</b>.</p>
+<p>Changing \(C\) may slightly change the result for floating-point types. This is due to changes to the order of summations and thus the floating-point round-off error.</p>
 <p>If the primary block size is set to 1 in any <b><a class="el" href="namespacetatami__mult.html" title="Multiplication of tatami matrices.">tatami_mult</a></b> function, no blocking will be performed. In this case, the choice of secondary block size will have no effect, i.e., \(C\) is ignored. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

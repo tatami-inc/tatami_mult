@@ -23,5 +23,6 @@ var searchData=
   ['oraculardenseextractor_3c_20value_5f_2c_20index_5f_20_3e_20',['OracularDenseExtractor&lt; Value_, Index_ &gt;',['https://tatami-inc.github.io/tatami/classtatami_1_1OracularDenseExtractor.html',1,'tatami']]],
   ['oracularsparseextractor_21',['OracularSparseExtractor',['https://tatami-inc.github.io/tatami/classtatami_1_1OracularSparseExtractor.html',1,'tatami']]],
   ['oracularsparseextractor_3c_20value_5f_2c_20index_5f_20_3e_22',['OracularSparseExtractor&lt; Value_, Index_ &gt;',['https://tatami-inc.github.io/tatami/classtatami_1_1OracularSparseExtractor.html',1,'tatami']]],
-  ['overview_23',['Overview',['../index.html#autotoc_md1',1,'Overview'],['../dense-blocking.html#autotoc_md7',1,'Overview']]]
+  ['other_20blocking_20schemes_23',['Other blocking schemes',['../sparse-blocking.html#autotoc_md12',1,'']]],
+  ['overview_24',['Overview',['../index.html#autotoc_md1',1,'Overview'],['../dense-blocking.html#autotoc_md7',1,'Overview']]]
 ];
