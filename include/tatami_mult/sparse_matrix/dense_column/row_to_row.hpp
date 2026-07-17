@@ -90,6 +90,12 @@ void multiply_dense_column_with_sparse_row_matrix_to_row_output(
             for (LeftIndex_ cd = 0; cd < length; ++cd) {
                 const auto lptr = left_ext->fetch(dbuffer.data());
                 const auto rrange = right_ext->fetch(vbuffer.data(), ibuffer.data());
+
+                // Make sure this skip is done after all fetch() calls, otherwise the extractors will not be in sync with the common dimension.
+                if (rrange.number == 0) {
+                    continue;
+                }
+
                 for (LeftIndex_ lr = 0; lr < left_NR; ++lr) {
                     const Output_ mult = lptr[lr];
                     for (RightIndex_ x = 0; x < rrange.number; ++x) {
@@ -120,11 +126,28 @@ void multiply_dense_column_with_sparse_row_matrix_to_row_output(
 
             LeftIndex_ cd = 0;
             while (cd < length) {
-                const auto cd_num = sanisizer::min(options.block_size, length - cd);
-                for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
-                    left_ptrs[cd_counter] = left_ext->fetch(left_dbuffers[cd_counter].data());
-                    right_ranges[cd_counter] = right_ext->fetch(right_vbuffers[cd_counter].data(), right_ibuffers[cd_counter].data());
-                }
+                // Only processing LHS columns if the corresponding RHS row has some structural non-zeros.
+                // If not, we just skip it altogether; no need to zero or do anything else, as we're skipping the corresponding RHS row too.
+                LeftIndex_ cd_num = 0;
+                do {
+                    auto lptr = left_ext->fetch(left_dbuffers[cd_num].data());
+                    auto rrange = right_ext->fetch(right_vbuffers[cd_num].data(), right_ibuffers[cd_num].data());
+
+                    // Again, this skip must be done after the LHS row is fetched, otherwise the extractors will be out of sync.
+                    if (rrange.number == 0) {
+                        ++cd;
+                        continue;
+                    }
+
+                    left_ptrs[cd_num] = lptr;
+                    right_ranges[cd_num] = std::move(rrange);
+                    ++cd_num;
+                    ++cd;
+
+                    if (sanisizer::is_equal(cd_num, options.block_size)) {
+                        break;
+                    }
+                } while (cd < length);
 
                 // Trying to keep the output row in cache across a block of multiple sparse RHS rows.
                 for (LeftIndex_ lr = 0; lr < left_NR; ++lr) {
@@ -136,8 +159,6 @@ void multiply_dense_column_with_sparse_row_matrix_to_row_output(
                         }
                     }
                 }
-
-                cd += cd_num;
             }
         }
 
