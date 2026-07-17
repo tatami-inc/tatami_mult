@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_column/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_column_with_dense_row_matrix_to_row_output()`.
  */
 struct MultiplyDenseColumnWithDenseRowMatrixToRowOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 
@@ -36,6 +41,7 @@ struct MultiplyDenseColumnWithDenseRowMatrixToRowOutputOptions {
     /**
      * Secondary block size, i.e., the number of RHS columns to be processed in each block.
      * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+     * Different secondary block sizes will not change the results.
      */
     int secondary_block_size = 64;
 };
@@ -51,6 +57,7 @@ struct MultiplyDenseColumnWithDenseRowMatrixToRowOutputOptions {
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
  * @param right RHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
+ * The number of rows in `right` should be equal to the number of columns in `left`.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
  * On output, this contains the product `left * right` in row-major format.
  * @param options Further options.

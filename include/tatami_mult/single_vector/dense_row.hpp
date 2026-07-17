@@ -15,12 +15,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_row/single_vector
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_row_with_single_vector()`.
  */
 struct MultiplyDenseRowWithSingleVectorOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 };
@@ -55,8 +60,12 @@ void multiply_dense_row_with_single_vector(
         auto buffer = tatami::create_container_of_Index_size<std::vector<Value_> >(NC);
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto ptr = ext->fetch(buffer.data());
-            // tatami guarantees that NC will fit in a std::size_t, so no need to protect the function call.
-            output[r] = dense_dot_product<accumulators_>(NC, ptr, right, static_cast<Output_>(0));
+            output[r] = dense_dot_product<accumulators_>(
+                NC, // tatami's contract guarantees that NC will fit in a std::size_t, so no need to protect the function call.
+                ptr,
+                right,
+                static_cast<Output_>(0)
+            );
         }
     }, NR, options.num_threads);
 }

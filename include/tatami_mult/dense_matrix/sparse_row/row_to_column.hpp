@@ -17,21 +17,26 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/sparse_row/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_sparse_row_with_dense_row_matrix_to_column_output()`.
  */
 struct MultiplySparseRowWithDenseRowMatrixToColumnOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 };
 
 /**
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -81,7 +86,6 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
                 }
             }
 
-            // Transposing to the output once all summations are done.
             for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                 output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = tmp_output[rc];
                 tmp_output[rc] = 0;

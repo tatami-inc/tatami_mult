@@ -16,12 +16,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/sparse_column/multiple_vectors
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_sparse_column_with_multiple_vectors()`.
  */
 struct MultiplySparseColumnWithMultipleVectorsOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 
@@ -33,16 +38,17 @@ struct MultiplySparseColumnWithMultipleVectorsOptions {
 };
 
 /**
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Value_ Numeric type of the LHS matrix value.
+ * @tparam Index_ Integer type of the LHS matrix index.
+ * @tparam Right_ Numeric type of the RHS vectors.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
  * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
  * @param[in] right Vector of pointers, each of which points to an array of length `left.ncol()`.
- * Each entry contains a vector with which to multiply `left`.
- * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * Each entry contains an RHS vector with which to multiply `left`.
+ * @param[out] output Vector of length equal to `right.size()`.
+ * Each entry is a pointer to an array of length `left.nrow()`.
  * On output, the `i`-th entry stores the product `left * right[i]`.
  * @param options Further options.
  */
@@ -70,8 +76,6 @@ void multiply_sparse_column_with_multiple_vectors(
     const auto num_used = tatami::parallelize([&](int t, Index_ start, Index_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(left, false, start, length);
 
-        // We reduce by adding the outer products across threads, so we need to allocate some
-        // space to store each outer product before returning to the serial section.
         std::optional<std::vector<std::vector<Output_> > > tmp_output;
         std::optional<std::vector<Output_*> > tmp_outptrs;
         Output_* const* outptrs; 
@@ -110,8 +114,6 @@ void multiply_sparse_column_with_multiple_vectors(
             }
 
         } else {
-            // Our blocking strategy is to collect multiple LHS columns so that, for each RHS vector,
-            // we can keep the corresponding output vector in cache for re-use with each LHS column.
             std::vector<std::vector<Value_> > left_vbuffers;
             std::vector<std::vector<Index_> > left_ibuffers;
             std::vector<tatami::SparseRange<Value_, Index_> > left_ranges;
@@ -142,7 +144,7 @@ void multiply_sparse_column_with_multiple_vectors(
                     cd,
                     length,
                     options.block_size,
-                    /* zero = */ [](Index_) -> void {} // (No need to worry about zeroing as the buffers have already been zeroed.)
+                    /* zero = */ [](Index_) -> void {} // No need to worry about zeroing as the buffers have already been zeroed.
                 );
                 const auto cd_num = left_block_info.num_non_empty;
 

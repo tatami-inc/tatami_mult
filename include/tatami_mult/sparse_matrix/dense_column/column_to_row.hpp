@@ -18,12 +18,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_column/sparse_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_column_with_sparse_column_matrix_to_row_output()`.
  */
 struct MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 
@@ -35,10 +40,10 @@ struct MultiplyDenseColumnWithSparseColumnMatrixToRowOutputOptions {
 };
 
 /**
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -129,7 +134,6 @@ void multiply_dense_column_with_sparse_column_matrix_to_row_output(
                         left_ptrs[cd_counter] = ext->fetch(left_buffers[cd_counter].data());
                     }
 
-                    // Trying to keep the output row in cache across a block of multiple sparse RHS rows.
                     for (LeftIndex_ lr = 0; lr < left_NR; ++lr) {
                         for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                             const auto mult = left_ptrs[cd_counter][lr];

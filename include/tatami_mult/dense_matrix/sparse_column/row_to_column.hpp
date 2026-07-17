@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/sparse_column/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_sparse_column_with_dense_row_matrix_to_column_output()`.
  */
 struct MultiplySparseColumnWithDenseRowMatrixToColumnOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 

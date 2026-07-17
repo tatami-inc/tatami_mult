@@ -18,20 +18,23 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_row/sparse_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_row_with_sparse_column_matrix_to_row_output()`.
  */
 struct MultiplyDenseRowWithSparseColumnMatrixToRowOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 
     /**
      * Block size, i.e., the number of LHS rows to be loaded at once.
      * See the \f$C\f$ parameter in the @ref sparse-blocking "Blocking for sparse matrices" section for more details.
-     *
-     * If this is set to 1, no blocking is performed.
      */
     int block_size = 1;
 };
@@ -39,10 +42,10 @@ struct MultiplyDenseRowWithSparseColumnMatrixToRowOutputOptions {
 /**
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -82,8 +85,6 @@ void multiply_dense_row_with_sparse_column_matrix_to_row_output(
                 // So, we might as well handle the zeroing in the same loop and save ourselves the trouble.
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                     const auto rrange = right_ranges[rc];
-
-                    // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
                     output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr)] = sparse_dot_product<accumulators_>(
                         rrange.number, // Implicit cast to size_t is safe, as per the tatami contract.
                         rrange.value,
@@ -127,7 +128,6 @@ void multiply_dense_row_with_sparse_column_matrix_to_row_output(
                     }
 
                     for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                        // Some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
                         output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr + lr_counter)] = sparse_dot_product<accumulators_>(
                             rrange.number, // Implicit cast to size_t is safe, as per the tatami contract.
                             rrange.value,

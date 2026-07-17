@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_column/multiple_vectors
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_column_with_multiple_vectors()`.
  */
 struct MultiplyDenseColumnWithMultipleVectorsOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 
@@ -36,21 +41,23 @@ struct MultiplyDenseColumnWithMultipleVectorsOptions {
     /**
      * Secondary block size, i.e., the number of LHS rows to be processed in each block.
      * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+     * Different secondary block sizes will not change the results.
      */
     int secondary_block_size = 64;
 };
 
 /**
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Value_ Numeric type of the LHS matrix value.
+ * @tparam Index_ Integer type of the LHS matrix index.
+ * @tparam Right_ Numeric type of the RHS vectors.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
  * @param[in] right Vector of pointers, each of which points to an array of length `left.ncol()`.
- * Each entry contains a vector with which to multiply `left`.
- * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * Each entry contains an RHS vector with which to multiply `left`.
+ * @param[out] output Vector of length equal to `right.size()`.
+ * Each entry is a pointer to an array of length `left.nrow()`.
  * On output, the `i`-th entry stores the product `left * right[i]`.
  * @param options Further options.
  */

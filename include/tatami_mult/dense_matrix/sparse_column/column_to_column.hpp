@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/sparse_column/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_sparse_column_with_dense_column_matrix_to_column_output()`.
  */
 struct MultiplySparseColumnWithDenseColumnMatrixToColumnOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 
@@ -98,8 +103,6 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
             }
 
         } else {
-            // Our blocking strategy is to collect multiple LHS columns so that, for each RHS vector,
-            // we can keep the corresponding output vector in cache for re-use with each LHS column.
             std::vector<std::vector<LeftValue_> > left_vbuffers;
             std::vector<std::vector<LeftIndex_> > left_ibuffers;
             std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;

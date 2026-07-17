@@ -46,6 +46,7 @@ struct MultiplyDenseRowWithSparseMatrixOptions {
 
 /**
  * Set the number of threads to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS.
+ * Different numbers of threads will not change the results. 
  *
  * @param options Options to be set.
  * @param num_threads Number of threads, should be positive.
@@ -75,10 +76,10 @@ inline void set_sparse_block_size(MultiplyDenseRowWithSparseMatrixOptions& optio
 /**
  * @tparam accumulators_ Number of accumulators for computing the dot product.
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.

@@ -15,12 +15,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/sparse_row/single_vector
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_sparse_row_with_single_vector()`.
  */
 struct MultiplySparseRowWithSingleVectorOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 };
@@ -56,8 +61,13 @@ void multiply_sparse_row_with_single_vector(
         auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(NC);
         for (Index_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            // tatami guarantees that range.number will fit in a std::size_t, so no need to protect the function call.
-            output[r] = sparse_dot_product<accumulators_>(range.number, range.value, range.index, right, static_cast<Output_>(0));
+            output[r] = sparse_dot_product<accumulators_>(
+                range.number, // tatami guarantees that range.number will fit in a std::size_t, so no need to protect the function call.
+                range.value,
+                range.index,
+                right,
+                static_cast<Output_>(0)
+            );
         }
     }, NR, options.num_threads);
 }

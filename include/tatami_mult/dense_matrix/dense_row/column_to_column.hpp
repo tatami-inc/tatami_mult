@@ -16,12 +16,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_row/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_row_with_dense_column_matrix_to_column_output()`.
  */
 struct MultiplyDenseRowWithDenseColumnMatrixToColumnOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 
@@ -35,6 +40,7 @@ struct MultiplyDenseRowWithDenseColumnMatrixToColumnOutputOptions {
     /**
      * Secondary block size, i.e., the number of LHS columns to be processed in each block.
      * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+     * Different secondary block sizes may slightly change the results due to differences in floating-point round-off error.
      */
     int secondary_block_size = 64;
 };
@@ -42,10 +48,10 @@ struct MultiplyDenseRowWithDenseColumnMatrixToColumnOutputOptions {
 /**
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -79,9 +85,12 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
             for (LeftIndex_ lr = 0; lr < length; ++lr) {
                 const auto lptr = lext->fetch(lbuffer.data());
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    // cast of common_dim to size_t is safe due to tatami's contract.
-                    const auto val = dense_dot_product<accumulators_>(common_dim, lptr, right_ptrs[rc], static_cast<Output_>(0));
-                    output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = val;
+                    output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = dense_dot_product<accumulators_>(
+                        common_dim, // cast of common_dim to size_t is safe due to tatami's contract.
+                        lptr,
+                        right_ptrs[rc],
+                        static_cast<Output_>(0)
+                    );
                 }
             }
         }, left_NR, options.num_threads);
@@ -138,7 +147,7 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
                     out_col_offset = 0;
                     out_stride = lr_num;
                 } else {
-                    out_row_offset = lr; // again, no need to add start, as it should be zero if there's only one thread.
+                    out_row_offset = lr; // again, no need to add 'start' as this should be zero if there's only one thread.
                     out_col_offset = rc;
                     out_stride = left_NR;
                 }

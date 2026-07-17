@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_row/multiple_vectors
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_row_with_multiple_vectors()`.
  */
 struct MultiplyDenseRowWithMultipleVectorsOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 
@@ -36,6 +41,7 @@ struct MultiplyDenseRowWithMultipleVectorsOptions {
     /**
      * Secondary block size, i.e., the number of LHS columns to be processed in each block.
      * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+     * Different secondary block sizes may slightly change the results due to differences in floating-point round-off error.
      */
     int secondary_block_size = 64;
 };
@@ -43,16 +49,17 @@ struct MultiplyDenseRowWithMultipleVectorsOptions {
 /**
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Value_ Numeric type of the LHS matrix value.
+ * @tparam Index_ Integer type of the LHS matrix index.
+ * @tparam Right_ Numeric type of the RHS vectors. 
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer row access, but will work with all matrices.
  * @param[in] right Vector of pointers, each of which points to an array of length `left.ncol()`.
- * Each entry contains a vector with which to multiply `left`.
- * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * Each entry contains an RHS vector with which to multiply `left`.
+ * @param[out] output Vector of length equal to `right.size()`.
+ * Each entry is a pointer to an array of length `left.nrow()`.
  * On output, the `i`-th entry stores the product `left * right[i]`.
  * @param options Further options.
  */
@@ -75,8 +82,12 @@ void multiply_dense_row_with_multiple_vectors(
             for (Index_ lr = 0; lr < length; ++lr) {
                 const auto lptr = lext->fetch(lbuffer.data());
                 for (RightIndex rc = 0; rc < right_NC; ++rc) {
-                    // Implicit cast of common_dim to std::size_t is safe, as per the tatami contract.
-                    output[rc][start + lr] = dense_dot_product<accumulators_>(common_dim, lptr, right[rc], static_cast<Output_>(0));
+                    output[rc][start + lr] = dense_dot_product<accumulators_>(
+                        common_dim, // Implicit cast to std::size_t is safe, as per the tatami contract.
+                        lptr,
+                        right[rc],
+                        static_cast<Output_>(0)
+                    );
                 }
             }
         }, left_NR, options.num_threads);
@@ -85,7 +96,8 @@ void multiply_dense_row_with_multiple_vectors(
 
     const bool do_parallel = options.num_threads > 1;
     if (!do_parallel) {
-        // Zeroing all of the buffers if we're operating on a single thread.
+        // Zeroing all of the buffers if we're operating on a single thread,
+        // as we're computing partial dot products and we need to start from zero.
         for (RightIndex h = 0; h < right_NC; ++h) {
             std::fill_n(output[h], left_NR, 0);
         }
@@ -151,9 +163,8 @@ void multiply_dense_row_with_multiple_vectors(
                         const auto& rightcol = right[rc + rc_counter];
                         for (Index_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                             auto& dest = outcol[out_row_offset + lr_counter]; 
-                            // Implicit cast of cd_num to std::size_t is safe, as per the tatami contract.
                             dest = dense_dot_product<accumulators_>(
-                                cd_num,
+                                cd_num, // Implicit cast to std::size_t is safe, as per the tatami contract.
                                 rightcol + cd,
                                 left_ptrs[lr_counter] + cd,
                                 dest

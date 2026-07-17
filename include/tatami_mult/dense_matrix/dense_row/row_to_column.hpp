@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_row/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_row_with_dense_row_matrix_to_column_output()`.
  */
 struct MultiplyDenseRowWithDenseRowMatrixToColumnOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 
@@ -36,15 +41,16 @@ struct MultiplyDenseRowWithDenseRowMatrixToColumnOutputOptions {
     /**
      * Secondary block size, i.e., the number of RHS columns to be processed in each block.
      * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+     * Different secondary block sizes will not change the results.
      */
     int secondary_block_size = 64;
 };
 
 /**
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -131,7 +137,7 @@ void multiply_dense_row_with_dense_row_matrix_to_column_output(
                 while (cd < common_dim) { 
                     const LeftIndex_ cd_end = cd + sanisizer::min(options.primary_block_size, common_dim - cd);
                     RightIndex_ rc = 0;
-                    while (rc < right_NC) { // jump by block to go to the right of the RHS rows as this is most contiguous.
+                    while (rc < right_NC) {
                         const RightIndex_ rc_end = rc + sanisizer::min(options.secondary_block_size, right_NC - rc);
 
                         for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {

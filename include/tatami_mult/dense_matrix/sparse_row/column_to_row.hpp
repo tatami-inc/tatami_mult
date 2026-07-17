@@ -16,12 +16,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/sparse_row/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_sparse_row_with_dense_column_matrix_to_row_output()`.
  */
 struct MultiplySparseRowWithDenseColumnMatrixToRowOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
 
@@ -35,10 +40,10 @@ struct MultiplySparseRowWithDenseColumnMatrixToRowOutputOptions {
 /**
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -74,10 +79,13 @@ void multiply_sparse_row_with_dense_column_matrix_to_row_output(
             for (LeftIndex_ lr = 0; lr < length; ++lr) {
                 const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    // Implicit cast of range.number to size_t is safe, as per the tatami contract.
-                    // Also some false sharing potential here, but we just touch each location once per outer loop, so it's fine.
-                    const auto val = sparse_dot_product<accumulators_>(range.number, range.value, range.index, right_ptrs[rc], static_cast<Output_>(0));
-                    output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr)] = val;
+                    output[sanisizer::nd_offset<std::size_t>(rc, right_NC, start + lr)] = sparse_dot_product<accumulators_>(
+                        range.number, // implicit cast of range.number to size_t is safe, as per the tatami contract.
+                        range.value,
+                        range.index,
+                        right_ptrs[rc],
+                        static_cast<Output_>(0)
+                    );
                 }
             }
         }, left_NR, options.num_threads);
@@ -87,8 +95,6 @@ void multiply_sparse_row_with_dense_column_matrix_to_row_output(
     tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
 
-        // Our blocking strategy is to collect multiple LHS rows so that, for each RHS vector,
-        // we can keep it in cache for easy re-use when computing the dot-product for each LHS row.
         std::vector<std::vector<LeftValue_> > left_vbuffers;
         std::vector<std::vector<LeftIndex_> > left_ibuffers;
         std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
@@ -129,6 +135,7 @@ void multiply_sparse_row_with_dense_column_matrix_to_row_output(
             // Otherwise, we'll have to access the 'left_non_empty' vector to figure out the indices of each non-empty column.
             if (left_block_info.all_non_empty) {
                 const auto lr_base = lr + start; 
+
                 // Yes, we deliberately iterate over the RHS columns in the outer loop to keep the dense column in cache across multiple LHS vectors.
                 // If we did it the other way around, this would defeat the purpose of blocking.
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {

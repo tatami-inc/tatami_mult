@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_column/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_dense_column_with_dense_column_matrix_to_row_output()`.
  */
 struct MultiplyDenseColumnWithDenseColumnMatrixToRowOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 
@@ -36,6 +41,7 @@ struct MultiplyDenseColumnWithDenseColumnMatrixToRowOutputOptions {
     /**
      * Secondary block size, i.e., the number of LHS rows to be processed in each block.
      * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+     * Different secondary block sizes will not change the results.
      */
     int secondary_block_size = 64;
 };
@@ -51,6 +57,7 @@ struct MultiplyDenseColumnWithDenseColumnMatrixToRowOutputOptions {
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
  * @param right RHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
+ * The number of rows in `right` should be equal to the number of columns in `left`.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
  * On output, this contains the product `left * right` in row-major format.
  * @param options Further options.
@@ -113,6 +120,8 @@ void multiply_dense_column_with_dense_column_matrix_to_row_output(
                 }
                 sanisizer::resize(left_ptrs, max_block_cols);
 
+                // We create a temporary buffer so that the inner loop for each block operates on contiguous output.
+                // This improves the efficiency of the hot loop, though we will have to transpose it to the output rows eventually.
                 const RightIndex_ max_block_right_cols = sanisizer::min(right_NC, options.primary_block_size);
                 const LeftIndex_ max_block_rows = sanisizer::min(left_NR, options.secondary_block_size);
                 tmp_output.resize(sanisizer::product<I<decltype(tmp_output.size())> >(max_block_rows, max_block_right_cols));
@@ -142,7 +151,6 @@ void multiply_dense_column_with_dense_column_matrix_to_row_output(
                             }
                         }
 
-                        // Transposed to the output.
                         for (RightIndex_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
                             for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                                 const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(lr_counter, lr_num, rc_counter)];

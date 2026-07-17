@@ -40,6 +40,7 @@ struct MultiplyWithSingleVectorOptions {
 
 /**
  * Set the number of threads to use in all multiplication functions involving single vector RHS.
+ * Different numbers of threads may slightly change the results depending on the choice of delegated function.
  *
  * @param options Options to be set.
  * @param num_threads Number of threads, should be positive.
@@ -52,6 +53,12 @@ inline void set_num_threads(MultiplyWithSingleVectorOptions& options, int num_th
 }
 
 /**
+ * This function delegates to `multiply_sparse_row_with_single_vector()`,
+ * `multiply_sparse_column_with_single_vector()`,
+ * `multiply_dense_row_with_single_vector()`,
+ * or `multiply_dense_column_with_single_vector()`,
+ * depending on the properties of `left`.
+ * 
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam Value_ Numeric type of the matrix value.

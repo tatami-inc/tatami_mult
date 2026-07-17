@@ -46,6 +46,7 @@ struct MultiplySparseRowWithSparseMatrixOptions {
 
 /**
  * Set the number of threads to use in all multiplication functions involving a sparse row-major LHS and a sparse matrix RHS.
+ * Different numbers of threads will not change the results. 
  *
  * @param options Options to be set.
  * @param num_threads Number of threads, should be positive.
@@ -70,12 +71,18 @@ inline void set_sparse_block_size(MultiplySparseRowWithSparseMatrixOptions& opti
 }
 
 /**
+ * This function delegates to `multiply_sparse_row_with_sparse_row_matrix_to_row_output()`,
+ * `multiply_sparse_row_with_sparse_row_matrix_to_column_output()`,
+ * `multiply_sparse_row_with_sparse_column_matrix_to_row_output()`, or
+ * `multiply_sparse_row_with_sparse_column_matrix_to_column_output()`,
+ * depending on the properties of `right` and the choice of `output_row_major`.
+ *
  * @tparam accumulators_ Number of accumulators for computing the dot product.
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.

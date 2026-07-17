@@ -46,6 +46,7 @@ struct MultiplyDenseColumnWithDenseMatrixOptions {
 
 /**
  * Set the number of threads to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS.
+ * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
  *
  * @param options Options to be set.
  * @param num_threads Number of threads, should be positive.
@@ -74,6 +75,7 @@ inline void set_dense_primary_block_size(MultiplyDenseColumnWithDenseMatrixOptio
 /**
  * Set the secondary block size to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS.
  * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+ * Different secondary block sizes will not change the results.
  *
  * @param options Options to be set.
  * @param secondary_block_size Secondary block size.
@@ -86,10 +88,16 @@ inline void set_dense_secondary_block_size(MultiplyDenseColumnWithDenseMatrixOpt
 }
 
 /**
- * @tparam LeftValue_ Numeric type of the left matrix value.
- * @tparam LeftIndex_ Integer type of the left matrix index.
- * @tparam RightValue_ Numeric type of the right matrix value.
- * @tparam RightIndex_ Integer type of the right matrix index.
+ * This function delegates to `multiply_dense_column_with_dense_row_matrix_to_row_output()`,
+ * `multiply_dense_column_with_dense_row_matrix_to_column_output()`,
+ * `multiply_dense_column_with_dense_column_matrix_to_row_output()`, or
+ * `multiply_dense_column_with_dense_column_matrix_to_column_output()`,
+ * depending on the properties of `right` and the choice of `output_row_major`.
+ *
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.

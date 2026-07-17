@@ -17,12 +17,17 @@
 
 namespace tatami_mult {
 
+/* See https://github.com/tatami-inc/test-multiplication/tree/master/sparse_column/dense_matrix
+ * for an explanation of the choice of algorithm.
+ */
+
 /**
  * @brief Options for `multiply_sparse_column_with_dense_column_matrix_to_row_output()`.
  */
 struct MultiplySparseColumnWithDenseColumnMatrixToRowOutputOptions {
     /**
      * Number of threads to use.
+     * Different numbers of threads may slightly change the results due to differences in floating-point round-off error.
      */
     int num_threads = 1;
 };
@@ -88,7 +93,9 @@ void multiply_sparse_column_with_dense_column_matrix_to_row_output(
                 continue;
             }
 
-            // Extracting to a dense buffer for more friendly inner loops.
+            // Transposing the conceptual RHS row to a dense buffer for more friendly inner loops.
+            // We could probably do this transposition once in the serial section, which would be more cache-friendly but require an extra allocation.
+            // But, it's not in the hot loop so we'll save ourselves a bit of memory and do it one at a time instead.
             for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
                 rbuffer[rc] = right_ptrs[rc][start + cd];
             }

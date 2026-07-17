@@ -40,6 +40,7 @@ struct MultiplyWithMultipleVectorsOptions {
 
 /**
  * Set the number of threads to use in all multiplication functions involving multiple vectors RHS.
+ * Different numbers of threads may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.
  *
  * @param options Options to be set.
  * @param num_threads Number of threads, should be positive.
@@ -66,6 +67,7 @@ inline void set_dense_primary_block_size(MultiplyWithMultipleVectorsOptions& opt
 /**
  * Set the secondary block size to use in all multiplication functions involving a dense matrix LHS and multiple vectors RHS.
  * See the \f$C\f$ parameter in the @ref dense-blocking "Blocking for dense matrices" section for more details.
+ * Different secondary block sizes may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.
  *
  * @param options Options to be set.
  * @param secondary_block_size Secondary block size.
@@ -88,6 +90,12 @@ inline void set_sparse_block_size(MultiplyWithMultipleVectorsOptions& options, i
 }
 
 /**
+ * This function delegates to `multiply_sparse_row_with_multiple_vectors()`,
+ * `multiply_sparse_column_with_multiple_vectors()`,
+ * `multiply_dense_row_with_multiple_vectors()`, or
+ * `multiply_dense_column_with_multiple_vectors()`,
+ * depending on the properties of `left`.
+ *
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam Value_ Numeric type of the matrix value.
