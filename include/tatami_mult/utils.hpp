@@ -89,28 +89,6 @@ FetchNonEmptySparseBlockInfo<Index_> fetch_non_empty_sparse_block(
     return FetchNonEmptySparseBlockInfo(position, num_non_empty, all_non_empty);
 }
 
-template<typename Output_, typename DenseValue_, typename Value_, typename Index_>
-Output_ dense_sparse_dot_product(const DenseValue_* ptr, const tatami::SparseRange<Value_, Index_>& range) {
-    if (range.number == 0) {
-        return 0;
-    }
-
-    // Copying Eigen's use of two accumulators; effectively unrolls the loop a little for speed.
-    Output_ dot1 = 0, dot2 = 0;
-
-    Index_ s = 0;
-    const Index_ number_m1 = range.number - 1;
-    for (; s < number_m1; s += 2) {
-        dot1 += range.value[s] * ptr[range.index[s]];
-        dot2 += range.value[s + 1] * ptr[range.index[s + 1]];
-    }
-
-    if (s < range.number) {
-        dot1 += range.value[s] * ptr[range.index[s]];
-    }
-    return dot1 + dot2;
-}
-
 }
 
 #endif
