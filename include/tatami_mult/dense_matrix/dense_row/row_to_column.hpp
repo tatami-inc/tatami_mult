@@ -8,6 +8,7 @@
 #include "sanisizer/sanisizer.hpp"
 #include "tatami/tatami.hpp"
 
+#include "../utils.hpp"
 #include "../../utils.hpp"
 
 /**

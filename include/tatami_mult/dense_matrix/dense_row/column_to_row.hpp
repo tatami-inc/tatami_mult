@@ -8,6 +8,7 @@
 #include "sanisizer/sanisizer.hpp"
 
 #include "../../dense_dot_product.hpp"
+#include "../utils.hpp"
 #include "../../utils.hpp"
 
 /**
