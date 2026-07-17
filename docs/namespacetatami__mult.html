@@ -261,6 +261,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtatami__mult_1_1MultiplyWithSingleVectorOptions.html">MultiplyWithSingleVectorOptions</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> for <code><a class="el" href="#a9ec69e790a06fc05841e696a0344089c">multiply_with_single_vector()</a></code>.  <a href="structtatami__mult_1_1MultiplyWithSingleVectorOptions.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> for <code><a class="el" href="#a79164b721c607199f746b7261f69f8fe">multiply_with_sparse_matrix()</a></code>.  <a href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtatami__mult_1_1Options.html">Options</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> for <code><a class="el" href="#a7eb0e957877357d3f3fdf106b7b1c0c3">multiply()</a></code>.  <a href="structtatami__mult_1_1Options.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -527,6 +530,13 @@ template&lt;std::size_t accumulators_, class ValueIterator_ , class IndexIterato
 <tr class="memitem:abc399353f71ddfec19228761b6e7eb1f" id="r_abc399353f71ddfec19228761b6e7eb1f"><td class="memTemplParams" colspan="2">template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:abc399353f71ddfec19228761b6e7eb1f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#abc399353f71ddfec19228761b6e7eb1f">multiply_dense_row_with_sparse_row_matrix_to_row_output</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const <a class="el" href="structtatami__mult_1_1MultiplyDenseRowWithSparseRowMatrixToRowOutputOptions.html">MultiplyDenseRowWithSparseRowMatrixToRowOutputOptions</a> &amp;options)</td></tr>
 <tr class="separator:abc399353f71ddfec19228761b6e7eb1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1f336e9eb8ff61ea2631bf587344126" id="r_af1f336e9eb8ff61ea2631bf587344126"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1f336e9eb8ff61ea2631bf587344126">set_num_threads</a> (<a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a> &amp;options, int num_threads)</td></tr>
+<tr class="separator:af1f336e9eb8ff61ea2631bf587344126"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa311c3728534e88b480405e4ee916784" id="r_aa311c3728534e88b480405e4ee916784"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa311c3728534e88b480405e4ee916784">set_sparse_block_size</a> (<a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a> &amp;options, int block_size)</td></tr>
+<tr class="separator:aa311c3728534e88b480405e4ee916784"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79164b721c607199f746b7261f69f8fe" id="r_a79164b721c607199f746b7261f69f8fe"><td class="memTemplParams" colspan="2">template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
+<tr class="memitem:a79164b721c607199f746b7261f69f8fe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a79164b721c607199f746b7261f69f8fe">multiply_with_sparse_matrix</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const bool output_row_major, const <a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a> &amp;options)</td></tr>
+<tr class="separator:a79164b721c607199f746b7261f69f8fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd9319d196a08d8a9552b4669ec7c54c" id="r_acd9319d196a08d8a9552b4669ec7c54c"><td class="memTemplParams" colspan="2">template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:acd9319d196a08d8a9552b4669ec7c54c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#acd9319d196a08d8a9552b4669ec7c54c">multiply_sparse_column_with_sparse_column_matrix_to_column_output</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const <a class="el" href="structtatami__mult_1_1MultiplySparseColumnWithSparseColumnMatrixToColumnOutputOptions.html">MultiplySparseColumnWithSparseColumnMatrixToColumnOutputOptions</a> &amp;options)</td></tr>
 <tr class="separator:acd9319d196a08d8a9552b4669ec7c54c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -3602,6 +3612,65 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 
 </div>
 </div>
+<a id="a79164b721c607199f746b7261f69f8fe" name="a79164b721c607199f746b7261f69f8fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79164b721c607199f746b7261f69f8fe">&#9670;&#160;</a></span>multiply_with_sparse_matrix()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void tatami_mult::multiply_with_sparse_matrix </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>left</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>right</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Output_ *const</td>          <td class="paramname"><span class="paramname"><em>output</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool</td>          <td class="paramname"><span class="paramname"><em>output_row_major</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>options</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. The number of rows in this matrix should be equal to the number of columns in <code>left</code>. This function is optimized for sparse matrices, but will work with all matrices. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right.ncol()</code>. On output, this stores the product of <code>left</code> and <code>right</code> in either row- or column-major format depending on <code>output_row_major</code>. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">output_row_major</td><td>Whether to store the matrix product in row-major format in <code>output</code>. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a3b51efeba00392b2e785aeb064f3c78b" name="a3b51efeba00392b2e785aeb064f3c78b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3b51efeba00392b2e785aeb064f3c78b">&#9670;&#160;</a></span>set_dense_primary_block_size() <span class="overload">[1/4]</span></h2>
 
@@ -3899,7 +3968,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="afc0315685090ef065ece8eb66cec7636" name="afc0315685090ef065ece8eb66cec7636"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc0315685090ef065ece8eb66cec7636">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[1/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afc0315685090ef065ece8eb66cec7636">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[1/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3936,7 +4005,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ad1fbc9633da249009a5f36bc87568dda" name="ad1fbc9633da249009a5f36bc87568dda"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1fbc9633da249009a5f36bc87568dda">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[2/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1fbc9633da249009a5f36bc87568dda">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[2/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3973,7 +4042,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="a945f944d20e7acdeb123addec30bc04a" name="a945f944d20e7acdeb123addec30bc04a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a945f944d20e7acdeb123addec30bc04a">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[3/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a945f944d20e7acdeb123addec30bc04a">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[3/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4010,7 +4079,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="abd318d9eecda720431f96c0529c8a658" name="abd318d9eecda720431f96c0529c8a658"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd318d9eecda720431f96c0529c8a658">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[4/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abd318d9eecda720431f96c0529c8a658">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[4/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4047,7 +4116,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ac2ea0270f16f725fd9dd774d02b21abe" name="ac2ea0270f16f725fd9dd774d02b21abe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2ea0270f16f725fd9dd774d02b21abe">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[5/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2ea0270f16f725fd9dd774d02b21abe">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[5/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4084,7 +4153,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="a5048fd8f2c2fcd09f4188d32b065985e" name="a5048fd8f2c2fcd09f4188d32b065985e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5048fd8f2c2fcd09f4188d32b065985e">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[6/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5048fd8f2c2fcd09f4188d32b065985e">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[6/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4121,7 +4190,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="aafd35fa56aa547737525a3e620ff286c" name="aafd35fa56aa547737525a3e620ff286c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aafd35fa56aa547737525a3e620ff286c">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[7/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aafd35fa56aa547737525a3e620ff286c">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[7/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4158,7 +4227,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ad52bf311452f8c768dab015ff0b1c835" name="ad52bf311452f8c768dab015ff0b1c835"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad52bf311452f8c768dab015ff0b1c835">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[8/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad52bf311452f8c768dab015ff0b1c835">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[8/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4195,7 +4264,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ad016dd6fdf22bbc99082f191b6edf961" name="ad016dd6fdf22bbc99082f191b6edf961"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad016dd6fdf22bbc99082f191b6edf961">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[9/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad016dd6fdf22bbc99082f191b6edf961">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[9/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4232,7 +4301,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="a5723d9b6e3db89dbd603660cc44b178b" name="a5723d9b6e3db89dbd603660cc44b178b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5723d9b6e3db89dbd603660cc44b178b">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[10/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5723d9b6e3db89dbd603660cc44b178b">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[10/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4269,7 +4338,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="a9f86844966ec55b7a52da7a7ae8b43a3" name="a9f86844966ec55b7a52da7a7ae8b43a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f86844966ec55b7a52da7a7ae8b43a3">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[11/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f86844966ec55b7a52da7a7ae8b43a3">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[11/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4305,8 +4374,45 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 
 </div>
 </div>
+<a id="af1f336e9eb8ff61ea2631bf587344126" name="af1f336e9eb8ff61ea2631bf587344126"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1f336e9eb8ff61ea2631bf587344126">&#9670;&#160;</a></span>set_num_threads() <span class="overload">[12/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tatami_mult::set_num_threads </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>options</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>num_threads</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the number of threads to use in all multiplication functions involving a sparse matrix RHS.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
+    <tr><td class="paramname">num_threads</td><td>Number of threads, should be positive. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a3ca1fdb2d48c6b66b35ad1b8d1145a99" name="a3ca1fdb2d48c6b66b35ad1b8d1145a99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ca1fdb2d48c6b66b35ad1b8d1145a99">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[1/7]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ca1fdb2d48c6b66b35ad1b8d1145a99">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[1/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4343,7 +4449,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ab161b26e3358dbd436f5a6ba4422dc49" name="ab161b26e3358dbd436f5a6ba4422dc49"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab161b26e3358dbd436f5a6ba4422dc49">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[2/7]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab161b26e3358dbd436f5a6ba4422dc49">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[2/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4380,7 +4486,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ae50bc9e1b96326bce0cbf988d011ffe4" name="ae50bc9e1b96326bce0cbf988d011ffe4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae50bc9e1b96326bce0cbf988d011ffe4">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[3/7]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae50bc9e1b96326bce0cbf988d011ffe4">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[3/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4417,7 +4523,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="a736729cda17bc1905e27df334fd1fa88" name="a736729cda17bc1905e27df334fd1fa88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a736729cda17bc1905e27df334fd1fa88">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[4/7]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a736729cda17bc1905e27df334fd1fa88">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[4/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4454,7 +4560,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="a8864b4e87f459b78ff05215653c9073e" name="a8864b4e87f459b78ff05215653c9073e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8864b4e87f459b78ff05215653c9073e">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[5/7]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8864b4e87f459b78ff05215653c9073e">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[5/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4491,7 +4597,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ae2080c66237c28e746041649ee7dee2a" name="ae2080c66237c28e746041649ee7dee2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2080c66237c28e746041649ee7dee2a">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[6/7]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2080c66237c28e746041649ee7dee2a">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[6/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4528,7 +4634,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </div>
 </div>
 <a id="ac568cf912d997fcf421e3a6b9eeaaf5a" name="ac568cf912d997fcf421e3a6b9eeaaf5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac568cf912d997fcf421e3a6b9eeaaf5a">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[7/7]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac568cf912d997fcf421e3a6b9eeaaf5a">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[7/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4554,6 +4660,43 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 </table>
 </div><div class="memdoc">
 <p>Set the block size to use in all multiplication functions involving a sparse matrix LHS and multiple vectors RHS. See the \(B\) parameter in the <a class="el" href="sparse-blocking.html">Blocking for sparse matrices</a> section for more details.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
+    <tr><td class="paramname">block_size</td><td>Block size. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa311c3728534e88b480405e4ee916784" name="aa311c3728534e88b480405e4ee916784"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa311c3728534e88b480405e4ee916784">&#9670;&#160;</a></span>set_sparse_block_size() <span class="overload">[8/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tatami_mult::set_sparse_block_size </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>options</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>block_size</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the block size to use in all multiplication functions involving a sparse matrix LHS and a sparse matrix RHS. See the <a class="el" href="sparse-blocking.html">Blocking for sparse matrices</a> section for more details.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>

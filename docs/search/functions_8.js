@@ -53,5 +53,6 @@ var searchData=
   ['multiply_5fsparse_5frow_5fwith_5fsparse_5frow_5fmatrix_5fto_5frow_5foutput_50',['multiply_sparse_row_with_sparse_row_matrix_to_row_output',['../namespacetatami__mult.html#aec8e5c85d0f79b279bcc8a234c93d89e',1,'tatami_mult']]],
   ['multiply_5fwith_5fdense_5fmatrix_51',['multiply_with_dense_matrix',['../namespacetatami__mult.html#a8c6e21d055ef8a5d0c59a383cbc16bec',1,'tatami_mult']]],
   ['multiply_5fwith_5fmultiple_5fvectors_52',['multiply_with_multiple_vectors',['../namespacetatami__mult.html#a2d723822a8058c6169cbbeab20db7f1e',1,'tatami_mult']]],
-  ['multiply_5fwith_5fsingle_5fvector_53',['multiply_with_single_vector',['../namespacetatami__mult.html#a9ec69e790a06fc05841e696a0344089c',1,'tatami_mult']]]
+  ['multiply_5fwith_5fsingle_5fvector_53',['multiply_with_single_vector',['../namespacetatami__mult.html#a9ec69e790a06fc05841e696a0344089c',1,'tatami_mult']]],
+  ['multiply_5fwith_5fsparse_5fmatrix_54',['multiply_with_sparse_matrix',['../namespacetatami__mult.html#a79164b721c607199f746b7261f69f8fe',1,'tatami_mult']]]
 ];
