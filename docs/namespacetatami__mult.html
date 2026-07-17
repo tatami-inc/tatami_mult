@@ -277,30 +277,6 @@ template&lt;typename Input_ &gt; </td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac44cd58992286e5405cad40f31e6c745" id="r_ac44cd58992286e5405cad40f31e6c745"><td class="memTemplParams" colspan="2"><a id="ac44cd58992286e5405cad40f31e6c745" name="ac44cd58992286e5405cad40f31e6c745"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:ac44cd58992286e5405cad40f31e6c745"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_column_vector</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const Right_ *rhs, Output_ *output, int num_threads)</td></tr>
-<tr class="separator:ac44cd58992286e5405cad40f31e6c745"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a355a68438c8d561007c5f36e749f417a" id="r_a355a68438c8d561007c5f36e749f417a"><td class="memTemplParams" colspan="2"><a id="a355a68438c8d561007c5f36e749f417a" name="a355a68438c8d561007c5f36e749f417a"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename GetOutput_ &gt; </td></tr>
-<tr class="memitem:a355a68438c8d561007c5f36e749f417a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_column_dense_vectors_internal</b> (const Index_ NR, const Index_ start, const Index_ length, <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1OracularDenseExtractor.html">tatami::OracularDenseExtractor</a>&lt; Value_, Index_ &gt; &amp;ext, std::vector&lt; Value_ &gt; &amp;buffer, const std::size_t num_rhs, const bool rhs_columnar, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const bool output_columnar, GetOutput_ get_output)</td></tr>
-<tr class="separator:a355a68438c8d561007c5f36e749f417a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64df76ce9e0bbbb02fa14d18da6d2db3" id="r_a64df76ce9e0bbbb02fa14d18da6d2db3"><td class="memTemplParams" colspan="2"><a id="a64df76ce9e0bbbb02fa14d18da6d2db3" name="a64df76ce9e0bbbb02fa14d18da6d2db3"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename GetOutput_ &gt; </td></tr>
-<tr class="memitem:a64df76ce9e0bbbb02fa14d18da6d2db3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_column_dense_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::size_t num_rhs, const bool rhs_columnar, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const bool output_columnar, GetOutput_ get_output, const int num_threads)</td></tr>
-<tr class="separator:a64df76ce9e0bbbb02fa14d18da6d2db3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b7377d76944c06016a5f7e73eb4129a" id="r_a0b7377d76944c06016a5f7e73eb4129a"><td class="memTemplParams" colspan="2"><a id="a0b7377d76944c06016a5f7e73eb4129a" name="a0b7377d76944c06016a5f7e73eb4129a"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a0b7377d76944c06016a5f7e73eb4129a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_column_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const std::vector&lt; Output_ * &gt; &amp;output, const int num_threads)</td></tr>
-<tr class="separator:a0b7377d76944c06016a5f7e73eb4129a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9560eaccede4f93e19ffcf7534006302" id="r_a9560eaccede4f93e19ffcf7534006302"><td class="memTemplParams" colspan="2"><a id="a9560eaccede4f93e19ffcf7534006302" name="a9560eaccede4f93e19ffcf7534006302"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a9560eaccede4f93e19ffcf7534006302"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_column_tatami_dense</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *const output, int num_threads)</td></tr>
-<tr class="separator:a9560eaccede4f93e19ffcf7534006302"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a677bf2ebb37808582e28221e665c79a4" id="r_a677bf2ebb37808582e28221e665c79a4"><td class="memTemplParams" colspan="2"><a id="a677bf2ebb37808582e28221e665c79a4" name="a677bf2ebb37808582e28221e665c79a4"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a677bf2ebb37808582e28221e665c79a4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_column_tatami_sparse</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *const output, int num_threads)</td></tr>
-<tr class="separator:a677bf2ebb37808582e28221e665c79a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3d2ed88d15916cd4fc5b8219db21682" id="r_ae3d2ed88d15916cd4fc5b8219db21682"><td class="memTemplParams" colspan="2"><a id="ae3d2ed88d15916cd4fc5b8219db21682" name="ae3d2ed88d15916cd4fc5b8219db21682"></a>
 template&lt;std::size_t counter_ = 0, class Iterator1_ , class Iterator2_ , typename Output_ , std::size_t accumulators_&gt; </td></tr>
 <tr class="memitem:ae3d2ed88d15916cd4fc5b8219db21682"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unrolled_dense_dot_product</b> (const std::size_t idx, Iterator1_ start1, Iterator2_ start2, std::array&lt; Output_, accumulators_ &gt; &amp;dots)</td></tr>
@@ -400,26 +376,10 @@ template&lt;std::size_t accumulators_, class Iterator1_ , class Iterator2_ , typ
 <tr class="memitem:aa5ef129537bd65d796d4015cd4159e25" id="r_aa5ef129537bd65d796d4015cd4159e25"><td class="memTemplParams" colspan="2">template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:aa5ef129537bd65d796d4015cd4159e25"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#aa5ef129537bd65d796d4015cd4159e25">multiply_sparse_row_with_dense_row_matrix_to_row_output</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const <a class="el" href="structtatami__mult_1_1MultiplySparseRowWithDenseRowMatrixToRowOutputOptions.html">MultiplySparseRowWithDenseRowMatrixToRowOutputOptions</a> &amp;options)</td></tr>
 <tr class="separator:aa5ef129537bd65d796d4015cd4159e25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5eb131fa5eaa31208799d5ffa95249b3" id="r_a5eb131fa5eaa31208799d5ffa95249b3"><td class="memTemplParams" colspan="2"><a id="a5eb131fa5eaa31208799d5ffa95249b3" name="a5eb131fa5eaa31208799d5ffa95249b3"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a5eb131fa5eaa31208799d5ffa95249b3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_row_vector</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const Right_ *rhs, Output_ *output, int num_threads)</td></tr>
-<tr class="separator:a5eb131fa5eaa31208799d5ffa95249b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11ea2267457febc5857978126b462039" id="r_a11ea2267457febc5857978126b462039"><td class="memTemplParams" colspan="2"><a id="a11ea2267457febc5857978126b462039" name="a11ea2267457febc5857978126b462039"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename GetOutput_ &gt; </td></tr>
-<tr class="memitem:a11ea2267457febc5857978126b462039"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_row_dense_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::size_t num_rhs, const bool rhs_columnar, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const bool output_columnar, GetOutput_ get_output, const int num_threads)</td></tr>
-<tr class="separator:a11ea2267457febc5857978126b462039"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e68946b467a3517591b03cfc719fd53" id="r_a4e68946b467a3517591b03cfc719fd53"><td class="memTemplParams" colspan="2"><a id="a4e68946b467a3517591b03cfc719fd53" name="a4e68946b467a3517591b03cfc719fd53"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a4e68946b467a3517591b03cfc719fd53"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_row_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const std::vector&lt; Output_ * &gt; &amp;output, int num_threads)</td></tr>
-<tr class="separator:a4e68946b467a3517591b03cfc719fd53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fa533f09ac17e56257185bf81334b70" id="r_a4fa533f09ac17e56257185bf81334b70"><td class="memTemplParams" colspan="2"><a id="a4fa533f09ac17e56257185bf81334b70" name="a4fa533f09ac17e56257185bf81334b70"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a4fa533f09ac17e56257185bf81334b70"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_row_tatami_dense</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *output, int num_threads)</td></tr>
-<tr class="separator:a4fa533f09ac17e56257185bf81334b70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0a6dd1f89056b22a2f4a5282fb1d7f8" id="r_ac0a6dd1f89056b22a2f4a5282fb1d7f8"><td class="memTemplParams" colspan="2"><a id="ac0a6dd1f89056b22a2f4a5282fb1d7f8" name="ac0a6dd1f89056b22a2f4a5282fb1d7f8"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:ac0a6dd1f89056b22a2f4a5282fb1d7f8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_row_tatami_sparse</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *output, int num_threads)</td></tr>
-<tr class="separator:ac0a6dd1f89056b22a2f4a5282fb1d7f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae607bd49928c8358b39adcc2302ab861" id="r_ae607bd49928c8358b39adcc2302ab861"><td class="memTemplParams" colspan="2"><a id="ae607bd49928c8358b39adcc2302ab861" name="ae607bd49928c8358b39adcc2302ab861"></a>
+template&lt;typename Value_ , typename Index_ &gt; </td></tr>
+<tr class="memitem:ae607bd49928c8358b39adcc2302ab861"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>populate_dense_buffers</b> (const bool row, const Index_ primary, const Index_ secondary, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, std::vector&lt; std::vector&lt; Value_ &gt; &gt; &amp;all_buffers, std::vector&lt; const Value_ * &gt; &amp;all_ptrs, int num_threads)</td></tr>
+<tr class="separator:ae607bd49928c8358b39adcc2302ab861"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a605fe32a9dff4760cba49806078b0332" id="r_a605fe32a9dff4760cba49806078b0332"><td class="memTemplParams" colspan="2">template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:a605fe32a9dff4760cba49806078b0332"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a605fe32a9dff4760cba49806078b0332">multiply_dense_column_with_multiple_vectors</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;left, const std::vector&lt; Right_ * &gt; &amp;right, const std::vector&lt; Output_ * &gt; &amp;output, const <a class="el" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html">MultiplyDenseColumnWithMultipleVectorsOptions</a> &amp;options)</td></tr>
 <tr class="separator:a605fe32a9dff4760cba49806078b0332"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -460,30 +420,6 @@ template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename 
 <tr class="memitem:a707fa56d64fb88069856289a715a5ae8" id="r_a707fa56d64fb88069856289a715a5ae8"><td class="memTemplParams" colspan="2">template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:a707fa56d64fb88069856289a715a5ae8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a707fa56d64fb88069856289a715a5ae8">multiply_sparse_row_with_single_vector</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const <a class="el" href="structtatami__mult_1_1MultiplySparseRowWithSingleVectorOptions.html">MultiplySparseRowWithSingleVectorOptions</a> &amp;options)</td></tr>
 <tr class="separator:a707fa56d64fb88069856289a715a5ae8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16373c9b8bf28c7a905d87c4bf521a47" id="r_a16373c9b8bf28c7a905d87c4bf521a47"><td class="memTemplParams" colspan="2"><a id="a16373c9b8bf28c7a905d87c4bf521a47" name="a16373c9b8bf28c7a905d87c4bf521a47"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a16373c9b8bf28c7a905d87c4bf521a47"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_column_vector</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const Right_ *rhs, Output_ *output, int num_threads)</td></tr>
-<tr class="separator:a16373c9b8bf28c7a905d87c4bf521a47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e4225c7ac65152c50a242d8c88ebe78" id="r_a3e4225c7ac65152c50a242d8c88ebe78"><td class="memTemplParams" colspan="2"><a id="a3e4225c7ac65152c50a242d8c88ebe78" name="a3e4225c7ac65152c50a242d8c88ebe78"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename GetOutput_ &gt; </td></tr>
-<tr class="memitem:a3e4225c7ac65152c50a242d8c88ebe78"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_column_dense_vectors_internal</b> (const Index_ start, const Index_ length, <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1OracularSparseExtractor.html">tatami::OracularSparseExtractor</a>&lt; Value_, Index_ &gt; &amp;ext, std::vector&lt; Value_ &gt; &amp;vbuffer, std::vector&lt; Index_ &gt; &amp;ibuffer, const std::size_t num_rhs, const bool rhs_columnar, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const bool output_columnar, GetOutput_ get_output)</td></tr>
-<tr class="separator:a3e4225c7ac65152c50a242d8c88ebe78"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab287a26a6d3a76a1fe90f704eeed937c" id="r_ab287a26a6d3a76a1fe90f704eeed937c"><td class="memTemplParams" colspan="2"><a id="ab287a26a6d3a76a1fe90f704eeed937c" name="ab287a26a6d3a76a1fe90f704eeed937c"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename GetOutput_ &gt; </td></tr>
-<tr class="memitem:ab287a26a6d3a76a1fe90f704eeed937c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_column_dense_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::size_t num_rhs, const bool rhs_columnar, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const bool output_columnar, GetOutput_ get_output, const int num_threads)</td></tr>
-<tr class="separator:ab287a26a6d3a76a1fe90f704eeed937c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba721932f051db77f79158d1e18e2fd8" id="r_aba721932f051db77f79158d1e18e2fd8"><td class="memTemplParams" colspan="2"><a id="aba721932f051db77f79158d1e18e2fd8" name="aba721932f051db77f79158d1e18e2fd8"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:aba721932f051db77f79158d1e18e2fd8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_column_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const std::vector&lt; Output_ * &gt; &amp;output, int num_threads)</td></tr>
-<tr class="separator:aba721932f051db77f79158d1e18e2fd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fe8f7ff699a13375cdb39d7608c6a23" id="r_a1fe8f7ff699a13375cdb39d7608c6a23"><td class="memTemplParams" colspan="2"><a id="a1fe8f7ff699a13375cdb39d7608c6a23" name="a1fe8f7ff699a13375cdb39d7608c6a23"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a1fe8f7ff699a13375cdb39d7608c6a23"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_column_tatami_dense</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *const output, int num_threads)</td></tr>
-<tr class="separator:a1fe8f7ff699a13375cdb39d7608c6a23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c823d3561372e3a19152bc0f3630a9e" id="r_a6c823d3561372e3a19152bc0f3630a9e"><td class="memTemplParams" colspan="2"><a id="a6c823d3561372e3a19152bc0f3630a9e" name="a6c823d3561372e3a19152bc0f3630a9e"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a6c823d3561372e3a19152bc0f3630a9e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_column_tatami_sparse</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *const output, int num_threads)</td></tr>
-<tr class="separator:a6c823d3561372e3a19152bc0f3630a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fd7bd991b0dc335c6fc67c95b36f5f7" id="r_a8fd7bd991b0dc335c6fc67c95b36f5f7"><td class="memTemplParams" colspan="2"><a id="a8fd7bd991b0dc335c6fc67c95b36f5f7" name="a8fd7bd991b0dc335c6fc67c95b36f5f7"></a>
 template&lt;std::size_t accumulators_, std::size_t counter_ = 0, class ValueIterator_ , class IndexIterator_ , typename Dense_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:a8fd7bd991b0dc335c6fc67c95b36f5f7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unrolled_sparse_dot_product</b> (const std::size_t idx, ValueIterator_ vptr, IndexIterator_ iptr, Dense_ dense, std::array&lt; Output_, accumulators_ &gt; &amp;dots)</td></tr>
@@ -585,26 +521,6 @@ template&lt;typename Value_ , typename Index_ , class Zero_ &gt; </td></tr>
 template&lt;typename Index_ , class Zero_ &gt; </td></tr>
 <tr class="memitem:a069aae7b060b1319a0849a634d044e53"><td class="memTemplItemLeft" align="right" valign="top">std::optional&lt; std::vector&lt; Index_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>filter_non_empty_sparse</b> (const std::vector&lt; std::vector&lt; Index_ &gt; &gt; &amp;all_index, Zero_ zerofun)</td></tr>
 <tr class="separator:a069aae7b060b1319a0849a634d044e53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7739ebdf0f5e2071a4eb117fc917f1f" id="r_ae7739ebdf0f5e2071a4eb117fc917f1f"><td class="memTemplParams" colspan="2"><a id="ae7739ebdf0f5e2071a4eb117fc917f1f" name="ae7739ebdf0f5e2071a4eb117fc917f1f"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:ae7739ebdf0f5e2071a4eb117fc917f1f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_row_vector</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const Right_ *rhs, Output_ *output, int num_threads)</td></tr>
-<tr class="separator:ae7739ebdf0f5e2071a4eb117fc917f1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06bd5ef55805c8a5db31d7cd1273f796" id="r_a06bd5ef55805c8a5db31d7cd1273f796"><td class="memTemplParams" colspan="2"><a id="a06bd5ef55805c8a5db31d7cd1273f796" name="a06bd5ef55805c8a5db31d7cd1273f796"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename GetOutput_ &gt; </td></tr>
-<tr class="memitem:a06bd5ef55805c8a5db31d7cd1273f796"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_row_dense_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::size_t num_rhs, const bool rhs_columnar, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const bool output_columnar, GetOutput_ get_output, const int num_threads)</td></tr>
-<tr class="separator:a06bd5ef55805c8a5db31d7cd1273f796"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1b61f7c8a35c70f049d3f700561ce15" id="r_ab1b61f7c8a35c70f049d3f700561ce15"><td class="memTemplParams" colspan="2"><a id="ab1b61f7c8a35c70f049d3f700561ce15" name="ab1b61f7c8a35c70f049d3f700561ce15"></a>
-template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:ab1b61f7c8a35c70f049d3f700561ce15"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_row_vectors</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const std::vector&lt; Right_ * &gt; &amp;rhs_ptrs, const std::vector&lt; Output_ * &gt; &amp;output, int num_threads)</td></tr>
-<tr class="separator:ab1b61f7c8a35c70f049d3f700561ce15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29c1e9c45a891ba66985a9db149da108" id="r_a29c1e9c45a891ba66985a9db149da108"><td class="memTemplParams" colspan="2"><a id="a29c1e9c45a891ba66985a9db149da108" name="a29c1e9c45a891ba66985a9db149da108"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a29c1e9c45a891ba66985a9db149da108"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_row_tatami_dense</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *const output, int num_threads)</td></tr>
-<tr class="separator:a29c1e9c45a891ba66985a9db149da108"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86520836a8c11873a9e47c870742554b" id="r_a86520836a8c11873a9e47c870742554b"><td class="memTemplParams" colspan="2"><a id="a86520836a8c11873a9e47c870742554b" name="a86520836a8c11873a9e47c870742554b"></a>
-template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a86520836a8c11873a9e47c870742554b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>sparse_row_tatami_sparse</b> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;rhs, const bool output_columnar, Output_ *const output, int num_threads)</td></tr>
-<tr class="separator:a86520836a8c11873a9e47c870742554b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7eb0e957877357d3f3fdf106b7b1c0c3" id="r_a7eb0e957877357d3f3fdf106b7b1c0c3"><td class="memTemplParams" colspan="2">template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:a7eb0e957877357d3f3fdf106b7b1c0c3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a7eb0e957877357d3f3fdf106b7b1c0c3">multiply</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;left, const Right_ *right, Output_ *output, const <a class="el" href="structtatami__mult_1_1Options.html">Options</a> &amp;opt)</td></tr>
 <tr class="separator:a7eb0e957877357d3f3fdf106b7b1c0c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -620,18 +536,10 @@ template&lt;typename Value_ , typename Index_ , typename RightValue_ , typename 
 <tr class="memitem:ad5560680ed15301d2446e333c8cd9c56" id="r_ad5560680ed15301d2446e333c8cd9c56"><td class="memTemplParams" colspan="2">template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
 <tr class="memitem:ad5560680ed15301d2446e333c8cd9c56"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#ad5560680ed15301d2446e333c8cd9c56">multiply</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *output, const <a class="el" href="structtatami__mult_1_1Options.html">Options</a> &amp;opt)</td></tr>
 <tr class="separator:ad5560680ed15301d2446e333c8cd9c56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae607bd49928c8358b39adcc2302ab861" id="r_ae607bd49928c8358b39adcc2302ab861"><td class="memTemplParams" colspan="2"><a id="ae607bd49928c8358b39adcc2302ab861" name="ae607bd49928c8358b39adcc2302ab861"></a>
-template&lt;typename Value_ , typename Index_ &gt; </td></tr>
-<tr class="memitem:ae607bd49928c8358b39adcc2302ab861"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>populate_dense_buffers</b> (const bool row, const Index_ primary, const Index_ secondary, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;matrix, std::vector&lt; std::vector&lt; Value_ &gt; &gt; &amp;all_buffers, std::vector&lt; const Value_ * &gt; &amp;all_ptrs, int num_threads)</td></tr>
-<tr class="separator:ae607bd49928c8358b39adcc2302ab861"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e4e0d98c84a2607d4746789574d1f3a" id="r_a4e4e0d98c84a2607d4746789574d1f3a"><td class="memTemplParams" colspan="2"><a id="a4e4e0d98c84a2607d4746789574d1f3a" name="a4e4e0d98c84a2607d4746789574d1f3a"></a>
 template&lt;typename Value_ , typename Index_ , class Zero_ &gt; </td></tr>
 <tr class="memitem:a4e4e0d98c84a2607d4746789574d1f3a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structtatami__mult_1_1FetchNonEmptySparseBlockInfo.html">FetchNonEmptySparseBlockInfo</a>&lt; Index_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>fetch_non_empty_sparse_block</b> (<a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1OracularSparseExtractor.html">tatami::OracularSparseExtractor</a>&lt; Value_, Index_ &gt; &amp;ext, std::vector&lt; std::vector&lt; Value_ &gt; &gt; &amp;vbuffers, std::vector&lt; std::vector&lt; Index_ &gt; &gt; &amp;ibuffers, std::vector&lt; <a class="elRef" href="https://tatami-inc.github.io/tatami/structtatami_1_1SparseRange.html">tatami::SparseRange</a>&lt; Value_, Index_ &gt; &gt; &amp;ranges, std::vector&lt; Index_ &gt; &amp;non_empty, Index_ position, const Index_ length, const int block_size, Zero_ zero)</td></tr>
 <tr class="separator:a4e4e0d98c84a2607d4746789574d1f3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0937aa0b9b2be3f76dcaf19e12a06f4f" id="r_a0937aa0b9b2be3f76dcaf19e12a06f4f"><td class="memTemplParams" colspan="2"><a id="a0937aa0b9b2be3f76dcaf19e12a06f4f" name="a0937aa0b9b2be3f76dcaf19e12a06f4f"></a>
-template&lt;typename Output_ , typename DenseValue_ , typename Value_ , typename Index_ &gt; </td></tr>
-<tr class="memitem:a0937aa0b9b2be3f76dcaf19e12a06f4f"><td class="memTemplItemLeft" align="right" valign="top">Output_&#160;</td><td class="memTemplItemRight" valign="bottom"><b>dense_sparse_dot_product</b> (const DenseValue_ *ptr, const <a class="elRef" href="https://tatami-inc.github.io/tatami/structtatami_1_1SparseRange.html">tatami::SparseRange</a>&lt; Value_, Index_ &gt; &amp;range)</td></tr>
-<tr class="separator:a0937aa0b9b2be3f76dcaf19e12a06f4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Multiplication of <b>tatami</b> matrices. </p>
@@ -940,7 +848,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. The number of rows in <code>right</code> should be equal to the number of columns in <code>left</code>. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right.ncol()</code>. On output, this contains the product <code>left * right</code> in column-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -992,7 +900,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. The number of rows in <code>right</code> should be equal to the number of columns in <code>left</code>. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right.ncol()</code>. On output, this contains the product <code>left * right</code> in row-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -1036,12 +944,13 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#ad4ecca31ebf7d8ff16b0670017ff6574">multiply_dense_column_with_dense_row_matrix_to_row_output()</a></code>, <code><a class="el" href="#a7f597750ff4ece602ad593ed4162ed9e">multiply_dense_column_with_dense_row_matrix_to_column_output()</a></code>, <code><a class="el" href="#abad3a77477ad693a76f04af92abd0660">multiply_dense_column_with_dense_column_matrix_to_row_output()</a></code>, or <code><a class="el" href="#af37983f2240af21981c19ca890730f32">multiply_dense_column_with_dense_column_matrix_to_column_output()</a></code>, depending on the properties of <code>right</code> and the choice of <code>output_row_major</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1102,7 +1011,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. The number of rows in <code>right</code> should be equal to the number of columns in <code>left</code>. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right.ncol()</code>. On output, this contains the product <code>left * right</code> in column-major order. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -1154,7 +1063,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">right</td><td>RHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. The number of rows in <code>right</code> should be equal to the number of columns in <code>left</code>. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right.ncol()</code>. On output, this contains the product <code>left * right</code> in row-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -1195,9 +1104,9 @@ template&lt;typename Value_ , typename Index_ , typename Right_ , typename Outpu
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Value_</td><td>Numeric type of the matrix value. </td></tr>
-    <tr><td class="paramname">Index_</td><td>Integer type of the matrix index. </td></tr>
-    <tr><td class="paramname">Right_</td><td>Numeric type of the vector on the right hand side. </td></tr>
+    <tr><td class="paramname">Value_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">Index_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">Right_</td><td>Numeric type of the RHS vectors. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1205,8 +1114,8 @@ template&lt;typename Value_ , typename Index_ , typename Right_ , typename Outpu
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains a vector with which to multiply <code>left</code>. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of pointers, each of which points to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains an RHS vector with which to multiply <code>left</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of length equal to <code>right.size()</code>. Each entry is a pointer to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
   </dd>
@@ -1297,10 +1206,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1349,10 +1258,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1404,12 +1313,13 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#a9195f90a79d71417eb292795dcf460ed">multiply_dense_column_with_sparse_row_matrix_to_row_output()</a></code>, <code><a class="el" href="#a45732486dab1c73dc4fa4221fa39866a">multiply_dense_column_with_sparse_row_matrix_to_column_output()</a></code>, <code><a class="el" href="#ab3241b84eb733673ce24e1e58fbdab2b">multiply_dense_column_with_sparse_column_matrix_to_row_output()</a></code>, or <code><a class="el" href="#a0cdbef4d71f4eb932d3f37918c3e4d9c">multiply_dense_column_with_sparse_column_matrix_to_column_output()</a></code>, depending on the properties of <code>right</code> and the choice of <code>output_row_major</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1459,10 +1369,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1511,10 +1421,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1564,10 +1474,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1617,10 +1527,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1672,13 +1582,14 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#ad934549bf8a9f1568498212bd82d97bd">multiply_dense_row_with_dense_row_matrix_to_row_output()</a></code>, <code><a class="el" href="#ada53490cb5c87baeb6d4d61ba3a92f8f">multiply_dense_row_with_dense_row_matrix_to_column_output()</a></code>, <code><a class="el" href="#aae82b9e0aacf6440a0ee209d988cc43b">multiply_dense_row_with_dense_column_matrix_to_row_output()</a></code>, or <code><a class="el" href="#a4acdaa5cf283187cc86a07a50eb665be">multiply_dense_row_with_dense_column_matrix_to_column_output()</a></code>, depending on the properties of <code>right</code> and the choice of <code>output_row_major</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1728,10 +1639,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1780,10 +1691,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1833,9 +1744,9 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">Value_</td><td>Numeric type of the matrix value. </td></tr>
-    <tr><td class="paramname">Index_</td><td>Integer type of the matrix index. </td></tr>
-    <tr><td class="paramname">Right_</td><td>Numeric type of the vector on the right hand side. </td></tr>
+    <tr><td class="paramname">Value_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">Index_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">Right_</td><td>Numeric type of the RHS vectors. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1843,8 +1754,8 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains a vector with which to multiply <code>left</code>. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of pointers, each of which points to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains an RHS vector with which to multiply <code>left</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of length equal to <code>right.size()</code>. Each entry is a pointer to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
   </dd>
@@ -1937,10 +1848,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -1990,10 +1901,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2048,10 +1959,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product. see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2101,10 +2012,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2153,10 +2064,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2312,12 +2223,13 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#a6cb6fdd3ad11731aa8d19be674a14084">multiply_sparse_column_with_dense_row_matrix_to_row_output()</a></code>, <code><a class="el" href="#a4d3e29358034f9329411a948767f19ef">multiply_sparse_column_with_dense_row_matrix_to_column_output()</a></code>, <code><a class="el" href="#a6c7bc5700b5e9fba3621918de9958f46">multiply_sparse_column_with_dense_column_matrix_to_row_output()</a></code>, or <code><a class="el" href="#a9a01c791fdfd3cddb030e2170b6eebbc">multiply_sparse_column_with_dense_column_matrix_to_column_output()</a></code>, depending on the properties of <code>right</code> and the choice of <code>output_row_major</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2471,9 +2383,9 @@ template&lt;typename Value_ , typename Index_ , typename Right_ , typename Outpu
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Value_</td><td>Numeric type of the matrix value. </td></tr>
-    <tr><td class="paramname">Index_</td><td>Integer type of the matrix index. </td></tr>
-    <tr><td class="paramname">Right_</td><td>Numeric type of the vector on the right hand side. </td></tr>
+    <tr><td class="paramname">Value_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">Index_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">Right_</td><td>Numeric type of the RHS vectors. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2481,8 +2393,8 @@ template&lt;typename Value_ , typename Index_ , typename Right_ , typename Outpu
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for sparse matrices that prefer column access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains a vector with which to multiply <code>left</code>. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of pointers, each of which points to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains an RHS vector with which to multiply <code>left</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of length equal to <code>right.size()</code>. Each entry is a pointer to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
   </dd>
@@ -2573,10 +2485,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2625,10 +2537,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2680,12 +2592,13 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#a0f1a4e21112f057bfee1033fbc66c372">multiply_sparse_column_with_sparse_row_matrix_to_row_output()</a></code>, <code><a class="el" href="#a9fcdd5b2c2bf5ec06c66197325f9049c">multiply_sparse_column_with_sparse_row_matrix_to_column_output()</a></code>, <code><a class="el" href="#ae11ce0d592ab76e72847588cd3786df7">multiply_sparse_column_with_sparse_column_matrix_to_row_output()</a></code>, or <code><a class="el" href="#acd9319d196a08d8a9552b4669ec7c54c">multiply_sparse_column_with_sparse_column_matrix_to_column_output()</a></code>, depending on the properties of <code>right</code> and the choice of <code>output_row_major</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2735,10 +2648,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2787,10 +2700,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2840,10 +2753,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2893,10 +2806,10 @@ template&lt;std::size_t accumulators_, typename LeftValue_ , typename LeftIndex_
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -2948,13 +2861,14 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#aa5ef129537bd65d796d4015cd4159e25">multiply_sparse_row_with_dense_row_matrix_to_row_output()</a></code>, <code><a class="el" href="#afa42bf63de234bc945e185fb740039ed">multiply_sparse_row_with_dense_row_matrix_to_column_output()</a></code>, <code><a class="el" href="#acdfa040e084442a281e83cb4316e5732">multiply_sparse_row_with_dense_column_matrix_to_row_output()</a></code>, or <code><a class="el" href="#a59c74edbb11bf7c24c17f132fd463a93">multiply_sparse_row_with_dense_column_matrix_to_column_output()</a></code>, depending on the properties of <code>right</code> and the choice of <code>output_row_major</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3004,10 +2918,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3056,10 +2970,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3109,9 +3023,9 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">Value_</td><td>Numeric type of the matrix value. </td></tr>
-    <tr><td class="paramname">Index_</td><td>Integer type of the matrix index. </td></tr>
-    <tr><td class="paramname">Right_</td><td>Numeric type of the vector on the right hand side. </td></tr>
+    <tr><td class="paramname">Value_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">Index_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">Right_</td><td>Numeric type of the RHS vectors. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3119,8 +3033,8 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for sparse matrices that prefer row access, but will work with all matrices. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains a vector with which to multiply <code>left</code>. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of pointers, each of which points to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Vector of pointers, each of which points to an array of length <code>left.ncol()</code>. Each entry contains an RHS vector with which to multiply <code>left</code>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Vector of length equal to <code>right.size()</code>. Each entry is a pointer to an array of length <code>left.nrow()</code>. On output, the <code>i</code>-th entry stores the product <code>left * right[i]</code>. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
   </dd>
@@ -3213,10 +3127,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3266,10 +3180,10 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3321,13 +3235,14 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#aec8e5c85d0f79b279bcc8a234c93d89e">multiply_sparse_row_with_sparse_row_matrix_to_row_output()</a></code>, <code><a class="el" href="#a95a7e04178cf72c96d10b3f1df5e6f4c">multiply_sparse_row_with_sparse_row_matrix_to_column_output()</a></code>, <code><a class="el" href="#a97c110942fdff2b6aa35d62a0639f848">multiply_sparse_row_with_sparse_column_matrix_to_row_output()</a></code>, or <code><a class="el" href="#a7699f10bb373282a26b31eab90b901eb">multiply_sparse_row_with_sparse_column_matrix_to_column_output()</a></code>, depending on the properties of <code>right</code> and the choice of <code>output_row_major</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product. see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3377,10 +3292,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3429,10 +3344,10 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
 </div><div class="memdoc">
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3484,13 +3399,14 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#a3b26cc88de35bad067a2325301fff8ec">multiply_sparse_row_with_dense_matrix()</a></code>, <code><a class="el" href="#aa47afd94879aef5972e647f9a1a164c4">multiply_sparse_column_with_dense_matrix()</a></code>, <code><a class="el" href="#a79ad7c8e71e5ef421f0a97d19af46b97">multiply_dense_row_with_dense_matrix()</a></code>, or <code><a class="el" href="#aafc0be4bec36a5c8484c414bc6d0ced3">multiply_dense_column_with_dense_matrix()</a></code>, depending on the properties of <code>left</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3538,6 +3454,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#a4b6510fa7843661ccf6c502f4ed6b80f">multiply_sparse_row_with_multiple_vectors()</a></code>, <code><a class="el" href="#a4d8821f903a298a86b75637cef841e0b">multiply_sparse_column_with_multiple_vectors()</a></code>, <code><a class="el" href="#a122cb6370799ae3b5e5ffda1144c0262">multiply_dense_row_with_multiple_vectors()</a></code>, or <code><a class="el" href="#a605fe32a9dff4760cba49806078b0332">multiply_dense_column_with_multiple_vectors()</a></code>, depending on the properties of <code>left</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
@@ -3590,6 +3507,7 @@ template&lt;std::size_t accumulators_ = 4, typename Value_ , typename Index_ , t
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#a707fa56d64fb88069856289a715a5ae8">multiply_sparse_row_with_single_vector()</a></code>, <code><a class="el" href="#a863215db9e5aa2d2821575616b4ab7ca">multiply_sparse_column_with_single_vector()</a></code>, <code><a class="el" href="#a3e6bd133678fddb8a65341e080ce832c">multiply_dense_row_with_single_vector()</a></code>, or <code><a class="el" href="#a84c2ea30feb5123cd1cf5e9be6e3bd06">multiply_dense_column_with_single_vector()</a></code>, depending on the properties of <code>left</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
@@ -3647,13 +3565,14 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
         </tr>
       </table>
 </div><div class="memdoc">
+<p>This function delegates to <code><a class="el" href="#abf69c3a76d150c8fdf7b7d79d9e2a4f6">multiply_sparse_row_with_sparse_matrix()</a></code>, <code><a class="el" href="#acfa047954b47181499a9e29f2324fe2f">multiply_sparse_column_with_sparse_matrix()</a></code>, <code><a class="el" href="#a119f9a1c32c479a5fa32b21e8bae4400">multiply_dense_row_with_sparse_matrix()</a></code>, or <code><a class="el" href="#aff67c79b3d546d5c8259e54f45c3f950">multiply_dense_column_with_sparse_matrix()</a></code>, depending on the properties of <code>left</code>.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">accumulators_</td><td>Number of accumulators for computing the dot product, see the <a class="el" href="multiple-accumulators.html">Multiple accumulators</a> section for more details. </td></tr>
-    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the left matrix value. </td></tr>
-    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the left matrix index. </td></tr>
-    <tr><td class="paramname">RightValue_</td><td>Numeric type of the right matrix value. </td></tr>
-    <tr><td class="paramname">RightIndex_</td><td>Integer type of the right matrix index. </td></tr>
+    <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
+    <tr><td class="paramname">LeftIndex_</td><td>Integer type of the LHS matrix index. </td></tr>
+    <tr><td class="paramname">RightValue_</td><td>Numeric type of the RHS matrix value. </td></tr>
+    <tr><td class="paramname">RightIndex_</td><td>Integer type of the RHS matrix index. </td></tr>
     <tr><td class="paramname">Output_</td><td>Numeric type of the output array.</td></tr>
   </table>
   </dd>
@@ -3771,7 +3690,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the primary block size to use in all multiplication functions involving a dense matrix LHS and a dense matrix RHS.</p>
+<p>Set the primary block size to use in all multiplication functions involving a dense matrix LHS and a dense matrix RHS. See the \(B\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -3845,7 +3764,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the secondary block size to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS. See the \(C\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details.</p>
+<p>Set the secondary block size to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS. See the \(C\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details. Different secondary block sizes will not change the results.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -3882,7 +3801,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the secondary block size to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS. See the \(C\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details.</p>
+<p>Set the secondary block size to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS. See the \(C\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details. Different secondary block sizes may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -3919,7 +3838,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the secondary block size to use in all multiplication functions involving a dense matrix LHS and a dense matrix RHS.</p>
+<p>Set the secondary block size to use in all multiplication functions involving a dense matrix LHS and a dense matrix RHS. See the \(C\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details. Different secondary block sizes may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -3956,7 +3875,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the secondary block size to use in all multiplication functions involving a dense matrix LHS and multiple vectors RHS. See the \(C\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details.</p>
+<p>Set the secondary block size to use in all multiplication functions involving a dense matrix LHS and multiple vectors RHS. See the \(C\) parameter in the <a class="el" href="dense-blocking.html">Blocking for dense matrices</a> section for more details. Different secondary block sizes may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -3993,7 +3912,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS. Different numbers of threads may slightly change the results due to differences in floating-point round-off error.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4030,7 +3949,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a dense column-major LHS and a dense matrix RHS. Different numbers of threads may slightly change the results due to differences in floating-point round-off error.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4067,7 +3986,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS. Different numbers of threads will not change the results.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4104,7 +4023,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a dense row-major LHS and a dense matrix RHS. Different numbers of threads will not change the results.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4141,7 +4060,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a sparse column-major LHS and a dense matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a sparse column-major LHS and a dense matrix RHS. Different numbers of threads may slightly change the results due to differences in floating-point round-off error.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4178,7 +4097,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a sparse column-major LHS and a sparse matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a sparse column-major LHS and a sparse matrix RHS. Different numbers of threads may slightly change the results due to differences in floating-point round-off error.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4215,7 +4134,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a sparse row-major LHS and a dense matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a sparse row-major LHS and a dense matrix RHS. Different numbers of threads will not change the results.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4252,7 +4171,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a sparse row-major LHS and a sparse matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a sparse row-major LHS and a sparse matrix RHS. Different numbers of threads will not change the results.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4289,7 +4208,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a dense matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a dense matrix RHS. Different numbers of threads may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4326,7 +4245,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving multiple vectors RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving multiple vectors RHS. Different numbers of threads may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4363,7 +4282,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving single vector RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving single vector RHS. Different numbers of threads may slightly change the results depending on the choice of delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4400,7 +4319,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the number of threads to use in all multiplication functions involving a sparse matrix RHS.</p>
+<p>Set the number of threads to use in all multiplication functions involving a sparse matrix RHS. Different numbers of threads may slightly change the results due to differences in floating-point round-off error, depending on the delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4437,7 +4356,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the block size to use in all multiplication functions involving a dense column-major LHS and a sparse matrix RHS. See <a class="el" href="sparse-blocking.html">Blocking for sparse matrices</a> section for more details; the exact interpretation depends on the specific function called by <code><a class="el" href="#aff67c79b3d546d5c8259e54f45c3f950">multiply_dense_column_with_sparse_matrix()</a></code>.</p>
+<p>Set the block size to use in all multiplication functions involving a dense column-major LHS and a sparse matrix RHS. See <a class="el" href="sparse-blocking.html">Blocking for sparse matrices</a> section for more details; the exact interpretation depends on the delegated function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
@@ -4622,7 +4541,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the block size to use in all multiplication functions involving a sparse matrix LHS and a dense matrix RHS.</p>
+<p>Set the block size to use in all multiplication functions involving a sparse matrix LHS and a dense matrix RHS. See the \(B\) parameter in the <a class="el" href="sparse-blocking.html">Blocking for sparse matrices</a> section for more details.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">options</td><td><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> to be set. </td></tr>
