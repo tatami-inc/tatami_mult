@@ -41,5 +41,8 @@ in which case \f$C\f$ should be a multiple of the number of accumulators to mini
 
 A larger \f$B\f$ increases memory usage as more dimension elements need to be realized by **tatami**.
 
+Changing \f$C\f$ may slightly change the result for floating-point types.
+This is due to changes to the order of summations and thus the floating-point round-off error.
+
 If the primary block size is set to 1 in any **tatami_mult** function, no blocking will be performed.
 In this case, the choice of secondary block size will have no effect, i.e., \f$C\f$ is ignored.
