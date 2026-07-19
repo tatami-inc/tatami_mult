@@ -79,7 +79,7 @@ inline void set_dense_secondary_block_size(MultiplyWithDenseMatrixOptions& optio
 
 /**
  * Set the block size to use in all multiplication functions involving a sparse matrix LHS and a dense matrix RHS.
- * See the \f$B\f$ parameter in the @ref sparse-blocking "Blocking for sparse matrices" section for more details.
+ * See the @ref sparse-blocking "Blocking for sparse matrices" section for more details.
  *
  * @param options Options to be set.
  * @param block_size Block size.

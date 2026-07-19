@@ -28,7 +28,10 @@ However, this is only applicable when the extent of the relevant dimension is sm
 
 In rare cases, some sparse algorithms have blocking schemes that do not fall into the above two categories.
 This is mostly related to easier transposition.
-See `multiply_dense_row_with_sparse_row_matrix_to_column_output()` for an example.
+For examples, see:
+
+- `multiply_dense_row_with_sparse_row_matrix_to_column_output()` 
+- `multiply_sparse_row_with_dense_row_matrix_to_column_output()` 
 
 ## Further comments
 

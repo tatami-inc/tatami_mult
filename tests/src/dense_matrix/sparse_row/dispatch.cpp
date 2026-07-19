@@ -203,4 +203,5 @@ TEST(DenseMatrixSparseRow, Options) {
     tatami_mult::set_sparse_block_size(opt, 42);
     EXPECT_EQ(opt.column_to_column.block_size, 42);
     EXPECT_EQ(opt.column_to_row.block_size, 42);
+    EXPECT_EQ(opt.row_to_column.block_size, 42);
 }

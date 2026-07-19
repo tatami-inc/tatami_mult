@@ -31,6 +31,17 @@ struct MultiplySparseRowWithDenseRowMatrixToColumnOutputOptions {
      * Different numbers of threads will not change the results. 
      */
     int num_threads = 1;
+
+    /**
+     * Block size, i.e., the number of LHS rows to use at once.
+     * The matrix product is computed for the submatrix consisting of each block of rows,
+     * and then transposed for storage in the column-major output array.
+     *
+     * The block size should be positive.
+     * Larger values generally improve speed at the cost of increased memory usage.
+     * If this is set to 1, no blocking is performed.
+     */
+    int block_size = 16;
 };
 
 /**
@@ -69,37 +80,87 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(common_dim);
         auto ibuffer = tatami::create_container_of_Index_size<std::vector<LeftIndex_> >(common_dim);
 
-        auto tmp_output = tatami::create_container_of_Index_size<std::vector<Output_> >(right_NC);
-        std::vector<LeftIndex_> left_empty;
+        if (options.block_size == 1) {
+            auto tmp_output = tatami::create_container_of_Index_size<std::vector<Output_> >(right_NC);
+            std::vector<LeftIndex_> left_empty;
 
-        for (LeftIndex_ lr = 0; lr < length; ++lr) {
-            const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            if (range.number == 0) {
-                left_empty.push_back(lr);
-                continue;
-            }
+            for (LeftIndex_ lr = 0; lr < length; ++lr) {
+                const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
+                if (range.number == 0) {
+                    left_empty.push_back(lr);
+                    continue;
+                }
 
-            for (LeftIndex_ x = 0; x < range.number; ++x) {
-                const auto rightrow = right_ptrs[range.index[x]];
-                const auto mult = range.value[x];
+                for (LeftIndex_ x = 0; x < range.number; ++x) {
+                    const auto rightrow = right_ptrs[range.index[x]];
+                    const Output_ mult = range.value[x];
+                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                        tmp_output[rc] += mult * static_cast<Output_>(rightrow[rc]);
+                    }
+                }
+
                 for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    tmp_output[rc] += mult * rightrow[rc];
+                    output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = tmp_output[rc];
+                }
+                std::fill(tmp_output.begin(), tmp_output.end(), 0);
+            }
+
+            if (left_empty.size()) {
+                // Zeroing the empty rows that we previously skipped. This is done with near-contiguous memory,
+                // so if there are many empty LHS rows, their special-casing should improve efficiency.
+                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                    for (const auto lr : left_empty) {
+                        output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = 0;
+                    }
                 }
             }
 
-            for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = tmp_output[rc];
-                tmp_output[rc] = 0;
-            }
-        }
+        } else {
+            const auto max_block_rows = sanisizer::min(length, options.block_size);
+            std::vector<Output_> tmp_output(sanisizer::product<typename std::vector<Output_>::size_type>(max_block_rows, right_NC));
 
-        if (left_empty.size()) {
-            // Zeroing the empty rows that we previously skipped. This is done with near-contiguous memory,
-            // so if there are many empty LHS rows, their special-casing should improve efficiency.
-            for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                for (const auto lr : left_empty) {
-                    output[sanisizer::nd_offset<std::size_t>(start + lr, left_NR, rc)] = 0;
+            LeftIndex_ lr = 0;
+            while (lr < length) {
+                const LeftIndex_ lrnum = sanisizer::min(options.block_size, length - lr);
+                bool any_non_empty = false;
+                for (LeftIndex_ lrcopy = 0; lrcopy < lrnum; ++lrcopy) {
+                    const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
+                    if (range.number == 0) {
+                        continue;
+                    }
+                    any_non_empty = true;
+
+                    for (LeftIndex_ x = 0; x < range.number; ++x) {
+                        const auto rightrow = right_ptrs[range.index[x]];
+                        const Output_ mult = range.value[x];
+                        for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
+                            tmp_output[sanisizer::nd_offset<std::size_t>(rc, right_NC, lrcopy)] += mult * static_cast<Output_>(rightrow[rc]);
+                        }
+                    }
                 }
+
+                // Now doing a blocked transposition.
+                // This is, in fact, the only purpose of the blocking here.
+                // We do this even if there were no non-empty LHS rows, because we have to zero the output array anyway.
+                RightIndex_ rc = 0;
+                while (rc < right_NC) {
+                    const RightIndex_ rcend = rc + sanisizer::min(options.block_size, right_NC - rc);
+                    for (LeftIndex_ lrcopy = 0; lrcopy < lrnum; ++lrcopy) {
+                        for (auto rcopy = rc; rcopy < rcend; ++rcopy) {
+                            const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(rcopy, right_NC, lrcopy)];
+                            output[sanisizer::nd_offset<std::size_t>(start + lr + lrcopy, left_NR, rcopy)] = val;
+                        }
+                    }
+                    rc = rcend;
+                }
+
+                // Too much effort to track individual non-empty rows, but if they're all empty, we skip the zeroing.
+                // If a few are non-empty, a single memset call is probably faster anyway than splitting it up.
+                if (any_non_empty) {
+                    std::fill_n(tmp_output.begin(), sanisizer::product_unsafe<std::size_t>(right_NC, lrnum), 0);
+                }
+
+                lr += lrnum;
             }
         }
     }, left_NR, options.num_threads);
