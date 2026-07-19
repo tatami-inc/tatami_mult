@@ -1203,6 +1203,13 @@
       <anchor>aaa2ccd06f964a28194e52b4db49bc51e</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>block_size</name>
+      <anchorfile>structtatami__mult_1_1MultiplySparseRowWithDenseRowMatrixToColumnOutputOptions.html</anchorfile>
+      <anchor>a7810517426a045ee5774f2d68a710b5d</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>tatami_mult::MultiplySparseRowWithDenseRowMatrixToRowOutputOptions</name>

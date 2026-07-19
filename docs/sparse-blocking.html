@@ -107,7 +107,11 @@ Caching multiple dense vectors</h1>
 <p>The idea is that the dense block is small enough that all of its vectors can be completely cached for quick re-use. The cache is also assumed to be large enough to store the sparse vector's contents for re-use across multiple dense vectors. By caching both the dense and sparse vectors, this strategy is more effective than just caching one dense vector. However, this is only applicable when the extent of the relevant dimension is small.</p>
 <h1><a class="anchor" id="autotoc_md12"></a>
 Other blocking schemes</h1>
-<p>In rare cases, some sparse algorithms have blocking schemes that do not fall into the above two categories. This is mostly related to easier transposition. See <code>multiply_dense_row_with_sparse_row_matrix_to_column_output()</code> for an example.</p>
+<p>In rare cases, some sparse algorithms have blocking schemes that do not fall into the above two categories. This is mostly related to easier transposition. For examples, see:</p>
+<ul>
+<li><code>multiply_dense_row_with_sparse_row_matrix_to_column_output()</code></li>
+<li><code>multiply_sparse_row_with_dense_row_matrix_to_column_output()</code></li>
+</ul>
 <h1><a class="anchor" id="autotoc_md13"></a>
 Further comments</h1>
 <p>Both \(B\) and \(C\) should be positive. If either is equal to 1, no blocking will be performed. </p>
