@@ -152,11 +152,17 @@ void multiply_dense_column_with_dense_column_matrix_to_row_output(
                             }
                         }
 
-                        for (RightIndex_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
-                            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                                const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(lr_counter, lr_num, rc_counter)];
-                                outptr[sanisizer::nd_offset<std::size_t>(rc + rc_counter, right_NC, lr + lr_counter)] += val;
+                        // Transposition using square blocks of the smaller (primary) block size.
+                        RightIndex_ lrt = 0;
+                        while (lrt < lr_num) {
+                            const LeftIndex_ lrt_end = lrt + sanisizer::min(options.primary_block_size, lr_num - lrt);
+                            for (RightIndex_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                                for (LeftIndex_ lrt_copy = lrt; lrt_copy < lrt_end; ++lrt_copy) {
+                                    const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(lrt_copy, lr_num, rc_counter)];
+                                    outptr[sanisizer::nd_offset<std::size_t>(rc + rc_counter, right_NC, lr + lrt_copy)] += val;
+                                }
                             }
+                            lrt = lrt_end;
                         }
                         std::fill_n(tmp_output.begin(), sanisizer::product_unsafe<std::size_t>(rc_num, lr_num), 0);
 

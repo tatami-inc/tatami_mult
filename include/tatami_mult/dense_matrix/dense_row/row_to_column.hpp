@@ -158,17 +158,17 @@ void multiply_dense_row_with_dense_row_matrix_to_column_output(
                     cd = cd_end;
                 }
 
-                // Doing a blocked transposition to write to the output array.
-                RightIndex_ rc = 0;
-                while (rc < right_NC) {
-                    const RightIndex_ rc_end = rc + sanisizer::min(options.secondary_block_size, right_NC - rc);
+                // Transposition using square blocks of the smaller (primary) block size.
+                RightIndex_ rct = 0;
+                while (rct < right_NC) {
+                    const RightIndex_ rct_end = rct + sanisizer::min(options.primary_block_size, right_NC - rct);
                     for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                        for (auto rc_copy = rc; rc_copy < rc_end; ++rc_copy) {
-                            const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(rc_copy, right_NC, lr_counter)];
-                            output[sanisizer::nd_offset<std::size_t>(start + lr + lr_counter, left_NR, rc_copy)] = val;
+                        for (auto rct_copy = rct; rct_copy < rct_end; ++rct_copy) {
+                            const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(rct_copy, right_NC, lr_counter)];
+                            output[sanisizer::nd_offset<std::size_t>(start + lr + lr_counter, left_NR, rct_copy)] = val;
                         }
                     }
-                    rc = rc_end;
+                    rct = rct_end;
                 }
 
                 lr += lr_num;

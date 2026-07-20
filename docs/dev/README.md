@@ -23,3 +23,15 @@ In such cases, we will allocate a per-thread block of memory to store the tempor
 (See https://github.com/tatami-inc/test-false_sharing, where per-thread allocations are pretty good at avoiding false sharing.) 
 Then, once the final result is available, it is written once to the output array.
 The risk of false sharing in this final write is no worse than the scenario described above where we deliberately ignore false sharing.
+
+## Blocked transposition
+
+Some algorithms require transposition to move temporary results into the output array.
+We use a block strategy where we transpose a small submatrix that fits into cache.
+The dimensions of the blocks used for transposition are loosely based on the dimensions of the blocks used in the [multiplication](dense-blocking.md),
+but we make sure that we use square submatrices, i.e., $B$-by-$B$ instead of $B$-by-$C$.
+
+This decision is motivated by the fact that $C$ is intended to refer to the faster-changing dimension.
+However, during transposition, $C$ would go along the slower-changing dimension.
+The submatrix would consist of $C$ non-contiguous memory segments and their associated cache lines.
+If the extra usage from the cache lines is comparable to $B$, the actual memory usage may be much higher than $BC$, possibly exceeding the size of the L1 cache.
