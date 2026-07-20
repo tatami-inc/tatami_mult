@@ -225,17 +225,17 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>                    cd = cd_end;</div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>                }</div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>                <span class="comment">// Doing a blocked transposition to write to the output array.</span></div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>                RightIndex_ rc = 0;</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>                <span class="keywordflow">while</span> (rc &lt; right_NC) {</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>                    <span class="keyword">const</span> RightIndex_ rc_end = rc + sanisizer::min(options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseRowWithDenseRowMatrixToColumnOutputOptions.html#a6b041c08d59aaf818417e359d44eaca0">secondary_block_size</a>, right_NC - rc);</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>                <span class="comment">// Transposition using square blocks of the smaller (primary) block size.</span></div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>                RightIndex_ rct = 0;</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>                <span class="keywordflow">while</span> (rct &lt; right_NC) {</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>                    <span class="keyword">const</span> RightIndex_ rct_end = rct + sanisizer::min(options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseRowWithDenseRowMatrixToColumnOutputOptions.html#a58e62011aa56788c563ec019ecfc4283">primary_block_size</a>, right_NC - rct);</div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>                    <span class="keywordflow">for</span> (LeftIndex_ lr_counter = 0; lr_counter &lt; lr_num; ++lr_counter) {</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>                        <span class="keywordflow">for</span> (<span class="keyword">auto</span> rc_copy = rc; rc_copy &lt; rc_end; ++rc_copy) {</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>                            <span class="keyword">const</span> <span class="keyword">auto</span> val = tmp_output[sanisizer::nd_offset&lt;std::size_t&gt;(rc_copy, right_NC, lr_counter)];</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>                            output[sanisizer::nd_offset&lt;std::size_t&gt;(start + lr + lr_counter, left_NR, rc_copy)] = val;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>                        <span class="keywordflow">for</span> (<span class="keyword">auto</span> rct_copy = rct; rct_copy &lt; rct_end; ++rct_copy) {</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>                            <span class="keyword">const</span> <span class="keyword">auto</span> val = tmp_output[sanisizer::nd_offset&lt;std::size_t&gt;(rct_copy, right_NC, lr_counter)];</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>                            output[sanisizer::nd_offset&lt;std::size_t&gt;(start + lr + lr_counter, left_NR, rct_copy)] = val;</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>                        }</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>                    }</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>                    rc = rc_end;</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>                    rct = rct_end;</div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>                }</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>                lr += lr_num;</div>
