@@ -47,6 +47,9 @@ struct MultiplyDenseRowWithDenseColumnMatrixToColumnOutputOptions {
 };
 
 /**
+ * This function will iterate over `left`, realizing rows into memory as needed.
+ * It will also realize all of `right` into memory for fast repeated accesses.
+ *
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam LeftValue_ Numeric type of the LHS matrix value.

@@ -78,6 +78,10 @@ inline void set_sparse_block_size(MultiplyDenseColumnWithSparseMatrixOptions& op
  * `multiply_dense_column_with_sparse_column_matrix_to_column_output()`,
  * depending on the properties of `right` and the choice of `output_row_major`.
  *
+ * This function will iterate over `left`, realizing columns into memory as needed.
+ * It may either simultaneously iterate over `right` or realize all of `right` into memory for fast repeated accesses,
+ * depending on the choice of delegated function.
+ *
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
  * @tparam RightValue_ Numeric type of the RHS matrix value.

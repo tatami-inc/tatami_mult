@@ -95,6 +95,10 @@ inline void set_sparse_block_size(MultiplyWithDenseMatrixOptions& options, int b
  * `multiply_dense_row_with_dense_matrix()`, or
  * `multiply_dense_column_with_dense_matrix()`,
  * depending on the properties of `left`.
+ *
+ * This function will iterate over `left`, realizing rows/columns into memory as needed.
+ * It may either simultaneously iterate over `right` or realize all of `right` into memory for fast repeated accesses,
+ * depending on the choice of delegated function.
  * 
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.

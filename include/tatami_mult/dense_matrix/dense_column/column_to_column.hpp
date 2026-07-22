@@ -48,12 +48,15 @@ struct MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions {
 };
 
 /**
+ * This function will iterate over `left`, realizing columns into memory as needed.
+ * It will also realize all of `right` into memory for fast repeated accesses.
+ *
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
  * @tparam RightValue_ Numeric type of the RHS matrix value.
  * @tparam RightIndex_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
- * 
+ *
  * @param left LHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
  * @param right RHS matrix to be multiplied.

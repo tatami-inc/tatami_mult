@@ -48,6 +48,9 @@ struct MultiplyDenseRowWithDenseRowMatrixToColumnOutputOptions {
 };
 
 /**
+ * This function will iterate over `left`, realizing rows into memory as needed.
+ * It will also realize all of `right` into memory for fast repeated accesses.
+ *
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
  * @tparam RightValue_ Numeric type of the RHS matrix value.

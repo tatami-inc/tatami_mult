@@ -40,6 +40,8 @@ struct MultiplyDenseColumnWithSparseRowMatrixToRowOutputOptions {
 };
 
 /**
+ * This function will iterate over both `left` and `right` simultaneously, realizing columns and rows respectively into memory as needed.
+ *
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
  * @tparam RightValue_ Numeric type of the RHS matrix value.
