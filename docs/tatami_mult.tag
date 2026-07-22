@@ -392,7 +392,11 @@
     <name>tatami_mult.hpp</name>
     <path>tatami_mult/</path>
     <filename>tatami__mult_8hpp.html</filename>
-    <class kind="struct">tatami_mult::Options</class>
+    <includes id="single__vector_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">single_vector/dispatch.hpp</includes>
+    <includes id="multiple__vectors_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">multiple_vectors/dispatch.hpp</includes>
+    <includes id="dense__matrix_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_matrix/dispatch.hpp</includes>
+    <includes id="sparse__matrix_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_matrix/dispatch.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyWithMatrixOptions</class>
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="struct">
@@ -1374,6 +1378,31 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>tatami_mult::MultiplyWithMatrixOptions</name>
+    <filename>structtatami__mult_1_1MultiplyWithMatrixOptions.html</filename>
+    <member kind="variable">
+      <type>MultiplyWithDenseMatrixOptions</type>
+      <name>dense_matrix</name>
+      <anchorfile>structtatami__mult_1_1MultiplyWithMatrixOptions.html</anchorfile>
+      <anchor>a84143686b3be5e75e62ce2be1322fd34</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>MultiplyWithSparseMatrixOptions</type>
+      <name>sparse_matrix</name>
+      <anchorfile>structtatami__mult_1_1MultiplyWithMatrixOptions.html</anchorfile>
+      <anchor>a6afc063eaaaf3c8a950c7705a56be08f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>bool</type>
+      <name>larger_left</name>
+      <anchorfile>structtatami__mult_1_1MultiplyWithMatrixOptions.html</anchorfile>
+      <anchor>ac3af02a215bf6e566b8a4bfee43ac4c6</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>tatami_mult::MultiplyWithMultipleVectorsOptions</name>
     <filename>structtatami__mult_1_1MultiplyWithMultipleVectorsOptions.html</filename>
     <member kind="variable">
@@ -1469,31 +1498,6 @@
       <arglist></arglist>
     </member>
   </compound>
-  <compound kind="struct">
-    <name>tatami_mult::Options</name>
-    <filename>structtatami__mult_1_1Options.html</filename>
-    <member kind="variable">
-      <type>int</type>
-      <name>num_threads</name>
-      <anchorfile>structtatami__mult_1_1Options.html</anchorfile>
-      <anchor>a5ea4a8dc6044006b4f64846429b9bbe8</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>bool</type>
-      <name>prefer_larger</name>
-      <anchorfile>structtatami__mult_1_1Options.html</anchorfile>
-      <anchor>a03e0813cf53e087dc9112f91b670c1af</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>bool</type>
-      <name>column_major_output</name>
-      <anchorfile>structtatami__mult_1_1Options.html</anchorfile>
-      <anchor>aaeda08a655cfd0b8ed4366aac50c1abb</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
   <compound kind="namespace">
     <name>tatami_mult</name>
     <filename>namespacetatami__mult.html</filename>
@@ -1547,10 +1551,10 @@
     <class kind="struct">tatami_mult::MultiplySparseRowWithSparseRowMatrixToColumnOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplySparseRowWithSparseRowMatrixToRowOutputOptions</class>
     <class kind="struct">tatami_mult::MultiplyWithDenseMatrixOptions</class>
+    <class kind="struct">tatami_mult::MultiplyWithMatrixOptions</class>
     <class kind="struct">tatami_mult::MultiplyWithMultipleVectorsOptions</class>
     <class kind="struct">tatami_mult::MultiplyWithSingleVectorOptions</class>
     <class kind="struct">tatami_mult::MultiplyWithSparseMatrixOptions</class>
-    <class kind="struct">tatami_mult::Options</class>
     <member kind="function">
       <type>void</type>
       <name>multiply_dense_column_with_dense_column_matrix_to_column_output</name>
@@ -2127,38 +2131,38 @@
     </member>
     <member kind="function">
       <type>void</type>
-      <name>multiply</name>
+      <name>set_num_threads</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a7eb0e957877357d3f3fdf106b7b1c0c3</anchor>
-      <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *right, Output_ *output, const Options &amp;opt)</arglist>
+      <anchor>a931d41a42f9f05abea6a480220c1a403</anchor>
+      <arglist>(MultiplyWithMatrixOptions &amp;options, int num_threads)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>multiply</name>
+      <name>set_dense_primary_block_size</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a22b5ef50f3b28580216ed5b6d434dde0</anchor>
-      <arglist>(const Left_ *left, const tatami::Matrix&lt; Value_, Index_ &gt; &amp;right, Output_ *output, const Options &amp;opt)</arglist>
+      <anchor>a7829df817d9e90372eb8a3b9cce61d47</anchor>
+      <arglist>(MultiplyWithMatrixOptions &amp;options, int primary_block_size)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>multiply</name>
+      <name>set_dense_secondary_block_size</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a546ba58cf2b39a6d651c11570d839d5d</anchor>
-      <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const std::vector&lt; Right_ * &gt; &amp;right, const std::vector&lt; Output_ * &gt; &amp;output, const Options &amp;opt)</arglist>
+      <anchor>a607ed806cc7a50fae39a397b828df934</anchor>
+      <arglist>(MultiplyWithMatrixOptions &amp;options, int secondary_block_size)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>multiply</name>
+      <name>set_sparse_block_size</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a99dc6ea4d7c53f0d0ca78c9e884fe572</anchor>
-      <arglist>(const std::vector&lt; Left_ * &gt; &amp;left, const tatami::Matrix&lt; Value_, Index_ &gt; &amp;right, const std::vector&lt; Output_ * &gt; &amp;output, const Options &amp;opt)</arglist>
+      <anchor>a0462457369855c38619a22c68c27cc8c</anchor>
+      <arglist>(MultiplyWithMatrixOptions &amp;options, int block_size)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>multiply</name>
+      <name>multiply_with_matrix</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>ad5560680ed15301d2446e333c8cd9c56</anchor>
-      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *output, const Options &amp;opt)</arglist>
+      <anchor>a53b27c59a9797a5b2ffafe98c7e58b1b</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const bool output_row_major, const MultiplyWithMatrixOptions &amp;options)</arglist>
     </member>
   </compound>
   <compound kind="page">

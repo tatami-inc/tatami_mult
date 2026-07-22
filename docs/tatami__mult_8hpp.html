@@ -107,10 +107,10 @@ $(function(){ initResizable(false); });
 
 <p>Multiplication of <b>tatami</b> matrices.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;dense_row.hpp&quot;</code><br />
-<code>#include &quot;sparse_row.hpp&quot;</code><br />
-<code>#include &quot;dense_column.hpp&quot;</code><br />
-<code>#include &quot;sparse_column.hpp&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="single__vector_2dispatch_8hpp_source.html">single_vector/dispatch.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="multiple__vectors_2dispatch_8hpp_source.html">multiple_vectors/dispatch.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="dense__matrix_2dispatch_8hpp_source.html">dense_matrix/dispatch.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="sparse__matrix_2dispatch_8hpp_source.html">sparse_matrix/dispatch.hpp</a>&quot;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 <code>#include &quot;<a class="elRef" href="https://tatami-inc.github.io/tatami/tatami_8hpp.html">tatami/tatami.hpp</a>&quot;</code><br />
 <code>#include &quot;sanisizer/sanisizer.hpp&quot;</code><br />
@@ -119,8 +119,8 @@ $(function(){ initResizable(false); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtatami__mult_1_1Options.html">tatami_mult::Options</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> for <code><a class="el" href="namespacetatami__mult.html#a7eb0e957877357d3f3fdf106b7b1c0c3">multiply()</a></code>.  <a href="structtatami__mult_1_1Options.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">tatami_mult::MultiplyWithMatrixOptions</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for <code><a class="el" href="namespacetatami__mult.html#a53b27c59a9797a5b2ffafe98c7e58b1b">multiply_with_matrix()</a></code>.  <a href="structtatami__mult_1_1MultiplyWithMatrixOptions.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
@@ -131,21 +131,17 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7eb0e957877357d3f3fdf106b7b1c0c3" id="r_a7eb0e957877357d3f3fdf106b7b1c0c3"><td class="memTemplParams" colspan="2">template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a7eb0e957877357d3f3fdf106b7b1c0c3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a7eb0e957877357d3f3fdf106b7b1c0c3">tatami_mult::multiply</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;left, const Right_ *right, Output_ *output, const <a class="el" href="structtatami__mult_1_1Options.html">Options</a> &amp;opt)</td></tr>
-<tr class="separator:a7eb0e957877357d3f3fdf106b7b1c0c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22b5ef50f3b28580216ed5b6d434dde0" id="r_a22b5ef50f3b28580216ed5b6d434dde0"><td class="memTemplParams" colspan="2">template&lt;typename Left_ , typename Value_ , typename Index_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a22b5ef50f3b28580216ed5b6d434dde0"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a22b5ef50f3b28580216ed5b6d434dde0">tatami_mult::multiply</a> (const Left_ *left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;right, Output_ *output, const <a class="el" href="structtatami__mult_1_1Options.html">Options</a> &amp;opt)</td></tr>
-<tr class="separator:a22b5ef50f3b28580216ed5b6d434dde0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a546ba58cf2b39a6d651c11570d839d5d" id="r_a546ba58cf2b39a6d651c11570d839d5d"><td class="memTemplParams" colspan="2">template&lt;typename Value_ , typename Index_ , typename Right_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a546ba58cf2b39a6d651c11570d839d5d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a546ba58cf2b39a6d651c11570d839d5d">tatami_mult::multiply</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;left, const std::vector&lt; Right_ * &gt; &amp;right, const std::vector&lt; Output_ * &gt; &amp;output, const <a class="el" href="structtatami__mult_1_1Options.html">Options</a> &amp;opt)</td></tr>
-<tr class="separator:a546ba58cf2b39a6d651c11570d839d5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99dc6ea4d7c53f0d0ca78c9e884fe572" id="r_a99dc6ea4d7c53f0d0ca78c9e884fe572"><td class="memTemplParams" colspan="2">template&lt;typename Left_ , typename Value_ , typename Index_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:a99dc6ea4d7c53f0d0ca78c9e884fe572"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a99dc6ea4d7c53f0d0ca78c9e884fe572">tatami_mult::multiply</a> (const std::vector&lt; Left_ * &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; Value_, Index_ &gt; &amp;right, const std::vector&lt; Output_ * &gt; &amp;output, const <a class="el" href="structtatami__mult_1_1Options.html">Options</a> &amp;opt)</td></tr>
-<tr class="separator:a99dc6ea4d7c53f0d0ca78c9e884fe572"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5560680ed15301d2446e333c8cd9c56" id="r_ad5560680ed15301d2446e333c8cd9c56"><td class="memTemplParams" colspan="2">template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
-<tr class="memitem:ad5560680ed15301d2446e333c8cd9c56"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#ad5560680ed15301d2446e333c8cd9c56">tatami_mult::multiply</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *output, const <a class="el" href="structtatami__mult_1_1Options.html">Options</a> &amp;opt)</td></tr>
-<tr class="separator:ad5560680ed15301d2446e333c8cd9c56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a931d41a42f9f05abea6a480220c1a403" id="r_a931d41a42f9f05abea6a480220c1a403"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a931d41a42f9f05abea6a480220c1a403">tatami_mult::set_num_threads</a> (<a class="el" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">MultiplyWithMatrixOptions</a> &amp;options, int num_threads)</td></tr>
+<tr class="separator:a931d41a42f9f05abea6a480220c1a403"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7829df817d9e90372eb8a3b9cce61d47" id="r_a7829df817d9e90372eb8a3b9cce61d47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a7829df817d9e90372eb8a3b9cce61d47">tatami_mult::set_dense_primary_block_size</a> (<a class="el" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">MultiplyWithMatrixOptions</a> &amp;options, int primary_block_size)</td></tr>
+<tr class="separator:a7829df817d9e90372eb8a3b9cce61d47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a607ed806cc7a50fae39a397b828df934" id="r_a607ed806cc7a50fae39a397b828df934"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a607ed806cc7a50fae39a397b828df934">tatami_mult::set_dense_secondary_block_size</a> (<a class="el" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">MultiplyWithMatrixOptions</a> &amp;options, int secondary_block_size)</td></tr>
+<tr class="separator:a607ed806cc7a50fae39a397b828df934"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0462457369855c38619a22c68c27cc8c" id="r_a0462457369855c38619a22c68c27cc8c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a0462457369855c38619a22c68c27cc8c">tatami_mult::set_sparse_block_size</a> (<a class="el" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">MultiplyWithMatrixOptions</a> &amp;options, int block_size)</td></tr>
+<tr class="separator:a0462457369855c38619a22c68c27cc8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53b27c59a9797a5b2ffafe98c7e58b1b" id="r_a53b27c59a9797a5b2ffafe98c7e58b1b"><td class="memTemplParams" colspan="2">template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , typename RightIndex_ , typename Output_ &gt; </td></tr>
+<tr class="memitem:a53b27c59a9797a5b2ffafe98c7e58b1b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetatami__mult.html#a53b27c59a9797a5b2ffafe98c7e58b1b">tatami_mult::multiply_with_matrix</a> (const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const <a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a>&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const bool output_row_major, const <a class="el" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">MultiplyWithMatrixOptions</a> &amp;options)</td></tr>
+<tr class="separator:a53b27c59a9797a5b2ffafe98c7e58b1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Multiplication of <b>tatami</b> matrices. </p>

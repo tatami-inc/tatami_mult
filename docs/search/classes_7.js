@@ -53,9 +53,10 @@ var searchData=
   ['multiplysparserowwithsparserowmatrixtocolumnoutputoptions_50',['MultiplySparseRowWithSparseRowMatrixToColumnOutputOptions',['../structtatami__mult_1_1MultiplySparseRowWithSparseRowMatrixToColumnOutputOptions.html',1,'tatami_mult']]],
   ['multiplysparserowwithsparserowmatrixtorowoutputoptions_51',['MultiplySparseRowWithSparseRowMatrixToRowOutputOptions',['../structtatami__mult_1_1MultiplySparseRowWithSparseRowMatrixToRowOutputOptions.html',1,'tatami_mult']]],
   ['multiplywithdensematrixoptions_52',['MultiplyWithDenseMatrixOptions',['../structtatami__mult_1_1MultiplyWithDenseMatrixOptions.html',1,'tatami_mult']]],
-  ['multiplywithmultiplevectorsoptions_53',['MultiplyWithMultipleVectorsOptions',['../structtatami__mult_1_1MultiplyWithMultipleVectorsOptions.html',1,'tatami_mult']]],
-  ['multiplywithsinglevectoroptions_54',['MultiplyWithSingleVectorOptions',['../structtatami__mult_1_1MultiplyWithSingleVectorOptions.html',1,'tatami_mult']]],
-  ['multiplywithsparsematrixoptions_55',['MultiplyWithSparseMatrixOptions',['../structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html',1,'tatami_mult']]],
-  ['myopicdenseextractor_56',['MyopicDenseExtractor',['https://tatami-inc.github.io/tatami/classtatami_1_1MyopicDenseExtractor.html',1,'tatami']]],
-  ['myopicsparseextractor_57',['MyopicSparseExtractor',['https://tatami-inc.github.io/tatami/classtatami_1_1MyopicSparseExtractor.html',1,'tatami']]]
+  ['multiplywithmatrixoptions_53',['MultiplyWithMatrixOptions',['../structtatami__mult_1_1MultiplyWithMatrixOptions.html',1,'tatami_mult']]],
+  ['multiplywithmultiplevectorsoptions_54',['MultiplyWithMultipleVectorsOptions',['../structtatami__mult_1_1MultiplyWithMultipleVectorsOptions.html',1,'tatami_mult']]],
+  ['multiplywithsinglevectoroptions_55',['MultiplyWithSingleVectorOptions',['../structtatami__mult_1_1MultiplyWithSingleVectorOptions.html',1,'tatami_mult']]],
+  ['multiplywithsparsematrixoptions_56',['MultiplyWithSparseMatrixOptions',['../structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html',1,'tatami_mult']]],
+  ['myopicdenseextractor_57',['MyopicDenseExtractor',['https://tatami-inc.github.io/tatami/classtatami_1_1MyopicDenseExtractor.html',1,'tatami']]],
+  ['myopicsparseextractor_58',['MyopicSparseExtractor',['https://tatami-inc.github.io/tatami/classtatami_1_1MyopicSparseExtractor.html',1,'tatami']]]
 ];

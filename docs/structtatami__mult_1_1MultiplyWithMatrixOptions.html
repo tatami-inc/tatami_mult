@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.12.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>tatami_mult: tatami_mult::Options Struct Reference</title>
+<title>tatami_mult: tatami_mult::MultiplyWithMatrixOptions Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -92,77 +92,78 @@ $(function(){ initResizable(false); });
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespacetatami__mult.html">tatami_mult</a></li><li class="navelem"><a class="el" href="structtatami__mult_1_1Options.html">Options</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacetatami__mult.html">tatami_mult</a></li><li class="navelem"><a class="el" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">MultiplyWithMatrixOptions</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div id="doc-content">
 <div class="header">
   <div class="summary">
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structtatami__mult_1_1Options-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">tatami_mult::Options Struct Reference</div></div>
+<a href="structtatami__mult_1_1MultiplyWithMatrixOptions-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">tatami_mult::MultiplyWithMatrixOptions Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> for <code><a class="el" href="namespacetatami__mult.html#a7eb0e957877357d3f3fdf106b7b1c0c3">multiply()</a></code>.  
+<p>Options for <code><a class="el" href="namespacetatami__mult.html#a53b27c59a9797a5b2ffafe98c7e58b1b">multiply_with_matrix()</a></code>.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="tatami__mult_8hpp_source.html">tatami_mult.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a5ea4a8dc6044006b4f64846429b9bbe8" id="r_a5ea4a8dc6044006b4f64846429b9bbe8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ea4a8dc6044006b4f64846429b9bbe8">num_threads</a> = 1</td></tr>
-<tr class="separator:a5ea4a8dc6044006b4f64846429b9bbe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03e0813cf53e087dc9112f91b670c1af" id="r_a03e0813cf53e087dc9112f91b670c1af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03e0813cf53e087dc9112f91b670c1af">prefer_larger</a> = true</td></tr>
-<tr class="separator:a03e0813cf53e087dc9112f91b670c1af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaeda08a655cfd0b8ed4366aac50c1abb" id="r_aaeda08a655cfd0b8ed4366aac50c1abb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaeda08a655cfd0b8ed4366aac50c1abb">column_major_output</a> = true</td></tr>
-<tr class="separator:aaeda08a655cfd0b8ed4366aac50c1abb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84143686b3be5e75e62ce2be1322fd34" id="r_a84143686b3be5e75e62ce2be1322fd34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtatami__mult_1_1MultiplyWithDenseMatrixOptions.html">MultiplyWithDenseMatrixOptions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84143686b3be5e75e62ce2be1322fd34">dense_matrix</a></td></tr>
+<tr class="separator:a84143686b3be5e75e62ce2be1322fd34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6afc063eaaaf3c8a950c7705a56be08f" id="r_a6afc063eaaaf3c8a950c7705a56be08f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6afc063eaaaf3c8a950c7705a56be08f">sparse_matrix</a></td></tr>
+<tr class="separator:a6afc063eaaaf3c8a950c7705a56be08f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3af02a215bf6e566b8a4bfee43ac4c6" id="r_ac3af02a215bf6e566b8a4bfee43ac4c6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3af02a215bf6e566b8a4bfee43ac4c6">larger_left</a> = true</td></tr>
+<tr class="separator:ac3af02a215bf6e566b8a4bfee43ac4c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="structtatami__mult_1_1Options.html" title="Options for multiply().">Options</a> for <code><a class="el" href="namespacetatami__mult.html#a7eb0e957877357d3f3fdf106b7b1c0c3">multiply()</a></code>. </p>
+<div class="textblock"><p>Options for <code><a class="el" href="namespacetatami__mult.html#a53b27c59a9797a5b2ffafe98c7e58b1b">multiply_with_matrix()</a></code>. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="aaeda08a655cfd0b8ed4366aac50c1abb" name="aaeda08a655cfd0b8ed4366aac50c1abb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaeda08a655cfd0b8ed4366aac50c1abb">&#9670;&#160;</a></span>column_major_output</h2>
+<a id="a84143686b3be5e75e62ce2be1322fd34" name="a84143686b3be5e75e62ce2be1322fd34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84143686b3be5e75e62ce2be1322fd34">&#9670;&#160;</a></span>dense_matrix</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool tatami_mult::Options::column_major_output = true</td>
+          <td class="memname"><a class="el" href="structtatami__mult_1_1MultiplyWithDenseMatrixOptions.html">MultiplyWithDenseMatrixOptions</a> tatami_mult::MultiplyWithMatrixOptions::dense_matrix</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Whether to save the product as a column-major matrix in <code>output</code>, for the <code><a class="el" href="namespacetatami__mult.html#a7eb0e957877357d3f3fdf106b7b1c0c3">multiply()</a></code> overload that accepts two <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code> objects. If false, the product is instead saved as a row-major matrix. </p>
+<p>Options to pass to <code>multiply_row_with_dense_matrix()</code>, if <code>right</code> is a dense matrix that prefers row access. </p>
 
 </div>
 </div>
-<a id="a5ea4a8dc6044006b4f64846429b9bbe8" name="a5ea4a8dc6044006b4f64846429b9bbe8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ea4a8dc6044006b4f64846429b9bbe8">&#9670;&#160;</a></span>num_threads</h2>
+<a id="ac3af02a215bf6e566b8a4bfee43ac4c6" name="ac3af02a215bf6e566b8a4bfee43ac4c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3af02a215bf6e566b8a4bfee43ac4c6">&#9670;&#160;</a></span>larger_left</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int tatami_mult::Options::num_threads = 1</td>
+          <td class="memname">bool tatami_mult::MultiplyWithMatrixOptions::larger_left = true</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Number of threads to use, for parallelization via <code><a class="elRef" href="https://tatami-inc.github.io/tatami/namespacetatami.html#a9c3979c60e3d7e066be533f7ee3a2f97">tatami::parallelize()</a></code>. </p>
+<p>Whether to set the larger matrix as the LHS matrix in the delegated functions. If <code>right</code> is larger, we transpose and swap <code>left</code> and <code>right</code> prior to calling the delegated functions. This ensures that we only pass over the larger matrix once while potentially passing through the smaller matrix multiple times. The result does not change though the delegated function will now be chosen based on the transposed <code>left</code>.</p>
+<p>If this is false (or <code>right</code> is already smaller), the multiplication is performed exactly with the supplied left and right matrices. </p>
 
 </div>
 </div>
-<a id="a03e0813cf53e087dc9112f91b670c1af" name="a03e0813cf53e087dc9112f91b670c1af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03e0813cf53e087dc9112f91b670c1af">&#9670;&#160;</a></span>prefer_larger</h2>
+<a id="a6afc063eaaaf3c8a950c7705a56be08f" name="a6afc063eaaaf3c8a950c7705a56be08f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6afc063eaaaf3c8a950c7705a56be08f">&#9670;&#160;</a></span>sparse_matrix</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool tatami_mult::Options::prefer_larger = true</td>
+          <td class="memname"><a class="el" href="structtatami__mult_1_1MultiplyWithSparseMatrixOptions.html">MultiplyWithSparseMatrixOptions</a> tatami_mult::MultiplyWithMatrixOptions::sparse_matrix</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Whether to iterate over the preferred dimension of the larger matrix, for the <code><a class="el" href="namespacetatami__mult.html#a7eb0e957877357d3f3fdf106b7b1c0c3">multiply()</a></code> overload that accepts two <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code> objects. This organizes the multiplication so that it only passes over the larger matrix once, while passing through the other matrix multiple times. If false, the multiplication is performed with the supplied left and right matrices. </p>
+<p>Options to pass to <code>multiply_row_with_sparse_matrix()</code>, if <code>right</code> is a sparse matrix that prefers row access. </p>
 
 </div>
 </div>
