@@ -45,6 +45,12 @@ TEST(SingleVectorDispatch, Vector) {
         EXPECT_FLOAT_EQ(drout[r], srout[r]);
         EXPECT_FLOAT_EQ(drout[r], scout[r]);
     }
+
+    // Checking the transpose.
+    std::vector<double> trout(NR);
+    auto transposed = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NR, dump);
+    tatami_mult::multiply_with_single_vector(rhs.data(), *transposed, trout.data(), {});
+    EXPECT_EQ(trout, drout);
 }
 
 TEST(SingleVectorDispatch, Options) {

@@ -61,9 +61,9 @@ inline void set_num_threads(MultiplyWithSingleVectorOptions& options, int num_th
  * 
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Value_ Numeric type of the LHS matrix value.
+ * @tparam Index_ Integer type of the LHS matrix index.
+ * @tparam Right_ Numeric type of the RHS vector. 
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -93,6 +93,33 @@ void multiply_with_single_vector(
             multiply_dense_column_with_single_vector(left, right, output, options.dense_column);
         }
     }
+}
+
+/**
+ * Overload that wraps `right` in a `tatami::DelayedTranspose` and calls `multiply_with_single_vector()`.
+ * 
+ * @tparam accumulators_ Number of accumulators for computing the dot product,
+ * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
+ * @tparam Right_ Numeric type of the LHS vector. 
+ * @tparam Value_ Numeric type of the RHS matrix value.
+ * @tparam Index_ Integer type of the RHS matrix index.
+ * @tparam Output_ Numeric type of the output array.
+ * 
+ * @param[in] left Pointer to an array of length equal to the number of rows of `right`, containing the LHS vector.
+ * @param right RHS matrix to be multiplied.
+ * @param[out] output Pointer to an array of length equal to the number of columns of `right`.
+ * On output, this stores the product `t(left) * right`.
+ * @param options Further options.
+ */
+template<std::size_t accumulators_ = 4, typename Left_, typename Value_, typename Index_, typename Output_>
+void multiply_with_single_vector(
+    const Left_* const left,
+    const tatami::Matrix<Value_, Index_>& right,
+    Output_* const output,
+    const MultiplyWithSingleVectorOptions& options
+) {
+    auto tright = tatami::make_DelayedTranspose(tatami::wrap_shared_ptr(&right));
+    multiply_with_single_vector<accumulators_>(*tright, left, output, options);
 }
 
 }

@@ -98,14 +98,14 @@ inline void set_sparse_block_size(MultiplyWithMultipleVectorsOptions& options, i
  *
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Value_ Numeric type of the LHS matrix value.
+ * @tparam Index_ Integer type of the LHS matrix index.
+ * @tparam Right_ Numeric type of the RHS vectors.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
  * @param[in] right Vector of pointers, each of which points to an array of length `left.ncol()`.
- * Each entry contains a vector with which to multiply `left`.
+ * Each entry contains a RHS vector with which to multiply `left`.
  * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
  * On output, the `i`-th entry stores the product `left * right[i]`.
  * @param options Further options.
@@ -130,6 +130,41 @@ void multiply_with_multiple_vectors(
             multiply_dense_column_with_multiple_vectors(left, right, output, options.dense_column);
         }
     }
+}
+
+/**
+ * Overload that wraps `right` in a `tatami::DelayedTranspose` and calls `multiply_with_multiple_vectors()`.
+ * 
+ * @tparam accumulators_ Number of accumulators for computing the dot product,
+ * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
+ * @tparam Left_ Numeric type of the LHS vectors. 
+ * @tparam Value_ Numeric type of the RHS matrix value.
+ * @tparam Index_ Integer type of the RHS matrix index.
+ * @tparam Output_ Numeric type of the output array.
+ * 
+ * @param[in] left Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * Each entry contains a vector with which to multiply `left`.
+ * @param right RHS matrix to be multiplied.
+ * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * On output, the `i`-th entry stores the product `left * right[i]`.
+ * @param options Further options.
+
+ * @param[in] left Vector of pointers, each of which points to an array of length `right.nrow()`.
+ * Each entry contains a LHS vector with which to multiply `right`.
+ * @param right RHS matrix to be multiplied.
+ * @param[out] output Pointer to an array of length equal to the number of columns of `right`.
+ * On output, the `i`-th entry stores the product `t(left[i]) * right`.
+ * @param options Further options.
+ */
+template<std::size_t accumulators_ = 4, typename Left_, typename Value_, typename Index_, typename Output_>
+void multiply_with_multiple_vectors(
+    const std::vector<Left_*>& left,
+    const tatami::Matrix<Value_, Index_>& right,
+    const std::vector<Output_*>& output,
+    const MultiplyWithMultipleVectorsOptions& options
+) {
+    auto tright = tatami::make_DelayedTranspose(tatami::wrap_shared_ptr(&right));
+    multiply_with_multiple_vectors<accumulators_>(*tright, left, output, options);
 }
 
 }

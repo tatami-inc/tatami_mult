@@ -63,6 +63,14 @@ TEST(MultipleVectorsDispatch, Basic) {
             EXPECT_FLOAT_EQ(ref, sc_output[h][r]);
         }
     }
+
+    // Checking the transpose.
+    std::vector<std::vector<double> > tr_output;
+    auto transposed = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NR, dump);
+    tatami_mult::multiply_with_multiple_vectors(rhs_ptrs, *transposed, formulate_ptrs(tr_output), {});
+    for (int h = 0; h < NRHS; ++h) {
+        EXPECT_EQ(tr_output[h], dr_output[h]);
+    }
 }
 
 TEST(MultipleVectorsDispatch, Options) {
