@@ -5,18 +5,11 @@
 #include <array>
 #include <numeric>
 
+#include "utils.hpp"
+
 namespace tatami_mult {
 
-// Force unrolling to avoid relying on optimizer decisions.
-// For example, older versions of GCC won't unroll at -O2, so we need to do it ourselves if we don't want a run-time nested loop.
-// Fortunately, compilers will stil auto-vectorize a manually-unrolled loop, so this won't be a pessimisation in the long term.
-template<std::size_t accumulators_, std::size_t counter_ = 0, class ValueIterator_, class IndexIterator_, typename Dense_, typename Output_>
-void unrolled_sparse_dot_product(const std::size_t idx, ValueIterator_ vptr, IndexIterator_ iptr, Dense_ dense, std::array<Output_, accumulators_>& dots) {
-    dots[counter_] += static_cast<Output_>(dense[*(iptr + idx + counter_)]) * static_cast<Output_>(*(vptr + idx + counter_));
-    if constexpr(counter_ + 1 < accumulators_) {
-        unrolled_sparse_dot_product<accumulators_, counter_ + 1>(idx, vptr, iptr, dense, dots);
-    }
-}
+// See comments in dense_dot_product.hpp for implementation decisions.
 
 template<std::size_t accumulators_, class ValueIterator_, class IndexIterator_, typename Dense_, typename Output_>
 Output_ sparse_dot_product(const std::size_t num_non_zeros, ValueIterator_ vptr, IndexIterator_ iptr, Dense_ dense, Output_ initial) {
@@ -32,25 +25,19 @@ Output_ sparse_dot_product(const std::size_t num_non_zeros, ValueIterator_ vptr,
         const std::size_t cycles = num_non_zeros / accumulators_;
         const std::size_t remainder = num_non_zeros % accumulators_;
 
-        // See comments in dense_dot_product.hpp about why we skip peeling.
-
         for (std::size_t c = 0; c < cycles; ++c) {
-            unrolled_sparse_dot_product(
-                c * accumulators_, // must be less than 'num_non_zeros' and thus must fit into a size_t.
-                vptr,
-                iptr,
-                dense,
-                dots
-            );
+            for (std::size_t a = 0; a < accumulators_; ++a) {
+                const std::size_t idx = c * accumulators_ + a;
+                dots[a] += static_cast<Output_>(dense[*(iptr + idx)]) * static_cast<Output_>(*(vptr + idx));
+            }
         }
 
-        // Keep adding to 'dots' to provide more opportunities for auto-vectorization.
         for (std::size_t i = 0; i < remainder; ++i) {
             const auto idx = cycles * accumulators_ + i;
-            dots[i] += dense[*(iptr + idx)] * *(vptr + idx);
+            initial += dense[*(iptr + idx)] * *(vptr + idx);
         }
 
-        return std::accumulate(dots.begin(), dots.end(), initial);
+        return initial + recursive_sum(dots);
     }
 }
 

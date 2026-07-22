@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <vector>
 #include <cassert>
+#include <array>
 
 #include "tatami/tatami.hpp"
 #include "sanisizer/sanisizer.hpp"
@@ -12,6 +13,27 @@ namespace tatami_mult {
 
 template<typename Input_>
 using I = std::remove_cv_t<std::remove_reference_t<Input_> >;
+
+// Mathematically equivalent to std::accumulate but reorders summations for greater instruction-level parallelism.
+template<std::size_t width_>
+double recursive_sum(std::array<double, width_>& dots) {
+    if constexpr(width_ == 1) {
+        return dots[0];
+    } else if constexpr(width_ == 2) {
+        return dots[0] + dots[1];
+    } else {
+        constexpr auto half_width = width_ / 2;
+        std::array<double, half_width> tmp;
+        for (std::size_t s = 0; s < half_width; ++s) { // Increase potential for vectorization.
+            tmp[s] = dots[s] + dots[s + half_width];
+        }
+        if constexpr(width_ % 2 == 1) {
+            return recursive_sum<width_ / 2>(tmp) + dots[width_ - 1];
+        } else {
+            return recursive_sum<width_ / 2>(tmp);
+        }
+    }
+}
 
 template<typename Index_>
 struct FetchNonEmptySparseBlockInfo {

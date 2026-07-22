@@ -41,3 +41,32 @@ INSTANTIATE_TEST_SUITE_P(
     DenseDotProductTest,
     ::testing::Values(1, 3, 4, 5, 51, 120, 130, 141) // check multiples and non-multiples of 4.
 );
+
+TEST(RecursiveSum, Basic) {
+    // Non-powers of 2.
+    {
+        std::array<double, 10> sums{1,2,3,4,5,6,7,8,9,10};
+        EXPECT_EQ(tatami_mult::recursive_sum(sums), std::accumulate(sums.begin(), sums.end(), 0.0));
+    }
+
+    {
+        std::array<double, 3> sums{11,12,13};
+        EXPECT_EQ(tatami_mult::recursive_sum(sums), std::accumulate(sums.begin(), sums.end(), 0.0));
+    }
+
+    // Powers of 2.
+    {
+        std::array<double, 2> sums{11,12};
+        EXPECT_EQ(tatami_mult::recursive_sum(sums), std::accumulate(sums.begin(), sums.end(), 0.0));
+    }
+
+    {
+        std::array<double, 4> sums{5,6,7,8};
+        EXPECT_EQ(tatami_mult::recursive_sum(sums), std::accumulate(sums.begin(), sums.end(), 0.0));
+    }
+
+    {
+        std::array<double, 8> sums{5,6,7,8,9,10,11,12};
+        EXPECT_EQ(tatami_mult::recursive_sum(sums), std::accumulate(sums.begin(), sums.end(), 0.0));
+    }
+}
