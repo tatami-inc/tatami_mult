@@ -28,6 +28,14 @@ protected:
         sparse_row = tatami::convert_to_compressed_sparse(dense_row.get(), true);
         sparse_column = tatami::convert_to_compressed_sparse(dense_row.get(), false);
     }
+
+    std::vector<double*> populate_pointers(std::vector<double>& src, std::size_t stride, std::size_t num) {
+        std::vector<double*> output(num);
+        for (std::size_t i = 0; i < num; ++i) {
+            output[i] = src.data() + i * stride;
+        }
+        return output;
+    }
 };
 
 TEST_F(OverlordTest, RightVector) {
@@ -45,15 +53,18 @@ TEST_F(OverlordTest, RightVector) {
 
     std::vector<double> output_dc(NR);
     tatami_mult::multiply(*dense_column, vec.data(), output_dc.data(), opt);
-    expect_almost_equal(output_dr, output_dc);
 
     std::vector<double> output_sr(NR);
     tatami_mult::multiply(*sparse_row, vec.data(), output_sr.data(), opt);
-    expect_almost_equal(output_dr, output_sr);
 
     std::vector<double> output_sc(NR);
     tatami_mult::multiply(*sparse_column, vec.data(), output_sc.data(), opt);
-    expect_almost_equal(output_dr, output_sc);
+
+    for (std::size_t r = 0; r < NR; ++r) {
+        EXPECT_FLOAT_EQ(output_dr[r], output_sc[r]);
+        EXPECT_FLOAT_EQ(output_dr[r], output_dc[r]);
+        EXPECT_FLOAT_EQ(output_dr[r], output_sr[r]);
+    }
 }
 
 TEST_F(OverlordTest, LeftVector) {
@@ -71,15 +82,18 @@ TEST_F(OverlordTest, LeftVector) {
 
     std::vector<double> output_dc(NC);
     tatami_mult::multiply(vec.data(), *dense_column, output_dc.data(), opt);
-    expect_almost_equal(output_dr, output_dc);
 
     std::vector<double> output_sr(NC);
     tatami_mult::multiply(vec.data(), *sparse_row, output_sr.data(), opt);
-    expect_almost_equal(output_dr, output_sr);
 
     std::vector<double> output_sc(NC);
     tatami_mult::multiply(vec.data(), *sparse_column, output_sc.data(), opt);
-    expect_almost_equal(output_dr, output_sc);
+
+    for (std::size_t c = 0; c < NC; ++c) {
+        EXPECT_FLOAT_EQ(output_dr[c], output_sc[c]);
+        EXPECT_FLOAT_EQ(output_dr[c], output_dc[c]);
+        EXPECT_FLOAT_EQ(output_dr[c], output_sr[c]);
+    }
 }
 
 TEST_F(OverlordTest, RightVectors) {
@@ -93,7 +107,8 @@ TEST_F(OverlordTest, RightVectors) {
     auto vec_ptrs = populate_pointers(vec, NC, 5);
     tatami_mult::Options opt;
 
-    std::vector<double> ref(NR * 5);
+    const std::size_t full_size = NR * 5; 
+    std::vector<double> ref(full_size);
     {
         auto ref_ptrs = populate_pointers(ref, NR, 5);
         for (size_t i = 0; i < ref_ptrs.size(); ++i) {
@@ -101,21 +116,24 @@ TEST_F(OverlordTest, RightVectors) {
         }
     }
 
-    std::vector<double> output_dr(NR * 5);
+    std::vector<double> output_dr(full_size);
     tatami_mult::multiply(*dense_row, vec_ptrs, populate_pointers(output_dr, NR, 5), opt);
-    expect_almost_equal(ref, output_dr);
 
-    std::vector<double> output_dc(NR * 5);
+    std::vector<double> output_dc(full_size);
     tatami_mult::multiply(*dense_column, vec_ptrs, populate_pointers(output_dc, NR, 5), opt);
-    expect_almost_equal(ref, output_dc);
 
-    std::vector<double> output_sr(NR * 5);
+    std::vector<double> output_sr(full_size);
     tatami_mult::multiply(*sparse_row, vec_ptrs, populate_pointers(output_sr, NR, 5), opt);
-    expect_almost_equal(ref, output_sr);
 
-    std::vector<double> output_sc(NR * 5);
+    std::vector<double> output_sc(full_size);
     tatami_mult::multiply(*sparse_column, vec_ptrs, populate_pointers(output_sc, NR, 5), opt);
-    expect_almost_equal(ref, output_sc);
+
+    for (std::size_t f = 0; f < full_size; ++f) {
+        EXPECT_FLOAT_EQ(ref[f], output_dr[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_dc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sr[f]);
+    }
 }
 
 TEST_F(OverlordTest, LeftVectors) {
@@ -129,7 +147,8 @@ TEST_F(OverlordTest, LeftVectors) {
     auto vec_ptrs = populate_pointers(vec, NR, 5);
     tatami_mult::Options opt;
 
-    std::vector<double> ref(NC * 5);
+    const std::size_t full_size = NC * 5; 
+    std::vector<double> ref(full_size);
     {
         auto ref_ptrs = populate_pointers(ref, NC, 5);
         for (size_t i = 0; i < ref_ptrs.size(); ++i) {
@@ -137,21 +156,24 @@ TEST_F(OverlordTest, LeftVectors) {
         }
     }
 
-    std::vector<double> output_dr(NC * 5);
+    std::vector<double> output_dr(full_size);
     tatami_mult::multiply(vec_ptrs, *dense_row, populate_pointers(output_dr, NC, 5), opt);
-    expect_almost_equal(ref, output_dr);
 
-    std::vector<double> output_dc(NC * 5);
+    std::vector<double> output_dc(full_size);
     tatami_mult::multiply(vec_ptrs, *dense_column, populate_pointers(output_dc, NC, 5), opt);
-    expect_almost_equal(ref, output_dc);
 
-    std::vector<double> output_sr(NC * 5);
+    std::vector<double> output_sr(full_size);
     tatami_mult::multiply(vec_ptrs, *sparse_row, populate_pointers(output_sr, NC, 5), opt);
-    expect_almost_equal(ref, output_sr);
 
-    std::vector<double> output_sc(NC * 5);
+    std::vector<double> output_sc(full_size);
     tatami_mult::multiply(vec_ptrs, *sparse_column, populate_pointers(output_sc, NC, 5), opt);
-    expect_almost_equal(ref, output_sc);
+
+    for (std::size_t f = 0; f < full_size; ++f) {
+        EXPECT_FLOAT_EQ(ref[f], output_dr[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_dc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sr[f]);
+    }
 }
 
 TEST_F(OverlordTest, RightMatrixDense) {
@@ -168,24 +190,28 @@ TEST_F(OverlordTest, RightMatrixDense) {
     tatami_mult::Options opt;
     opt.prefer_larger = false;
 
-    std::vector<double> ref(NR * 5);
+    const std::size_t full_size = NR * 5; 
+    std::vector<double> ref(full_size);
     tatami_mult::multiply(*dense_row, populate_pointers(vec, NC, 5), populate_pointers(ref, NR, 5), opt);
 
-    std::vector<double> output_dr(NR * 5);
+    std::vector<double> output_dr(full_size);
     tatami_mult::multiply(*dense_row, *rhs, output_dr.data(), opt);
-    expect_almost_equal(ref, output_dr);
 
-    std::vector<double> output_dc(NR * 5);
+    std::vector<double> output_dc(full_size);
     tatami_mult::multiply(*dense_column, *rhs, output_dc.data(), opt);
-    expect_almost_equal(ref, output_dc);
 
-    std::vector<double> output_sr(NR * 5);
+    std::vector<double> output_sr(full_size);
     tatami_mult::multiply(*sparse_row, *rhs, output_sr.data(), opt);
-    expect_almost_equal(ref, output_sr);
 
-    std::vector<double> output_sc(NR * 5);
+    std::vector<double> output_sc(full_size);
     tatami_mult::multiply(*sparse_column, *rhs, output_sc.data(), opt);
-    expect_almost_equal(ref, output_sc);
+
+    for (std::size_t f = 0; f < full_size; ++f) {
+        EXPECT_FLOAT_EQ(ref[f], output_dr[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_dc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sr[f]);
+    }
 }
 
 TEST_F(OverlordTest, LeftMatrixDense) {
@@ -202,26 +228,30 @@ TEST_F(OverlordTest, LeftMatrixDense) {
     tatami_mult::Options opt;
     opt.prefer_larger = false;
 
-    std::vector<double> tref(NC * 5);
+    const std::size_t full_size = NR * 5; 
+    std::vector<double> tref(full_size);
     tatami_mult::multiply(populate_pointers(vec, NR, 5), *dense_row, populate_pointers(tref, NC, 5), opt);
-    std::vector<double> ref(NC * 5); 
+    std::vector<double> ref(full_size); 
     tatami::transpose(tref.data(), 5, NC, ref.data()); // need to transpose back to column-major for comparison.
 
-    std::vector<double> output_dr(NC * 5);
+    std::vector<double> output_dr(full_size);
     tatami_mult::multiply(*lhs, *dense_row, output_dr.data(), opt);
-    expect_almost_equal(ref, output_dr);
 
-    std::vector<double> output_dc(NC * 5);
+    std::vector<double> output_dc(full_size);
     tatami_mult::multiply(*lhs, *dense_column, output_dc.data(), opt);
-    expect_almost_equal(ref, output_dc);
 
-    std::vector<double> output_sr(NC * 5);
+    std::vector<double> output_sr(full_size);
     tatami_mult::multiply(*lhs, *sparse_row, output_sr.data(), opt);
-    expect_almost_equal(ref, output_sr);
 
-    std::vector<double> output_sc(NC * 5);
+    std::vector<double> output_sc(full_size);
     tatami_mult::multiply(*lhs, *sparse_column, output_sc.data(), opt);
-    expect_almost_equal(ref, output_sc);
+
+    for (std::size_t f = 0; f < full_size; ++f) {
+        EXPECT_FLOAT_EQ(ref[f], output_dr[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_dc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sr[f]);
+    }
 }
 
 TEST_F(OverlordTest, RightMatrixSparse) {
@@ -243,24 +273,28 @@ TEST_F(OverlordTest, RightMatrixSparse) {
     tatami_mult::Options opt;
     opt.prefer_larger = false;
 
-    std::vector<double> ref(NR * 5);
+    const std::size_t full_size = NR * 5; 
+    std::vector<double> ref(full_size);
     tatami_mult::multiply(*dense_row, populate_pointers(vec, NC, 5), populate_pointers(ref, NR, 5), opt);
 
-    std::vector<double> output_dr(NR * 5);
+    std::vector<double> output_dr(full_size);
     tatami_mult::multiply(*dense_row, *rhs, output_dr.data(), opt);
-    expect_almost_equal(ref, output_dr);
 
-    std::vector<double> output_dc(NR * 5);
+    std::vector<double> output_dc(full_size);
     tatami_mult::multiply(*dense_column, *rhs, output_dc.data(), opt);
-    expect_almost_equal(ref, output_dc);
 
-    std::vector<double> output_sr(NR * 5);
+    std::vector<double> output_sr(full_size);
     tatami_mult::multiply(*sparse_row, *rhs, output_sr.data(), opt);
-    expect_almost_equal(ref, output_sr);
 
-    std::vector<double> output_sc(NR * 5);
+    std::vector<double> output_sc(full_size);
     tatami_mult::multiply(*sparse_column, *rhs, output_sc.data(), opt);
-    expect_almost_equal(ref, output_sc);
+
+    for (std::size_t f = 0; f < full_size; ++f) {
+        EXPECT_FLOAT_EQ(ref[f], output_dr[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_dc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sr[f]);
+    }
 }
 
 TEST_F(OverlordTest, LeftMatrixSparse) {
@@ -282,26 +316,30 @@ TEST_F(OverlordTest, LeftMatrixSparse) {
     tatami_mult::Options opt;
     opt.prefer_larger = false;
 
+    const std::size_t full_size = NC * 5; 
     std::vector<double> tref(NC * 5);
     tatami_mult::multiply(populate_pointers(vec, NR, 5), *dense_row, populate_pointers(tref, NC, 5), opt);
-    std::vector<double> ref(NC * 5);
+    std::vector<double> ref(full_size);
     tatami::transpose(tref.data(), 5, NC, ref.data()); // need to transpose back to column-major for comparison.
 
-    std::vector<double> output_dr(NC * 5);
+    std::vector<double> output_dr(full_size);
     tatami_mult::multiply(*lhs, *dense_row, output_dr.data(), opt);
-    expect_almost_equal(ref, output_dr);
 
-    std::vector<double> output_dc(NC * 5);
+    std::vector<double> output_dc(full_size);
     tatami_mult::multiply(*lhs, *dense_column, output_dc.data(), opt);
-    expect_almost_equal(ref, output_dc);
 
-    std::vector<double> output_sr(NC * 5);
+    std::vector<double> output_sr(full_size);
     tatami_mult::multiply(*lhs, *sparse_row, output_sr.data(), opt);
-    expect_almost_equal(ref, output_sr);
 
-    std::vector<double> output_sc(NC * 5);
+    std::vector<double> output_sc(full_size);
     tatami_mult::multiply(*lhs, *sparse_column, output_sc.data(), opt);
-    expect_almost_equal(ref, output_sc);
+
+    for (std::size_t f = 0; f < full_size; ++f) {
+        EXPECT_FLOAT_EQ(ref[f], output_dr[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_dc[f]);
+        EXPECT_FLOAT_EQ(ref[f], output_sr[f]);
+    }
 }
 
 TEST_F(OverlordTest, MatrixOptions) {
@@ -319,16 +357,19 @@ TEST_F(OverlordTest, MatrixOptions) {
 
     tatami_mult::Options opt;
     opt.prefer_larger = false;
-    std::vector<double> ref(NC * 5);
+    const std::size_t full_size = NC * 5; 
+    std::vector<double> ref(full_size);
     tatami_mult::multiply(*lhs, *dense_row, ref.data(), opt);
 
     // Checking that the switch is done correctly when we allow it to choose the iteration order.
     {
         tatami_mult::Options opt;
         opt.prefer_larger = true;
-        std::vector<double> out(NC * 5);
+        std::vector<double> out(full_size);
         tatami_mult::multiply(*lhs, *dense_row, out.data(), opt);
-        expect_almost_equal(ref, out);
+        for (std::size_t f = 0; f < full_size; ++f) {
+            EXPECT_FLOAT_EQ(ref[f], out[f]);
+        }
     }
 
     // Checking that we can save in row-major order.
@@ -336,21 +377,42 @@ TEST_F(OverlordTest, MatrixOptions) {
         tatami_mult::Options opt;
         opt.prefer_larger = false;
         opt.column_major_output = false;
-        std::vector<double> tout(NC * 5);
+        std::vector<double> tout(full_size);
         tatami_mult::multiply(*lhs, *dense_row, tout.data(), opt);
-        std::vector<double> out(NC * 5);
+        std::vector<double> out(full_size);
         tatami::transpose(tout.data(), 5, NC, out.data());
-        expect_almost_equal(ref, out);
+        for (std::size_t f = 0; f < full_size; ++f) {
+            EXPECT_FLOAT_EQ(ref[f], out[f]);
+        }
     }
 
     // Checking that we can save in row-major order, combined with automatic choice of iteration order.
     {
         tatami_mult::Options opt;
         opt.column_major_output = false;
-        std::vector<double> tout(NC * 5);
+        std::vector<double> tout(full_size);
         tatami_mult::multiply(*lhs, *dense_row, tout.data(), opt);
-        std::vector<double> out(NC * 5);
+        std::vector<double> out(full_size);
         tatami::transpose(tout.data(), 5, NC, out.data());
-        expect_almost_equal(ref, out);
+        for (std::size_t f = 0; f < full_size; ++f) {
+            EXPECT_FLOAT_EQ(ref[f], out[f]);
+        }
     }
+}
+
+TEST(MultiplyMatrix, Options) {
+    tatami_mult::MultiplyWithMatrixOptions opt;
+    tatami_mult::set_num_threads(opt, 13);
+    EXPECT_EQ(opt.dense_matrix.dense_row.column_to_column.num_threads, 13);
+    EXPECT_EQ(opt.sparse_matrix.dense_row.column_to_column.num_threads, 13);
+
+    tatami_mult::set_dense_primary_block_size(opt, 100);
+    EXPECT_EQ(opt.dense_matrix.dense_row.column_to_column.primary_block_size, 100);
+
+    tatami_mult::set_dense_secondary_block_size(opt, 55);
+    EXPECT_EQ(opt.dense_matrix.dense_row.column_to_column.secondary_block_size, 55);
+
+    tatami_mult::set_sparse_block_size(opt, 100);
+    EXPECT_EQ(opt.dense_matrix.sparse_row.column_to_column.block_size, 100);
+    EXPECT_EQ(opt.sparse_matrix.sparse_row.column_to_column.block_size, 100);
 }

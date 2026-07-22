@@ -30,6 +30,7 @@ add_executable(
     src/sparse_matrix/sparse_row/dispatch.cpp
     src/sparse_matrix/sparse_column/dispatch.cpp
     src/sparse_matrix/dispatch.cpp
+    src/tatami_mult.cpp
 )
 
 target_link_libraries(
