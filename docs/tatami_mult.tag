@@ -1847,6 +1847,13 @@
     </member>
     <member kind="function">
       <type>void</type>
+      <name>multiply_with_multiple_vectors</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a9681283419f4cdaf6682f3936d395bff</anchor>
+      <arglist>(const std::vector&lt; Left_ * &gt; &amp;left, const tatami::Matrix&lt; Value_, Index_ &gt; &amp;right, const std::vector&lt; Output_ * &gt; &amp;output, const MultiplyWithMultipleVectorsOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
       <name>multiply_sparse_column_with_multiple_vectors</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
       <anchor>a4d8821f903a298a86b75637cef841e0b</anchor>
@@ -1886,6 +1893,13 @@
       <anchorfile>namespacetatami__mult.html</anchorfile>
       <anchor>a9ec69e790a06fc05841e696a0344089c</anchor>
       <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const MultiplyWithSingleVectorOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_with_single_vector</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a5cdc7816e6946e7cb1fbc010c83f6896</anchor>
+      <arglist>(const Left_ *const left, const tatami::Matrix&lt; Value_, Index_ &gt; &amp;right, Output_ *const output, const MultiplyWithSingleVectorOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
