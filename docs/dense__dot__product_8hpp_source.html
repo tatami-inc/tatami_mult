@@ -107,21 +107,21 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;array&gt;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;numeric&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="foldopen" id="foldopen00008" data-start="{" data-end="}">
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html">    8</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetatami__mult.html">tatami_mult</a> {</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;utils.hpp&quot;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">// Force unrolling to avoid relying on optimizer decisions.</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">// For example, older versions of GCC won&#39;t unroll at -O2, so we need to do it ourselves if we don&#39;t want a run-time nested loop.</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// Fortunately, compilers will stil auto-vectorize a manually-unrolled loop, so this won&#39;t be a pessimisation in the long term.</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> counter_ = 0, <span class="keyword">class</span> Iterator1_, <span class="keyword">class</span> Iterator2_, <span class="keyword">typename</span> Output_, std::<span class="keywordtype">size_t</span> accumulators_&gt;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keywordtype">void</span> unrolled_dense_dot_product(<span class="keyword">const</span> std::size_t idx, Iterator1_ start1, Iterator2_ start2, std::array&lt;Output_, accumulators_&gt;&amp; dots) {</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    dots[counter_] += <span class="keyword">static_cast&lt;</span>Output_<span class="keyword">&gt;</span>(*(start1 + idx + counter_)) * <span class="keyword">static_cast&lt;</span>Output_<span class="keyword">&gt;</span>(*(start2 + idx + counter_));</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span>(counter_ + 1 &lt; accumulators_) {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        unrolled_dense_dot_product&lt;counter_ + 1&gt;(idx, start1, start2, dots);</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    }</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>}</div>
+<div class="foldopen" id="foldopen00010" data-start="{" data-end="}">
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html">   10</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetatami__mult.html">tatami_mult</a> {</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// Check out https://github.com/tatami-inc/test-multiplication/blob/master/other/accumulators for implementation choices.</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">//</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">// In particular, we trust compiler to the appropriate amount of unrolling.</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">// Note that this doesn&#39;t happen at -O2 with older GCCs, but I still don&#39;t want to manually unroll;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// I want the compiler to be able to decide to do partial unrolling if there are too many accumulators.</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">//</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// We don&#39;t do any peeling or vectorization of the epilogue loop</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// as these don&#39;t seem to provide any benefit and are sometimes worse at higher numbers of accumulators.</span></div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> accumulators_, <span class="keyword">class</span> Iterator1_, <span class="keyword">class</span> Iterator2_, <span class="keyword">typename</span> Output_&gt;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> accumulators_, <span class="keyword">typename</span> Iterator1_, <span class="keyword">typename</span> Iterator2_, <span class="keyword">typename</span> Output_&gt;</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>Output_ dense_dot_product(<span class="keyword">const</span> std::size_t len, Iterator1_ start1, Iterator2_ start2, Output_ initial) {</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keywordflow">if</span> <span class="keyword">constexpr</span>(accumulators_ == 1) {</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        Output_ dot = initial;</div>
@@ -135,41 +135,27 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>        <span class="keyword">const</span> std::size_t remainder = len % accumulators_;</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>        std::array&lt;Output_, accumulators_&gt; dots{};</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        <span class="comment">// One might think to create a peeling iteration to initialize the array with the first cycle of the dot products, like:</span></div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        <span class="comment">// </span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        <span class="comment">// for (std::size_t i = 0; i &lt; accumulators_; ++i) {</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>        <span class="comment">//     dots[i] = *(start1 + i) * *(start2 + i);</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        <span class="comment">// }</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        <span class="comment">// counter = accumulators_;</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="comment">// </span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="comment">// and setting c = 1 below, which saves us one set of additions.</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        <span class="comment">// But when I test this out, this seems to be no better, and indeed, a slight pessimisation for len ~= 200.</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="comment">// I would guess that the time saved by skipping the addition is offset by the increased size of the program.</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordflow">for</span> (std::size_t c = 0; c &lt; cycles; ++c) {</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            unrolled_dense_dot_product(</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                c * accumulators_, <span class="comment">// this is less than &#39;len&#39; and so must fit in a std::size_t.</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>                start1,</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                start2,</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                dots</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>            );</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        }</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        <span class="comment">// Keep adding to &#39;dots&#39; to provide more opportunities for auto-vectorization.</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; remainder; ++i) {</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            <span class="keyword">const</span> <span class="keyword">auto</span> idx = cycles * accumulators_ + i;</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>            dots[i] += *(start1 + idx) * *(start2 + idx);</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        }</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>        <span class="keywordflow">return</span> std::accumulate(dots.begin(), dots.end(), initial);</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    }</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>}</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>}</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>        <span class="keywordflow">for</span> (std::size_t c = 0; c &lt; cycles; ++c) {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>            <span class="keywordflow">for</span> (std::size_t a = 0; a &lt; accumulators_; ++a) {</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                <span class="keyword">const</span> std::size_t idx = c * accumulators_ + a;;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                dots[a] += <span class="keyword">static_cast&lt;</span>Output_<span class="keyword">&gt;</span>(*(start1 + idx)) * <span class="keyword">static_cast&lt;</span>Output_<span class="keyword">&gt;</span>(*(start2 + idx));</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>            }</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        }</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; remainder; ++i) {</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>            <span class="keyword">const</span> <span class="keyword">auto</span> idx = cycles * accumulators_ + i;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>            initial += <span class="keyword">static_cast&lt;</span>Output_<span class="keyword">&gt;</span>(*(start1 + idx)) * <span class="keyword">static_cast&lt;</span>Output_<span class="keyword">&gt;</span>(*(start2 + idx));</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        }</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>        <span class="keywordflow">return</span> initial + recursive_sum(dots);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    }</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>}</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>}</div>
 </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="anamespacetatami__mult_html"><div class="ttname"><a href="namespacetatami__mult.html">tatami_mult</a></div><div class="ttdoc">Multiplication of tatami matrices.</div><div class="ttdef"><b>Definition</b> dense_dot_product.hpp:8</div></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="anamespacetatami__mult_html"><div class="ttname"><a href="namespacetatami__mult.html">tatami_mult</a></div><div class="ttdoc">Multiplication of tatami matrices.</div><div class="ttdef"><b>Definition</b> dense_dot_product.hpp:10</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
