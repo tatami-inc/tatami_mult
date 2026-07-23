@@ -46,7 +46,7 @@ var searchData=
   ['multiply_5fsparse_5fcolumn_5fwith_5fdense_5frow_5fmatrix_5fto_5fcolumn_5foutput_43',['multiply_sparse_column_with_dense_row_matrix_to_column_output',['../namespacetatami__mult.html#a4d3e29358034f9329411a948767f19ef',1,'tatami_mult']]],
   ['multiply_5fsparse_5fcolumn_5fwith_5fdense_5frow_5fmatrix_5fto_5frow_5foutput_44',['multiply_sparse_column_with_dense_row_matrix_to_row_output',['../namespacetatami__mult.html#a6cb6fdd3ad11731aa8d19be674a14084',1,'tatami_mult']]],
   ['multiply_5fsparse_5fcolumn_5fwith_5fmultiple_5fvectors_45',['multiply_sparse_column_with_multiple_vectors',['../namespacetatami__mult.html#a4d8821f903a298a86b75637cef841e0b',1,'tatami_mult']]],
-  ['multiply_5fsparse_5fcolumn_5fwith_5fsingle_5fvector_46',['multiply_sparse_column_with_single_vector',['../namespacetatami__mult.html#a863215db9e5aa2d2821575616b4ab7ca',1,'tatami_mult']]],
+  ['multiply_5fsparse_5fcolumn_5fwith_5fsingle_5fvector_46',['multiply_sparse_column_with_single_vector',['../namespacetatami__mult.html#acbb165c2b1a64ffbf37935fc588f71d5',1,'tatami_mult']]],
   ['multiply_5fsparse_5fcolumn_5fwith_5fsparse_5fcolumn_5fmatrix_5fto_5fcolumn_5foutput_47',['multiply_sparse_column_with_sparse_column_matrix_to_column_output',['../namespacetatami__mult.html#acd9319d196a08d8a9552b4669ec7c54c',1,'tatami_mult']]],
   ['multiply_5fsparse_5fcolumn_5fwith_5fsparse_5fcolumn_5fmatrix_5fto_5frow_5foutput_48',['multiply_sparse_column_with_sparse_column_matrix_to_row_output',['../namespacetatami__mult.html#ae11ce0d592ab76e72847588cd3786df7',1,'tatami_mult']]],
   ['multiply_5fsparse_5fcolumn_5fwith_5fsparse_5fmatrix_49',['multiply_sparse_column_with_sparse_matrix',['../namespacetatami__mult.html#acfa047954b47181499a9e29f2324fe2f',1,'tatami_mult']]],

@@ -115,9 +115,11 @@ Quick start</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Store the matrix-vector product in &#39;output&#39;.</span></div>
 <div class="line">std::vector&lt;double&gt; output(mat.nrow());</div>
-<div class="line">tatami_mult::Options opt;</div>
-<div class="line">tatami_mult::multiply(*mat, rhs.data(), output.data(), opt);</div>
+<div class="line"><a class="code hl_struct" href="structtatami__mult_1_1MultiplyWithSingleVectorOptions.html">tatami_mult::MultiplyWithSingleVectorOptions</a> opt;</div>
+<div class="line"><a class="code hl_function" href="namespacetatami__mult.html#a9ec69e790a06fc05841e696a0344089c">tatami_mult::multiply_with_single_vector</a>(*mat, rhs.data(), output.data(), opt);</div>
 <div class="ttc" id="aclasstatami_1_1DenseRowMatrix_html"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1DenseRowMatrix.html">tatami::DenseRowMatrix</a></div></div>
+<div class="ttc" id="anamespacetatami__mult_html_a9ec69e790a06fc05841e696a0344089c"><div class="ttname"><a href="namespacetatami__mult.html#a9ec69e790a06fc05841e696a0344089c">tatami_mult::multiply_with_single_vector</a></div><div class="ttdeci">void multiply_with_single_vector(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const MultiplyWithSingleVectorOptions &amp;options)</div><div class="ttdef"><b>Definition</b> dispatch.hpp:77</div></div>
+<div class="ttc" id="astructtatami__mult_1_1MultiplyWithSingleVectorOptions_html"><div class="ttname"><a href="structtatami__mult_1_1MultiplyWithSingleVectorOptions.html">tatami_mult::MultiplyWithSingleVectorOptions</a></div><div class="ttdoc">Options for multiply_with_single_vector().</div><div class="ttdef"><b>Definition</b> dispatch.hpp:19</div></div>
 <div class="ttc" id="atatami__mult_8hpp_html"><div class="ttname"><a href="tatami__mult_8hpp.html">tatami_mult.hpp</a></div><div class="ttdoc">Multiplication of tatami matrices.</div></div>
 </div><!-- fragment --><p>If multiple vectors are present, we can handle it in a single pass through our matrix:</p>
 <div class="fragment"><div class="line"><span class="comment">// Create multiple LHS vectors.</span></div>
@@ -134,15 +136,40 @@ Quick start</h1>
 <div class="line">    out_ptrs[l] = output[l].data()</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line">tatami_mult::Options opt;</div>
-<div class="line">tatami_mult::multiply(lhs_ptrs, *mat, out_ptrs, opt);</div>
-</div><!-- fragment --><p>With two <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code> objects, <code>multiply()</code> will prefer a single pass through the larger matrix, and will save the product as a column-major array. Both of these behaviors can be modified by changing the settings in <code>Options</code>.</p>
+<div class="line"><a class="code hl_struct" href="structtatami__mult_1_1MultiplyWithMultipleVectorsOptions.html">tatami_mult::MultiplyWithMultipleVectorsOptions</a> opt;</div>
+<div class="line"><a class="code hl_function" href="namespacetatami__mult.html#a2d723822a8058c6169cbbeab20db7f1e">tatami_mult::multiply_with_multiple_vectors</a>(lhs_ptrs, *mat, out_ptrs, opt);</div>
+<div class="ttc" id="anamespacetatami__mult_html_a2d723822a8058c6169cbbeab20db7f1e"><div class="ttname"><a href="namespacetatami__mult.html#a2d723822a8058c6169cbbeab20db7f1e">tatami_mult::multiply_with_multiple_vectors</a></div><div class="ttdeci">void multiply_with_multiple_vectors(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const std::vector&lt; Right_ * &gt; &amp;right, const std::vector&lt; Output_ * &gt; &amp;output, const MultiplyWithMultipleVectorsOptions &amp;options)</div><div class="ttdef"><b>Definition</b> dispatch.hpp:114</div></div>
+<div class="ttc" id="astructtatami__mult_1_1MultiplyWithMultipleVectorsOptions_html"><div class="ttname"><a href="structtatami__mult_1_1MultiplyWithMultipleVectorsOptions.html">tatami_mult::MultiplyWithMultipleVectorsOptions</a></div><div class="ttdoc">Options for multiply_with_multiple_vectors().</div><div class="ttdef"><b>Definition</b> dispatch.hpp:19</div></div>
+</div><!-- fragment --><p>With two <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code> objects, <code>multiply()</code> will prefer a single pass through the larger matrix and will save the product as a column-major array.</p>
 <div class="fragment"><div class="line">std::shared_ptr&lt;tatami::NumericMatrix&gt; mat2(</div>
 <div class="line">    <span class="keyword">new</span> <a class="code hl_classRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1DenseRowMatrix.html">tatami::DenseRowMatrix&lt;double, int&gt;</a>(ncols, 100, vals)</div>
 <div class="line">);</div>
 <div class="line"> </div>
 <div class="line">std::vector&lt;double&gt; output(nrow, 100);</div>
-<div class="line">tatami_mult::multiply(mat, mat2, output.data(), opt);</div>
+<div class="line"><a class="code hl_struct" href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">tatami_mult::MultiplyWithMatrixOptions</a> opt;</div>
+<div class="line"><a class="code hl_function" href="namespacetatami__mult.html#a53b27c59a9797a5b2ffafe98c7e58b1b">tatami_mult::multiply_with_matrix</a>(</div>
+<div class="line">    mat,</div>
+<div class="line">    mat2,</div>
+<div class="line">    output.data(),</div>
+<div class="line">    <span class="comment">/* row-major output = */</span> <span class="keyword">true</span>,</div>
+<div class="line">    opt</div>
+<div class="line">);</div>
+<div class="ttc" id="anamespacetatami__mult_html_a53b27c59a9797a5b2ffafe98c7e58b1b"><div class="ttname"><a href="namespacetatami__mult.html#a53b27c59a9797a5b2ffafe98c7e58b1b">tatami_mult::multiply_with_matrix</a></div><div class="ttdeci">void multiply_with_matrix(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const bool output_row_major, const MultiplyWithMatrixOptions &amp;options)</div><div class="ttdef"><b>Definition</b> tatami_mult.hpp:121</div></div>
+<div class="ttc" id="astructtatami__mult_1_1MultiplyWithMatrixOptions_html"><div class="ttname"><a href="structtatami__mult_1_1MultiplyWithMatrixOptions.html">tatami_mult::MultiplyWithMatrixOptions</a></div><div class="ttdoc">Options for multiply_with_matrix().</div><div class="ttdef"><b>Definition</b> tatami_mult.hpp:28</div></div>
+</div><!-- fragment --><p>We can also tune the behavior of each function via the various <code>*Options</code> classes:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="namespacetatami__mult.html#afc0315685090ef065ece8eb66cec7636">tatami_mult::set_num_threads</a>(opt, 4); <span class="comment">// parallelize with 4 threads.</span></div>
+<div class="line"><a class="code hl_function" href="namespacetatami__mult.html#a3b51efeba00392b2e785aeb064f3c78b">tatami_mult::set_dense_primary_block_size</a>(opt, 8); <span class="comment">// change block dimensions.</span></div>
+<div class="line"><a class="code hl_function" href="namespacetatami__mult.html#a660a7717b54d0d0dd21954d3c321cf76">tatami_mult::set_dense_secondary_block_size</a>(opt, 128); <span class="comment">// change block dimensions.</span></div>
+<div class="line"><a class="code hl_function" href="namespacetatami__mult.html#a53b27c59a9797a5b2ffafe98c7e58b1b">tatami_mult::multiply_with_matrix</a>(</div>
+<div class="line">    mat,</div>
+<div class="line">    mat2,</div>
+<div class="line">    output.data(),</div>
+<div class="line">    <span class="comment">/* row-major output = */</span> <span class="keyword">true</span>,</div>
+<div class="line">    opt</div>
+<div class="line">);</div>
+<div class="ttc" id="anamespacetatami__mult_html_a3b51efeba00392b2e785aeb064f3c78b"><div class="ttname"><a href="namespacetatami__mult.html#a3b51efeba00392b2e785aeb064f3c78b">tatami_mult::set_dense_primary_block_size</a></div><div class="ttdeci">void set_dense_primary_block_size(MultiplyDenseColumnWithDenseMatrixOptions &amp;options, int primary_block_size)</div><div class="ttdef"><b>Definition</b> dispatch.hpp:68</div></div>
+<div class="ttc" id="anamespacetatami__mult_html_a660a7717b54d0d0dd21954d3c321cf76"><div class="ttname"><a href="namespacetatami__mult.html#a660a7717b54d0d0dd21954d3c321cf76">tatami_mult::set_dense_secondary_block_size</a></div><div class="ttdeci">void set_dense_secondary_block_size(MultiplyDenseColumnWithDenseMatrixOptions &amp;options, int secondary_block_size)</div><div class="ttdef"><b>Definition</b> dispatch.hpp:83</div></div>
+<div class="ttc" id="anamespacetatami__mult_html_afc0315685090ef065ece8eb66cec7636"><div class="ttname"><a href="namespacetatami__mult.html#afc0315685090ef065ece8eb66cec7636">tatami_mult::set_num_threads</a></div><div class="ttdeci">void set_num_threads(MultiplyDenseColumnWithDenseMatrixOptions &amp;options, int num_threads)</div><div class="ttdef"><b>Definition</b> dispatch.hpp:54</div></div>
 </div><!-- fragment --><p>Check out the <a href="https://tatami-inc.github.io/tatami_mult">reference documentation</a> for more details.</p>
 <h1><a class="anchor" id="autotoc_md3"></a>
 Building projects</h1>

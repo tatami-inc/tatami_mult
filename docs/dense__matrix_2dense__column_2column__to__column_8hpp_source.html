@@ -113,7 +113,8 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;../utils.hpp&quot;</span></div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;../../utils.hpp&quot;</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetatami__mult.html">tatami_mult</a> {</div>
+<div class="foldopen" id="foldopen00019" data-start="{" data-end="}">
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html">   19</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetatami__mult.html">tatami_mult</a> {</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">/* See https://github.com/tatami-inc/test-multiplication/tree/master/dense_column/dense_matrix</span></div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> * for an explanation of the choice of algorithm.</span></div>
@@ -238,12 +239,13 @@ $(function(){ initResizable(false); });
 </div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span> </div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>}</div>
+</div>
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span> </div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></div></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a1f6fec43d5bae3f831841646bc02377b"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a1f6fec43d5bae3f831841646bc02377b">tatami::Matrix::ncol</a></div><div class="ttdeci">virtual Index_ ncol() const=0</div></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a54fe7b4baf78069d35ff00357a1b6cc6"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a54fe7b4baf78069d35ff00357a1b6cc6">tatami::Matrix::nrow</a></div><div class="ttdeci">virtual Index_ nrow() const=0</div></div>
-<div class="ttc" id="anamespacetatami__mult_html"><div class="ttname"><a href="namespacetatami__mult.html">tatami_mult</a></div><div class="ttdoc">Multiplication of tatami matrices.</div><div class="ttdef"><b>Definition</b> dense_dot_product.hpp:10</div></div>
+<div class="ttc" id="anamespacetatami__mult_html"><div class="ttname"><a href="namespacetatami__mult.html">tatami_mult</a></div><div class="ttdoc">Multiplication of tatami matrices.</div><div class="ttdef"><b>Definition</b> column_to_column.hpp:19</div></div>
 <div class="ttc" id="anamespacetatami__mult_html_af37983f2240af21981c19ca890730f32"><div class="ttname"><a href="namespacetatami__mult.html#af37983f2240af21981c19ca890730f32">tatami_mult::multiply_dense_column_with_dense_column_matrix_to_column_output</a></div><div class="ttdeci">void multiply_dense_column_with_dense_column_matrix_to_column_output(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions &amp;options)</div><div class="ttdef"><b>Definition</b> column_to_column.hpp:70</div></div>
 <div class="ttc" id="anamespacetatami_html_a9c3979c60e3d7e066be533f7ee3a2f97"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/namespacetatami.html#a9c3979c60e3d7e066be533f7ee3a2f97">tatami::parallelize</a></div><div class="ttdeci">int parallelize(Function_ fun, const Index_ tasks, const int workers)</div></div>
 <div class="ttc" id="anamespacetatami_html_ac6d0f6694ab914f57229b925641779d4"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/namespacetatami.html#ac6d0f6694ab914f57229b925641779d4">tatami::cast_Index_to_container_size</a></div><div class="ttdeci">I&lt; decltype(std::declval&lt; Container_ &gt;().size())&gt; cast_Index_to_container_size(const Index_ x)</div></div>
