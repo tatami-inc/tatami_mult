@@ -47,5 +47,9 @@ if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_link_options(libtest PRIVATE --coverage)
 endif()
 
+if (FORCE_COPY)
+    target_compile_definitions(${target} PRIVATE TATAMI_DEBUG_FORCE_COPY=1)
+endif()
+
 include(GoogleTest)
 gtest_discover_tests(libtest)
