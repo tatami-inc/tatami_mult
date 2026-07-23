@@ -34,9 +34,9 @@ struct MultiplyDenseColumnWithSingleVectorOptions {
 };
 
 /**
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Value_ Numeric type of the LHS matrix value.
+ * @tparam Index_ Integer type of the LHS matrix index.
+ * @tparam Right_ Numeric type of the RHS vector. 
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.

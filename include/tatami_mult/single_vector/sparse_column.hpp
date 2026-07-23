@@ -32,9 +32,9 @@ struct MultiplySparseColumnWithSingleVectorOptions {
 };
 
 /**
- * @tparam Value_ Numeric type of the matrix value.
- * @tparam Index_ Integer type of the matrix index.
- * @tparam Right_ Numeric type of the vector on the right hand side.
+ * @tparam Value_ Numeric type of the LHS matrix value.
+ * @tparam Index_ Integer type of the LHS matrix index.
+ * @tparam Right_ Numeric type of the RHS vector. 
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -48,7 +48,7 @@ struct MultiplySparseColumnWithSingleVectorOptions {
 template<typename Value_, typename Index_, typename Right_, typename Output_>
 void multiply_sparse_column_with_single_vector(
     const tatami::Matrix<Value_, Index_>& left,
-    const Right_* const rhs,
+    const Right_* const right,
     Output_* const output,
     const MultiplySparseColumnWithSingleVectorOptions& options
 ) {
@@ -78,7 +78,7 @@ void multiply_sparse_column_with_single_vector(
 
         for (Index_ c = 0; c < length; ++c) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-            const Output_ mult = rhs[start + c];
+            const Output_ mult = right[start + c];
             for (Index_ r = 0; r < range.number; ++r) {
                 optr[range.index[r]] += mult * range.value[r];
             }

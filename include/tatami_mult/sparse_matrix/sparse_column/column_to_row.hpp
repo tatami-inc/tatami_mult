@@ -12,7 +12,7 @@
 #include "../../sparse_dot_product.hpp"
 
 /**
- * @file column_to_column.hpp
+ * @file column_to_row.hpp
  * @brief Sparse column-major LHS, sparse column-major RHS, row-major output.
  */
 

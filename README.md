@@ -26,8 +26,8 @@ std::vector<double> rhs(mat.ncol());
 
 // Store the matrix-vector product in 'output'.
 std::vector<double> output(mat.nrow());
-tatami_mult::Options opt;
-tatami_mult::multiply(*mat, rhs.data(), output.data(), opt);
+tatami_mult::MultiplyWithSingleVectorOptions opt;
+tatami_mult::multiply_with_single_vector(*mat, rhs.data(), output.data(), opt);
 ```
 
 If multiple vectors are present, we can handle it in a single pass through our matrix:
@@ -47,13 +47,11 @@ for (size_t l = 0; l < output.size(); ++l) {
     out_ptrs[l] = output[l].data()
 }
 
-tatami_mult::Options opt;
-tatami_mult::multiply(lhs_ptrs, *mat, out_ptrs, opt);
+tatami_mult::MultiplyWithMultipleVectorsOptions opt;
+tatami_mult::multiply_with_multiple_vectors(lhs_ptrs, *mat, out_ptrs, opt);
 ```
 
-With two `tatami::Matrix` objects, `multiply()` will prefer a single pass through the larger matrix,
-and will save the product as a column-major array.
-Both of these behaviors can be modified by changing the settings in `Options`.
+With two `tatami::Matrix` objects, `multiply()` will prefer a single pass through the larger matrix and will save the product as a column-major array.
 
 ```cpp
 std::shared_ptr<tatami::NumericMatrix> mat2(
@@ -61,7 +59,29 @@ std::shared_ptr<tatami::NumericMatrix> mat2(
 );
 
 std::vector<double> output(nrow, 100);
-tatami_mult::multiply(mat, mat2, output.data(), opt);
+tatami_mult::MultiplyWithMatrixOptions opt;
+tatami_mult::multiply_with_matrix(
+    mat,
+    mat2,
+    output.data(),
+    /* row-major output = */ true,
+    opt
+);
+```
+
+We can also tune the behavior of each function via the various `*Options` classes:
+
+```cpp
+tatami_mult::set_num_threads(opt, 4); // parallelize with 4 threads.
+tatami_mult::set_dense_primary_block_size(opt, 8); // change block dimensions.
+tatami_mult::set_dense_secondary_block_size(opt, 128); // change block dimensions.
+tatami_mult::multiply_with_matrix(
+    mat,
+    mat2,
+    output.data(),
+    /* row-major output = */ true,
+    opt
+);
 ```
 
 Check out the [reference documentation](https://tatami-inc.github.io/tatami_mult) for more details.

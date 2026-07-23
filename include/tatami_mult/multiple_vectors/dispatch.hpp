@@ -142,13 +142,6 @@ void multiply_with_multiple_vectors(
  * @tparam Index_ Integer type of the RHS matrix index.
  * @tparam Output_ Numeric type of the output array.
  * 
- * @param[in] left Vector of pointers, each of which points to an array of length `left.nrow()`.
- * Each entry contains a vector with which to multiply `left`.
- * @param right RHS matrix to be multiplied.
- * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
- * On output, the `i`-th entry stores the product `left * right[i]`.
- * @param options Further options.
-
  * @param[in] left Vector of pointers, each of which points to an array of length `right.nrow()`.
  * Each entry contains a LHS vector with which to multiply `right`.
  * @param right RHS matrix to be multiplied.

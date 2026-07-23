@@ -12,7 +12,7 @@
 #include "../../utils.hpp"
 
 /**
- * @file row_to_row.hpp
+ * @file row_to_column.hpp
  * @brief Sparse row-major LHS, sparse row-major RHS, column-major output.
  */
 
