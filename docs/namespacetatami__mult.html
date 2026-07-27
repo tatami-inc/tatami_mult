@@ -597,7 +597,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightColumns_ ,
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th RHS column of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th column of the RHS matrix. This function should be thread-safe. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right_columns</code>. On output, this contains the matrix product in column-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -708,7 +708,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightColumns_ ,
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th RHS column of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th column of the RHS matrix. This function should be thread-safe. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right_columns</code>. On output, this contains the matrix product in row-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -747,7 +747,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Overload of <code><a class="el" href="#a698c5ec0269d4728e3839a22809d950a">multiply_dense_column_with_dense_column_matrix_to_column_output()</a></code> for a RHS <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code>. This function will iterate over <code>left</code>, realizing columns into memory as needed. It will also realize all of <code>right</code> into memory for fast repeated accesses.</p>
+<p>Overload of <code><a class="el" href="#ad8c7124322bf7cc7a25772d9b94e95b4">multiply_dense_column_with_dense_column_matrix_to_row_output()</a></code> for a RHS <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code>. This function will iterate over <code>left</code>, realizing columns into memory as needed. It will also realize all of <code>right</code> into memory for fast repeated accesses.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
@@ -879,7 +879,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightColumns_ ,
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>LeftIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th RHS row of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>LeftIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th row of the RHS matrix. This function should be thread-safe. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right_columns</code>. On output, this contains the matrix product in column-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -990,7 +990,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightColumns_ ,
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer column access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>RightIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th RHS row of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>RightIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th row of the RHS matrix. This function should be thread-safe. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right.ncol()</code>. On output, this contains the product <code>left * right</code> in row-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -1535,7 +1535,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th RHS column of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th column of the RHS matrix. This function should be thread-safe. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right_columns</code>. On output, this stores the matrix product in column-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -1648,7 +1648,7 @@ template&lt;std::size_t accumulators_ = 4, typename LeftValue_ , typename LeftIn
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th RHS column of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_column</td><td>Function that accepts a <code>RightColumns_</code> in <code>[0, right_columns)</code> and returns a pointer to an array of length <code>left.ncol()</code>. The array referenced by <code>get_right_column(i)</code> represents the <code>i</code>-th column of the RHS matrix. This function should be thread-safe. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right_columns</code>. On output, this stores the matrix product in row-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -1821,7 +1821,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightColumns_ ,
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>LeftIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th RHS row of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>LeftIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th row of the RHS matrix. This function should be thread-safe. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right_columns</code>. On output, this stores the matrix product in column-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
@@ -1932,8 +1932,8 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightColumns_ ,
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">left</td><td>LHS matrix to be multiplied. This function is optimized for dense matrices that prefer row access, but will work with all matrices. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">right_columns</td><td>Number of columns of the RHS matrix to be multiplied. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>LeftIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th RHS row of the RHS matrix. This function should be thread-safe. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right.ncol()</code>. On output, this stores the product of <code>left</code> and <code>right</code> in row-major format. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">get_right_row</td><td>Function that accepts a <code>LeftIndex_</code> in <code>[0, left.ncol())</code> and returns a pointer to an array of length <code>right_columns</code>. The array referenced by <code>get_right_row(i)</code> represents the <code>i</code>-th row of the RHS matrix. This function should be thread-safe. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">output</td><td>Pointer to an array of length equal to <code>left.nrow() * right_columns</code>. On output, this stores the matrix product in row-major format. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">options</td><td>Further options. </td></tr>
   </table>
   </dd>
@@ -1971,7 +1971,7 @@ template&lt;typename LeftValue_ , typename LeftIndex_ , typename RightValue_ , t
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Overload of <code><a class="el" href="#acc636f2ee875c3d1471bc7e8fa148863">multiply_dense_row_with_dense_row_matrix_to_column_output()</a></code> for a RHS <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code>. This function will iterate over <code>left</code>, realizing rows into memory as needed. It will also realize all of <code>right</code> into memory for fast repeated accesses.</p>
+<p>Overload of <code><a class="el" href="#a7c057be8bccd0d94b193c6436c69a7b5">multiply_dense_row_with_dense_row_matrix_to_row_output()</a></code> for a RHS <code><a class="elRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></code>. This function will iterate over <code>left</code>, realizing rows into memory as needed. It will also realize all of <code>right</code> into memory for fast repeated accesses.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">LeftValue_</td><td>Numeric type of the LHS matrix value. </td></tr>
