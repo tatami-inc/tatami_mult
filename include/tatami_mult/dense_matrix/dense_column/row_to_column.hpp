@@ -218,7 +218,7 @@ void multiply_dense_column_with_dense_row_matrix_to_column_output_internal(
  * The array referenced by `get_right_row(i)` represents the `i`-th RHS row of the RHS matrix.
  * This function should be thread-safe.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right_columns`.
- * On output, this contains the matrix product in column-major order.
+ * On output, this contains the matrix product in column-major format.
  * @param options Further options.
  */
 template<typename LeftValue_, typename LeftIndex_, typename RightColumns_, typename GetRightRow_, typename Output_>
