@@ -58,7 +58,7 @@ struct MultiplyDenseColumnWithDenseColumnMatrixToRowOutputOptions {
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
  * @param right_columns Number of columns of the RHS matrix to be multiplied.
  * @param get_right_column Function that accepts a `RightColumns_` in `[0, right_columns)` and returns a pointer to an array of length `left.ncol()`.
- * The array referenced by `get_right_column(i)` represents the `i`-th RHS column of the RHS matrix.
+ * The array referenced by `get_right_column(i)` represents the `i`-th column of the RHS matrix.
  * This function should be thread-safe.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right_columns`.
  * On output, this contains the matrix product in row-major format.
@@ -191,7 +191,7 @@ void multiply_dense_column_with_dense_column_matrix_to_row_output(
 }
 
 /**
- * Overload of `multiply_dense_column_with_dense_column_matrix_to_column_output()` for a RHS `tatami::Matrix`.
+ * Overload of `multiply_dense_column_with_dense_column_matrix_to_row_output()` for a RHS `tatami::Matrix`.
  * This function will iterate over `left`, realizing columns into memory as needed.
  * It will also realize all of `right` into memory for fast repeated accesses.
  *

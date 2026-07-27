@@ -49,7 +49,16 @@ struct MultiplyDenseColumnWithDenseRowMatrixToRowOutputOptions {
 /**
  * @cond
  */
-template<bool is_pointer_, typename RightValue_, typename LeftValue_, typename LeftIndex_, typename RightColumns_, typename RightMatrix_, typename GetRightRow_, typename Output_>
+template<
+    bool is_pointer_,
+    typename RightValue_, // not used if `is_pointer = true`
+    typename LeftValue_,
+    typename LeftIndex_,
+    typename RightColumns_,
+    typename RightMatrix_, // not used if `is_pointer = true`
+    typename GetRightRow_, // not used if `is_pointer = false`
+    typename Output_
+>
 void multiply_dense_column_with_dense_row_matrix_to_row_output_internal(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
     const RightColumns_ right_columns,
@@ -215,7 +224,7 @@ void multiply_dense_column_with_dense_row_matrix_to_row_output_internal(
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
  * @param right_columns Number of columns of the RHS matrix to be multiplied.
  * @param get_right_row Function that accepts a `RightIndex_` in `[0, left.ncol())` and returns a pointer to an array of length `right_columns`.
- * The array referenced by `get_right_row(i)` represents the `i`-th RHS row of the RHS matrix.
+ * The array referenced by `get_right_row(i)` represents the `i`-th row of the RHS matrix.
  * This function should be thread-safe.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
  * On output, this contains the product `left * right` in row-major format.
