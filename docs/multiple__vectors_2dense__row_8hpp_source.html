@@ -262,33 +262,33 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>}</div>
 </div>
 <div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> accumulators_ = 4, <span class="keyword">typename</span> LeftValue_, <span class="keyword">typename</span> LeftIndex_, <span class="keyword">typename</span> RightValue_, <span class="keyword">typename</span> Output_&gt;</div>
-<div class="foldopen" id="foldopen00226" data-start="{" data-end="}">
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html#a5919dfed2311d134bcf16aca4d38d381">  226</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacetatami__mult.html#a2d76eed277d027ca2797ee59dfd54f96">multiply_dense_row_with_multiple_vectors</a>(</div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>    <span class="keyword">const</span> <a class="code hl_classRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix&lt;LeftValue_, LeftIndex_&gt;</a>&amp; left,</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    <span class="keyword">const</span> std::vector&lt;RightValue_*&gt;&amp; right,</div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>    <span class="keyword">const</span> std::vector&lt;Output_*&gt;&amp; output,</div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    <span class="keyword">const</span> <a class="code hl_struct" href="structtatami__mult_1_1MultiplyDenseRowWithMultipleVectorsOptions.html">MultiplyDenseRowWithMultipleVectorsOptions</a>&amp; options</div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>) {</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    <span class="keyword">const</span> <span class="keyword">auto</span> right_vectors = right.size();</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    <span class="keyword">typedef</span> I&lt;<span class="keyword">decltype</span>(right_vectors)&gt; RightVectors;</div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    <a class="code hl_function" href="namespacetatami__mult.html#a2d76eed277d027ca2797ee59dfd54f96">multiply_dense_row_with_multiple_vectors</a>(</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>        left,</div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>        right_vectors,</div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>        [&amp;](<span class="keyword">const</span> RightVectors rc) -&gt; <span class="keyword">const</span> RightValue_* {</div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>            <span class="keywordflow">return</span> right[rc];</div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        },</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        [&amp;](<span class="keyword">const</span> RightVectors rc) -&gt; Output_* {</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>            <span class="keywordflow">return</span> output[rc];</div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        },</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>        options</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>    );</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>}</div>
-</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span> </div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> accumulators_ = 4, <span class="keyword">typename</span> LeftValue_, <span class="keyword">typename</span> LeftIndex_, <span class="keyword">typename</span> RightValue_, <span class="keyword">typename</span> Output_&gt;</div>
+<div class="foldopen" id="foldopen00228" data-start="{" data-end="}">
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html#a5919dfed2311d134bcf16aca4d38d381">  228</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacetatami__mult.html#a2d76eed277d027ca2797ee59dfd54f96">multiply_dense_row_with_multiple_vectors</a>(</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>    <span class="keyword">const</span> <a class="code hl_classRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix&lt;LeftValue_, LeftIndex_&gt;</a>&amp; left,</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    <span class="keyword">const</span> std::vector&lt;RightValue_*&gt;&amp; right,</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <span class="keyword">const</span> std::vector&lt;Output_*&gt;&amp; output,</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    <span class="keyword">const</span> <a class="code hl_struct" href="structtatami__mult_1_1MultiplyDenseRowWithMultipleVectorsOptions.html">MultiplyDenseRowWithMultipleVectorsOptions</a>&amp; options</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>) {</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    <span class="keyword">const</span> <span class="keyword">auto</span> right_vectors = right.size();</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>    <span class="keyword">typedef</span> I&lt;<span class="keyword">decltype</span>(right_vectors)&gt; RightVectors;</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    <a class="code hl_function" href="namespacetatami__mult.html#a2d76eed277d027ca2797ee59dfd54f96">multiply_dense_row_with_multiple_vectors</a>(</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>        left,</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>        right_vectors,</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        [&amp;](<span class="keyword">const</span> RightVectors rc) -&gt; <span class="keyword">const</span> RightValue_* {</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>            <span class="keywordflow">return</span> right[rc];</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        },</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        [&amp;](<span class="keyword">const</span> RightVectors rc) -&gt; Output_* {</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>            <span class="keywordflow">return</span> output[rc];</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>        },</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>        options</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    );</div>
 <div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>}</div>
+</div>
 <div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>}</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></div></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a1f6fec43d5bae3f831841646bc02377b"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a1f6fec43d5bae3f831841646bc02377b">tatami::Matrix::ncol</a></div><div class="ttdeci">virtual Index_ ncol() const=0</div></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a54fe7b4baf78069d35ff00357a1b6cc6"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a54fe7b4baf78069d35ff00357a1b6cc6">tatami::Matrix::nrow</a></div><div class="ttdeci">virtual Index_ nrow() const=0</div></div>
