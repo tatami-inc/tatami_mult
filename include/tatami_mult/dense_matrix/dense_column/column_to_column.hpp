@@ -48,39 +48,36 @@ struct MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions {
 };
 
 /**
- * This function will iterate over `left`, realizing columns into memory as needed.
- * It will also realize all of `right` into memory for fast repeated accesses.
- *
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
- * @tparam RightValue_ Numeric type of the RHS matrix value.
- * @tparam RightIndex_ Integer type of the RHS matrix index.
+ * @tparam RightColumns_ Integer type of the number of RHS columns.
+ * @tparam GetRightColumn_ Functor that accepts a `RightColumns_` and returns a pointer to an RHS column.
  * @tparam Output_ Numeric type of the output array.
  *
  * @param left LHS matrix to be multiplied.
  * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
- * @param right RHS matrix to be multiplied.
- * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
- * The number of rows in `right` should be equal to the number of columns in `left`.
- * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
- * On output, this contains the product `left * right` in column-major format.
+ * @param right_columns Number of columns of the RHS matrix to be multiplied.
+ * @param get_right_column Function that accepts a `RightColumns_` in `[0, right_columns)` and returns a pointer to an array of length `left.ncol()`.
+ * The array referenced by `get_right_column(i)` represents the `i`-th RHS column of the RHS matrix.
+ * This function should be thread-safe.
+ * @param[out] output Pointer to an array of length equal to `left.nrow() * right_columns`.
+ * On output, this contains the matrix product in column-major format.
  * @param options Further options.
  */
-template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+template<typename LeftValue_, typename LeftIndex_, typename RightColumns_, class GetRightColumn_, typename Output_>
 void multiply_dense_column_with_dense_column_matrix_to_column_output(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
-    const tatami::Matrix<RightValue_, RightIndex_>& right,
+    const RightColumns_ right_columns,
+    GetRightColumn_ get_right_column,
     Output_* const output,
     const MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions& options
 ) {
     const auto left_NR = left.nrow();
     const auto common_dim = left.ncol();
-    const auto right_NC = right.ncol();
-    std::fill_n(output, sanisizer::product_unsafe<std::size_t>(left_NR, right_NC), 0);
 
-    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
-    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
-    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+    // Product must fit in a size_t in order for output to have been allocated correctly in the first place.
+    // Technically, right_columns could be larger than a size_t if left_NR == 0, but the product after wraparound would still be zero, so it's fine.
+    std::fill_n(output, sanisizer::product_unsafe<std::size_t>(left_NR, right_columns), 0);
 
     const bool do_parallel = options.num_threads > 1;
     std::optional<std::vector<std::optional<std::vector<Output_> > > > tmp_results;
@@ -96,7 +93,7 @@ void multiply_dense_column_with_dense_column_matrix_to_column_output(
         if (!do_parallel || t == 0) {
             outptr = output;
         } else {
-            tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(left_NR, right_NC));
+            tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(left_NR, right_columns));
             outptr = tmp_output->data();
         }
 
@@ -104,8 +101,8 @@ void multiply_dense_column_with_dense_column_matrix_to_column_output(
             auto buffer = tatami::create_container_of_Index_size<std::vector<Output_> >(left_NR);
             for (LeftIndex_ cd = 0; cd < length; ++cd) {
                 const auto ptr = ext->fetch(buffer.data());
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const Output_ mult = right_ptrs[rc][start + cd];
+                for (RightColumns_ rc = 0; rc < right_columns; ++rc) {
+                    const Output_ mult = get_right_column(rc)[start + cd];
                     for (LeftIndex_ lr = 0; lr < left_NR; ++lr) {
                         outptr[sanisizer::nd_offset<std::size_t>(lr, left_NR, rc)] += mult * static_cast<Output_>(ptr[lr]);
                     }
@@ -131,9 +128,9 @@ void multiply_dense_column_with_dense_column_matrix_to_column_output(
                     left_ptrs[cd_counter] = ext->fetch(left_buffers[cd_counter].data());
                 }
 
-                RightIndex_ rc = 0;
-                while (rc < right_NC) {
-                    const RightIndex_ rc_end = rc + sanisizer::min(options.primary_block_size, right_NC - rc);
+                RightColumns_ rc = 0;
+                while (rc < right_columns) {
+                    const RightColumns_ rc_end = rc + sanisizer::min(options.primary_block_size, right_columns - rc);
                     LeftIndex_ lr = 0;
                     while (lr < left_NR) {
                         const LeftIndex_ lr_end = lr + sanisizer::min(options.secondary_block_size, left_NR - lr);
@@ -141,7 +138,7 @@ void multiply_dense_column_with_dense_column_matrix_to_column_output(
                         for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                             const auto matcol = left_ptrs[cd_counter];
                             for (auto rc_copy = rc; rc_copy < rc_end; ++rc_copy) {
-                                const Output_ mult = right_ptrs[rc_copy][start + cd + cd_counter];
+                                const Output_ mult = get_right_column(rc_copy)[start + cd + cd_counter];
                                 for (auto lr_copy = lr; lr_copy < lr_end; ++lr_copy) {
                                     outptr[sanisizer::nd_offset<std::size_t>(lr_copy, left_NR, rc_copy)] += mult * static_cast<Output_>(matcol[lr_copy]);
                                 }
@@ -170,6 +167,50 @@ void multiply_dense_column_with_dense_column_matrix_to_column_output(
             }
         }
     }
+}
+
+/**
+ * Overload of `multiply_dense_column_with_dense_column_matrix_to_column_output()` for a RHS `tatami::Matrix`.
+ * This will iterate over `left`, realizing columns into memory as needed.
+ * It will also realize all of `right` into memory for fast repeated accesses.
+ *
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
+ * @tparam Output_ Numeric type of the output array.
+ *
+ * @param left LHS matrix to be multiplied.
+ * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
+ * @param right RHS matrix to be multiplied.
+ * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
+ * The number of rows in `right` should be equal to the number of columns in `left`.
+ * @param[out] output Pointer to an array of length equal to `left.nrow() * right.ncol()`.
+ * On output, this contains the product `left * right` in column-major format.
+ * @param options Further options.
+ */
+template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+void multiply_dense_column_with_dense_column_matrix_to_column_output(
+    const tatami::Matrix<LeftValue_, LeftIndex_>& left,
+    const tatami::Matrix<RightValue_, RightIndex_>& right,
+    Output_* const output,
+    const MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions& options
+) {
+    const auto right_NC = right.ncol();
+    const auto common_dim = right.nrow();
+    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
+    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
+    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+
+    multiply_dense_column_with_dense_column_matrix_to_column_output(
+        left,
+        right_NC,
+        [&](const RightIndex_ rc) -> const RightValue_* {
+            return right_ptrs[rc];
+        },
+        output,
+        options
+    );
 }
 
 }
