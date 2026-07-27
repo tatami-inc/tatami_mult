@@ -1577,8 +1577,22 @@
       <type>void</type>
       <name>multiply_dense_column_with_dense_column_matrix_to_column_output</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a698c5ec0269d4728e3839a22809d950a</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightColumns_ right_columns, GetRightColumn_ get_right_column, Output_ *const output, const MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_dense_column_matrix_to_column_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
       <anchor>af37983f2240af21981c19ca890730f32</anchor>
       <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const MultiplyDenseColumnWithDenseColumnMatrixToColumnOutputOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_dense_column_matrix_to_row_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>ad8c7124322bf7cc7a25772d9b94e95b4</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightColumns_ right_columns, GetRightColumn_ get_right_column, Output_ *const output, const MultiplyDenseColumnWithDenseColumnMatrixToRowOutputOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1619,8 +1633,22 @@
       <type>void</type>
       <name>multiply_dense_column_with_dense_row_matrix_to_column_output</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>afd9124423cc999b6d0b0f1effc89819d</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightColumns_ right_columns, GetRightRow_ get_right_row, Output_ *const output, const MultiplyDenseColumnWithDenseRowMatrixToColumnOutputOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_dense_row_matrix_to_column_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
       <anchor>a7f597750ff4ece602ad593ed4162ed9e</anchor>
       <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const tatami::Matrix&lt; RightValue_, RightIndex_ &gt; &amp;right, Output_ *const output, const MultiplyDenseColumnWithDenseRowMatrixToColumnOutputOptions &amp;options)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>multiply_dense_column_with_dense_row_matrix_to_row_output</name>
+      <anchorfile>namespacetatami__mult.html</anchorfile>
+      <anchor>a220edab2a4d347682a5f2ed0d936e2b6</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightColumns_ right_columns, GetRightRow_ get_right_row, Output_ *const output, const MultiplyDenseColumnWithDenseRowMatrixToRowOutputOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1822,8 +1850,8 @@
       <type>void</type>
       <name>multiply_dense_column_with_multiple_vectors</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a105c1a75e9577b72ddff30b0ecd225cf</anchor>
-      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightIndex_ num_right, GetRight_ get_right, GetOutput_ get_output, const MultiplyDenseColumnWithMultipleVectorsOptions &amp;options)</arglist>
+      <anchor>a4a8acb9d75a8a668f376d8b03a7471bf</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightVectors_ right_vectors, GetRightVector_ get_right_vector, GetOutput_ get_output_vector, const MultiplyDenseColumnWithMultipleVectorsOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1836,8 +1864,8 @@
       <type>void</type>
       <name>multiply_dense_row_with_multiple_vectors</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>ab96c2e93f320a39519d4d9ec72a5738d</anchor>
-      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightIndex_ num_right, GetRight_ get_right, GetOutput_ get_output, const MultiplyDenseRowWithMultipleVectorsOptions &amp;options)</arglist>
+      <anchor>a2d76eed277d027ca2797ee59dfd54f96</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightVectors_ right_vectors, GetRightVector_ get_right_vector, GetOutputVector_ get_output_vector, const MultiplyDenseRowWithMultipleVectorsOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1892,8 +1920,8 @@
       <type>void</type>
       <name>multiply_sparse_column_with_multiple_vectors</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a3b228931c5440afb91c8a95e6f045be6</anchor>
-      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightIndex_ num_right, GetRight_ get_right, GetOutput_ get_output, const MultiplySparseColumnWithMultipleVectorsOptions &amp;options)</arglist>
+      <anchor>a0810e2f820e3ab3c5b4461c1d3d53ab8</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightVectors_ right_vectors, GetRightVector_ get_right_vector, GetOutputVector_ get_output_vector, const MultiplySparseColumnWithMultipleVectorsOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1906,8 +1934,8 @@
       <type>void</type>
       <name>multiply_sparse_row_with_multiple_vectors</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>aedef0dfc951c0e1e9ec12e7b2c4227fd</anchor>
-      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightIndex_ num_right, GetRight_ get_right, GetOutput_ get_output, const MultiplySparseRowWithMultipleVectorsOptions &amp;options)</arglist>
+      <anchor>accc7f8396af6f4535b78d3cc57f5577f</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightVectors_ right_vectors, GetRightVector_ get_right_vector, GetOutputVector_ get_output_vector, const MultiplySparseRowWithMultipleVectorsOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>

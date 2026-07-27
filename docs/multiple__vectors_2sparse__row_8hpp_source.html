@@ -125,19 +125,19 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>};</div>
 </div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> accumulators_ = 4, <span class="keyword">typename</span> LeftValue_, <span class="keyword">typename</span> LeftIndex_, <span class="keyword">typename</span> RightIndex_, <span class="keyword">typename</span> GetRight_, <span class="keyword">typename</span> GetOutput_&gt;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> accumulators_ = 4, <span class="keyword">typename</span> LeftValue_, <span class="keyword">typename</span> LeftIndex_, <span class="keyword">typename</span> RightVectors_, <span class="keyword">typename</span> GetRightVector_, <span class="keyword">typename</span> GetOutputVector_&gt;</div>
 <div class="foldopen" id="foldopen00061" data-start="{" data-end="}">
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html#aedef0dfc951c0e1e9ec12e7b2c4227fd">   61</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacetatami__mult.html#aedef0dfc951c0e1e9ec12e7b2c4227fd">multiply_sparse_row_with_multiple_vectors</a>(</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html#accc7f8396af6f4535b78d3cc57f5577f">   61</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacetatami__mult.html#accc7f8396af6f4535b78d3cc57f5577f">multiply_sparse_row_with_multiple_vectors</a>(</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keyword">const</span> <a class="code hl_classRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix&lt;LeftValue_, LeftIndex_&gt;</a>&amp; left,</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">const</span> RightIndex_ num_right,</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    GetRight_ get_right,</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    GetOutput_ get_output,</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">const</span> RightVectors_ right_vectors,</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    GetRightVector_ get_right_vector,</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    GetOutputVector_ get_output_vector,</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keyword">const</span> <a class="code hl_struct" href="structtatami__mult_1_1MultiplySparseRowWithMultipleVectorsOptions.html">MultiplySparseRowWithMultipleVectorsOptions</a>&amp; options</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>) {</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keyword">const</span> <span class="keyword">auto</span> left_NR = left.<a class="code hl_functionRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a54fe7b4baf78069d35ff00357a1b6cc6">nrow</a>();</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keyword">const</span> <span class="keyword">auto</span> common_dim = left.<a class="code hl_functionRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a1f6fec43d5bae3f831841646bc02377b">ncol</a>();</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keyword">const</span> <span class="keyword">auto</span> right_NC = num_right; <span class="comment">// using an alias just for consistent terminology.</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keyword">typedef</span> I&lt;<span class="keyword">decltype</span>(get_output(0)[0])&gt; Output;;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keyword">const</span> <span class="keyword">auto</span> right_NC = right_vectors; <span class="comment">// using an alias just for consistent terminology.</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="keyword">typedef</span> I&lt;<span class="keyword">decltype</span>(get_output_vector(0)[0])&gt; Output;;</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keywordflow">if</span> (options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplySparseRowWithMultipleVectorsOptions.html#a6fa9b3310a38e1cd5677bcec04d3c0db">block_size</a> == 1) {</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <a class="code hl_functionRef" href="https://tatami-inc.github.io/tatami/namespacetatami.html#a9c3979c60e3d7e066be533f7ee3a2f97">tatami::parallelize</a>([&amp;](<span class="keywordtype">int</span>, LeftIndex_ start, LeftIndex_ length) -&gt; <span class="keywordtype">void</span> {</div>
@@ -148,18 +148,18 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>            <span class="keywordflow">for</span> (LeftIndex_ lr = 0; lr &lt; length; ++lr) {</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>                <span class="keyword">const</span> <span class="keyword">auto</span> range = ext-&gt;fetch(vbuffer.data(), ibuffer.data());</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>                <span class="keywordflow">if</span> (range.number == 0) {</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>                    <span class="keywordflow">for</span> (RightIndex_ rc = 0; rc &lt; right_NC; ++rc) {</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                        get_output(rc)[start + lr] = 0;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>                    <span class="keywordflow">for</span> (RightVectors_ rv = 0; rv &lt; right_NC; ++rv) {</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>                        get_output_vector(rv)[start + lr] = 0;</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>                    }</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>                    <span class="keywordflow">continue</span>;</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>                }</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                <span class="keywordflow">for</span> (RightIndex_ rc = 0; rc &lt; right_NC; ++rc) {</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                    get_output(rc)[start + lr] = sparse_dot_product&lt;accumulators_&gt;(</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                <span class="keywordflow">for</span> (RightVectors_ rv = 0; rv &lt; right_NC; ++rv) {</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>                    get_output_vector(rv)[start + lr] = sparse_dot_product&lt;accumulators_&gt;(</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>                        range.number, <span class="comment">// Implicit cast to size_t is safe, as per the tatami contract.</span></div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>                        range.value,</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                        range.index,</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                        get_right(rc),</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                        get_right_vector(rv),</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>                        <span class="keyword">static_cast&lt;</span>Output<span class="keyword">&gt;</span>(0)</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>                    );</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>                }</div>
@@ -187,23 +187,23 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>            LeftIndex_ lr = 0;</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>            <span class="keywordflow">while</span> (lr &lt; length) {</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>                <span class="comment">// No point skipping the LHS rows with no structural non-zeros.</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>                <span class="comment">// We still need to set the corresponding entry of &#39;outcol&#39; to zero, so we&#39;d end up having to loop through the LHS rows anyway.</span></div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>                <span class="comment">// We still need to set the corresponding entry of &#39;outvec&#39; to zero, so we&#39;d end up having to loop through the LHS rows anyway.</span></div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>                <span class="comment">// We might as well just let it be set to zero naturally in the existing loop below.</span></div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>                <span class="keyword">const</span> LeftIndex_ lr_num = sanisizer::min(options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplySparseRowWithMultipleVectorsOptions.html#a6fa9b3310a38e1cd5677bcec04d3c0db">block_size</a>, length - lr);</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>                <span class="keywordflow">for</span> (LeftIndex_ lr_counter = 0; lr_counter &lt; lr_num; ++lr_counter) {</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                    left_ranges[lr_counter] = ext-&gt;fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                }</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>                <span class="keywordflow">for</span> (RightIndex_ rc = 0; rc &lt; right_NC; ++rc) {</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                    <span class="keyword">const</span> <span class="keyword">auto</span> rcol = get_right(rc);</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>                    <span class="keyword">const</span> <span class="keyword">auto</span> outcol = get_output(rc);</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>                <span class="keywordflow">for</span> (RightVectors_ rv = 0; rv &lt; right_NC; ++rv) {</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>                    <span class="keyword">const</span> <span class="keyword">auto</span> rightvec = get_right_vector(rv);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>                    <span class="keyword">const</span> <span class="keyword">auto</span> outvec = get_output_vector(rv);</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>                    <span class="keywordflow">for</span> (LeftIndex_ lr_counter = 0; lr_counter &lt; lr_num; ++lr_counter) {</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>                        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; currange = left_ranges[lr_counter];</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>                        outcol[start + lr + lr_counter] = sparse_dot_product&lt;accumulators_&gt;(</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>                        outvec[start + lr + lr_counter] = sparse_dot_product&lt;accumulators_&gt;(</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>                            currange.number, <span class="comment">// Implicit cast of range.number to size_t is safe, as per the tatami contract.</span></div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>                            currange.value,</div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>                            currange.index,</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>                            rcol,</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>                            rightvec,</div>
 <div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>                            <span class="keyword">static_cast&lt;</span>Output<span class="keyword">&gt;</span>(0)</div>
 <div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>                        );</div>
 <div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>                    }</div>
@@ -218,21 +218,21 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
 <div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="keyword">template</span>&lt;std::<span class="keywordtype">size_t</span> accumulators_ = 4, <span class="keyword">typename</span> LeftValue_, <span class="keyword">typename</span> LeftIndex_, <span class="keyword">typename</span> RightValue_, <span class="keyword">typename</span> Output_&gt;</div>
 <div class="foldopen" id="foldopen00167" data-start="{" data-end="}">
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html#af5a318be298e02eed1821b90b139d2f0">  167</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacetatami__mult.html#aedef0dfc951c0e1e9ec12e7b2c4227fd">multiply_sparse_row_with_multiple_vectors</a>(</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno"><a class="line" href="namespacetatami__mult.html#af5a318be298e02eed1821b90b139d2f0">  167</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacetatami__mult.html#accc7f8396af6f4535b78d3cc57f5577f">multiply_sparse_row_with_multiple_vectors</a>(</div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    <span class="keyword">const</span> <a class="code hl_classRef" href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix&lt;LeftValue_, LeftIndex_&gt;</a>&amp; left,</div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    <span class="keyword">const</span> std::vector&lt;RightValue_*&gt;&amp; right,</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <span class="keyword">const</span> std::vector&lt;Output_*&gt;&amp; output,</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    <span class="keyword">const</span> <a class="code hl_struct" href="structtatami__mult_1_1MultiplySparseRowWithMultipleVectorsOptions.html">MultiplySparseRowWithMultipleVectorsOptions</a>&amp; options</div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>) {</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    <span class="keyword">const</span> <span class="keyword">auto</span> num_right = right.size();</div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    <span class="keyword">typedef</span> I&lt;<span class="keyword">decltype</span>(num_right)&gt; RightIndex;</div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    <a class="code hl_function" href="namespacetatami__mult.html#aedef0dfc951c0e1e9ec12e7b2c4227fd">multiply_sparse_row_with_multiple_vectors</a>(</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    <span class="keyword">const</span> <span class="keyword">auto</span> right_vectors = right.size();</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    <span class="keyword">typedef</span> I&lt;<span class="keyword">decltype</span>(right_vectors)&gt; RightVectors;</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    <a class="code hl_function" href="namespacetatami__mult.html#accc7f8396af6f4535b78d3cc57f5577f">multiply_sparse_row_with_multiple_vectors</a>(</div>
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        left,</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        num_right,</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        [&amp;](<span class="keyword">const</span> RightIndex rc) -&gt; <span class="keyword">const</span> RightValue_* {</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        right_vectors,</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        [&amp;](<span class="keyword">const</span> RightVectors rc) -&gt; <span class="keyword">const</span> RightValue_* {</div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>            <span class="keywordflow">return</span> right[rc];</div>
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        },</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        [&amp;](<span class="keyword">const</span> RightIndex rc) -&gt; Output_* {</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        [&amp;](<span class="keyword">const</span> RightVectors rc) -&gt; Output_* {</div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>            <span class="keywordflow">return</span> output[rc];</div>
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>        },</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>        options</div>
@@ -247,7 +247,7 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a1f6fec43d5bae3f831841646bc02377b"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a1f6fec43d5bae3f831841646bc02377b">tatami::Matrix::ncol</a></div><div class="ttdeci">virtual Index_ ncol() const=0</div></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a54fe7b4baf78069d35ff00357a1b6cc6"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a54fe7b4baf78069d35ff00357a1b6cc6">tatami::Matrix::nrow</a></div><div class="ttdeci">virtual Index_ nrow() const=0</div></div>
 <div class="ttc" id="anamespacetatami__mult_html"><div class="ttname"><a href="namespacetatami__mult.html">tatami_mult</a></div><div class="ttdoc">Multiplication of tatami matrices.</div><div class="ttdef"><b>Definition</b> column_to_column.hpp:19</div></div>
-<div class="ttc" id="anamespacetatami__mult_html_aedef0dfc951c0e1e9ec12e7b2c4227fd"><div class="ttname"><a href="namespacetatami__mult.html#aedef0dfc951c0e1e9ec12e7b2c4227fd">tatami_mult::multiply_sparse_row_with_multiple_vectors</a></div><div class="ttdeci">void multiply_sparse_row_with_multiple_vectors(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightIndex_ num_right, GetRight_ get_right, GetOutput_ get_output, const MultiplySparseRowWithMultipleVectorsOptions &amp;options)</div><div class="ttdef"><b>Definition</b> sparse_row.hpp:61</div></div>
+<div class="ttc" id="anamespacetatami__mult_html_accc7f8396af6f4535b78d3cc57f5577f"><div class="ttname"><a href="namespacetatami__mult.html#accc7f8396af6f4535b78d3cc57f5577f">tatami_mult::multiply_sparse_row_with_multiple_vectors</a></div><div class="ttdeci">void multiply_sparse_row_with_multiple_vectors(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightVectors_ right_vectors, GetRightVector_ get_right_vector, GetOutputVector_ get_output_vector, const MultiplySparseRowWithMultipleVectorsOptions &amp;options)</div><div class="ttdef"><b>Definition</b> sparse_row.hpp:61</div></div>
 <div class="ttc" id="anamespacetatami_html_a9c3979c60e3d7e066be533f7ee3a2f97"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/namespacetatami.html#a9c3979c60e3d7e066be533f7ee3a2f97">tatami::parallelize</a></div><div class="ttdeci">int parallelize(Function_ fun, const Index_ tasks, const int workers)</div></div>
 <div class="ttc" id="anamespacetatami_html_ac6d0f6694ab914f57229b925641779d4"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/namespacetatami.html#ac6d0f6694ab914f57229b925641779d4">tatami::cast_Index_to_container_size</a></div><div class="ttdeci">I&lt; decltype(std::declval&lt; Container_ &gt;().size())&gt; cast_Index_to_container_size(const Index_ x)</div></div>
 <div class="ttc" id="anamespacetatami_html_ada885a7e7ae9dcafcaf98cde30622afc"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/namespacetatami.html#ada885a7e7ae9dcafcaf98cde30622afc">tatami::create_container_of_Index_size</a></div><div class="ttdeci">Container_ create_container_of_Index_size(const Index_ x, Args_ &amp;&amp;... args)</div></div>
