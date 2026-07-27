@@ -84,6 +84,22 @@ TEST_P(DenseMatrixSparseColumnTest, Basic) {
             EXPECT_FLOAT_EQ(ref, sc_rr_co[cm_idx]);
         }
     }
+
+    // Check the functor overloads that aren't directly called.
+    auto rext = right_row->dense(true, tatami::Options());
+    std::vector<double> rxbuffer(NRHS);
+    auto get_right = [&](std::size_t rc) -> const double* {
+        return rext->fetch(rc, rxbuffer.data());
+    };
+    std::vector<double> fun_rr_ro(output_size, 1.2), fun_rr_co(output_size, 2.2);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*sparse_col, NRHS, get_right, fun_rr_co.data(), opt.row_to_column);
+    EXPECT_EQ(sc_rr_co, fun_rr_co);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*sparse_row, NRHS, get_right, fun_rr_co.data(), opt.row_to_column);
+    EXPECT_EQ(sr_rr_co, fun_rr_co);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*sparse_col, NRHS, get_right, fun_rr_ro.data(), opt.row_to_row);
+    EXPECT_EQ(sc_rr_ro, fun_rr_ro);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*sparse_row, NRHS, get_right, fun_rr_ro.data(), opt.row_to_row);
+    EXPECT_EQ(sr_rr_ro, fun_rr_ro);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -165,6 +181,22 @@ TEST_P(DenseMatrixSparseColumnEmptyTest, Basic) {
             EXPECT_FLOAT_EQ(ref, sc_rr_co[cm_idx]);
         }
     }
+
+    // Check the functor overloads that aren't directly called.
+    auto rext = right_row->dense(true, tatami::Options());
+    std::vector<double> rxbuffer(NRHS);
+    auto get_right = [&](std::size_t rc) -> const double* {
+        return rext->fetch(rc, rxbuffer.data());
+    };
+    std::vector<double> fun_rr_ro(output_size, 1.2), fun_rr_co(output_size, 2.2);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*sparse_col, NRHS, get_right, fun_rr_co.data(), opt.row_to_column);
+    EXPECT_EQ(sc_rr_co, fun_rr_co);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*sparse_row, NRHS, get_right, fun_rr_co.data(), opt.row_to_column);
+    EXPECT_EQ(sr_rr_co, fun_rr_co);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*sparse_col, NRHS, get_right, fun_rr_ro.data(), opt.row_to_row);
+    EXPECT_EQ(sc_rr_ro, fun_rr_ro);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*sparse_row, NRHS, get_right, fun_rr_ro.data(), opt.row_to_row);
+    EXPECT_EQ(sr_rr_ro, fun_rr_ro);
 }
 
 INSTANTIATE_TEST_SUITE_P(

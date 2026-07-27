@@ -39,35 +39,36 @@ struct MultiplySparseColumnWithDenseColumnMatrixToColumnOutputOptions {
     int block_size = 16;
 };
 
+
+
+
 /**
- * This function will iterate over `left`, realizing columns into memory as needed.
- * It will also realize all of `right` into memory for fast repeated accesses.
- *
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
- * @tparam RightValue_ Numeric type of the RHS matrix value.
- * @tparam RightIndex_ Integer type of the RHS matrix index.
+ * @tparam RightColumns_ Integer type of the number of RHS columns.
+ * @tparam GetRightColumn_ Functor that accepts a `RightColumns_` and returns a pointer to an RHS column.
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
  * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
- * @param right RHS matrix to be multiplied.
- * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
- * The number of rows in `right` should be equal to the number of columns in `left`.
+ * @param right_columns Number of columns of the RHS matrix to be multiplied.
+ * @param get_right_column Function that accepts a `RightColumns_` in `[0, right_columns)` and returns a pointer to an array of length `left.ncol()`.
+ * The array referenced by `get_right_column(i)` represents the `i`-th column of the RHS matrix.
+ * This function should be thread-safe.
  * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
  * On output, this contains the product `left * right` in column-major format.
  * @param options Further options.
  */
-template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+template<typename LeftValue_, typename LeftIndex_, typename RightColumns_, class GetRightColumn_, typename Output_>
 void multiply_sparse_column_with_dense_column_matrix_to_column_output(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
-    const tatami::Matrix<RightValue_, RightIndex_>& right,
+    const RightColumns_ right_columns,
+    GetRightColumn_ get_right_column,
     Output_* const output,
     const MultiplySparseColumnWithDenseColumnMatrixToColumnOutputOptions& options
 ) {
     const auto left_NR = left.nrow();
     const auto common_dim = left.ncol();
-    const auto right_NC = right.ncol();
 
     const bool do_parallel = options.num_threads > 1;
     std::optional<std::vector<std::optional<std::vector<Output_> > > > tmp_results;
@@ -75,11 +76,9 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
     }
 
-    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
-    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
-    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
-
-    std::fill_n(output, sanisizer::product<std::size_t>(left_NR, right_NC), 0);
+    // Product must fit in a size_t in order for output to have been allocated correctly in the first place.
+    // Technically, right_columns could be larger than a size_t if left_NR == 0, but the product after wraparound would still be zero, so it's fine.
+    std::fill_n(output, sanisizer::product<std::size_t>(left_NR, right_columns), 0);
 
     const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(left, false, start, length);
@@ -89,7 +88,7 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
         if (!do_parallel || t == 0) {
             outptr = output;
         } else {
-            tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(left_NR, right_NC));
+            tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(left_NR, right_columns));
             outptr = tmp_output->data();
         }
 
@@ -98,8 +97,8 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
             auto ibuffer = tatami::create_container_of_Index_size<std::vector<LeftIndex_> >(left_NR);
             for (LeftIndex_ cd = 0; cd < length; ++cd) {
                 const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const Output_ mult = right_ptrs[rc][start + cd];
+                for (RightColumns_ rc = 0; rc < right_columns; ++rc) {
+                    const Output_ mult = get_right_column(rc)[start + cd];
                     for (LeftIndex_ x = 0; x < range.number; ++x) {
                         outptr[sanisizer::nd_offset<std::size_t>(range.index[x], left_NR, rc)] += mult * static_cast<Output_>(range.value[x]); 
                     }
@@ -144,8 +143,8 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
                 // Otherwise, we'll have to access the 'left_non_empty' vector to figure out the indices of each non-empty column.
                 if (left_block_info.all_non_empty) {
                     const LeftIndex_ cd_base = cd + start; 
-                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                        const auto rightcol = right_ptrs[rc];
+                    for (RightColumns_ rc = 0; rc < right_columns; ++rc) {
+                        const auto rightcol = get_right_column(rc);
                         for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                             const auto& currange = left_ranges[cd_counter];
                             const Output_ mult = rightcol[cd_base + cd_counter];
@@ -159,8 +158,8 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
                     for (auto& cdne : left_non_empty) {
                         cdne += start;
                     }
-                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                        const auto rightcol = right_ptrs[rc];
+                    for (RightColumns_ rc = 0; rc < right_columns; ++rc) {
+                        const auto rightcol = get_right_column(rc);
                         for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                             const auto& currange = left_ranges[cd_counter];
                             const Output_ mult = rightcol[left_non_empty[cd_counter]];
@@ -189,6 +188,50 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
             }
         }
     }
+}
+
+/**
+ * Overload of `multiply_sparse_column_with_dense_column_matrix_to_column_output()` for a RHS `tatami::Matrix`.
+ * This function will iterate over `left`, realizing columns into memory as needed.
+ * It will also realize all of `right` into memory for fast repeated accesses.
+ *
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS matrix value.
+ * @tparam RightIndex_ Integer type of the RHS matrix index.
+ * @tparam Output_ Numeric type of the output array.
+ * 
+ * @param left LHS matrix to be multiplied.
+ * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
+ * @param right RHS matrix to be multiplied.
+ * This function is optimized for dense matrices that prefer column access, but will work with all matrices.
+ * The number of rows in `right` should be equal to the number of columns in `left`.
+ * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
+ * On output, this contains the product `left * right` in column-major format.
+ * @param options Further options.
+ */
+template<typename LeftValue_, typename LeftIndex_, typename RightValue_, typename RightIndex_, typename Output_>
+void multiply_sparse_column_with_dense_column_matrix_to_column_output(
+    const tatami::Matrix<LeftValue_, LeftIndex_>& left,
+    const tatami::Matrix<RightValue_, RightIndex_>& right,
+    Output_* const output,
+    const MultiplySparseColumnWithDenseColumnMatrixToColumnOutputOptions& options
+) {
+    const auto right_NC = right.ncol();
+    auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
+    auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
+    const auto common_dim = left.ncol();
+    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+
+    multiply_sparse_column_with_dense_column_matrix_to_column_output(
+        left,
+        right_NC,
+        [&](const RightIndex_ rc) -> const RightValue_* {
+            return right_ptrs[rc];
+        },
+        output,
+        options
+    );
 }
 
 }
