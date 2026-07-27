@@ -1920,15 +1920,15 @@
       <type>void</type>
       <name>multiply_dense_column_with_single_vector</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a84c2ea30feb5123cd1cf5e9be6e3bd06</anchor>
-      <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const MultiplyDenseColumnWithSingleVectorOptions &amp;options)</arglist>
+      <anchor>a05cded5d3245fbffece0202be5c79058</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightValue_ *const right, Output_ *const output, const MultiplyDenseColumnWithSingleVectorOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>multiply_dense_row_with_single_vector</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a3e6bd133678fddb8a65341e080ce832c</anchor>
-      <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const MultiplyDenseRowWithSingleVectorOptions &amp;options)</arglist>
+      <anchor>a8c8999f6f8c498b4963e8d36f96aef83</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightValue_ *const right, Output_ *const output, const MultiplyDenseRowWithSingleVectorOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1955,15 +1955,15 @@
       <type>void</type>
       <name>multiply_sparse_column_with_single_vector</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>acbb165c2b1a64ffbf37935fc588f71d5</anchor>
-      <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const MultiplySparseColumnWithSingleVectorOptions &amp;options)</arglist>
+      <anchor>a1bd362c8f756bc68e08ab416471c6c1d</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightValue_ *const right, Output_ *const output, const MultiplySparseColumnWithSingleVectorOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>multiply_sparse_row_with_single_vector</name>
       <anchorfile>namespacetatami__mult.html</anchorfile>
-      <anchor>a707fa56d64fb88069856289a715a5ae8</anchor>
-      <arglist>(const tatami::Matrix&lt; Value_, Index_ &gt; &amp;left, const Right_ *const right, Output_ *const output, const MultiplySparseRowWithSingleVectorOptions &amp;options)</arglist>
+      <anchor>ab11f62104e93a7f3e8ec761823df8d42</anchor>
+      <arglist>(const tatami::Matrix&lt; LeftValue_, LeftIndex_ &gt; &amp;left, const RightValue_ *const right, Output_ *const output, const MultiplySparseRowWithSingleVectorOptions &amp;options)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
