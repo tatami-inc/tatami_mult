@@ -42,33 +42,33 @@ struct MultiplySparseRowWithMultipleVectorsOptions {
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
- * @tparam RightIndex_ Integer type of the number of RHS vectors.
- * @tparam GetRight_ Functor that accepts a `RightIndex_` and returns a pointer to a numeric (typically floating-point) array.
- * @tparam GetOutput_ Functor that accepts a `RightIndex_` and returns a pointer to a numeric (typically floating-point) array.
+ * @tparam RightVectors_ Integer type of the number of RHS vectors.
+ * @tparam GetRightVector_ Functor that accepts a `RightVectors_` and returns a pointer to a numeric (typically floating-point) array.
+ * @tparam GetOutputVector_ Functor that accepts a `RightVectors_` and returns a pointer to a numeric (typically floating-point) array.
  * 
  * @param left LHS matrix to be multiplied.
  * This function is optimized for sparse matrices that prefer row access, but will work with all matrices.
- * @param num_right Number of RHS vectors.
- * @param get_right Function that accepts a `RightIndex_` in `[0, num_right)` and returns a pointer to an array of length `left.ncol()`.
- * The array referenced by `get_right(i)` represents the `i`-th RHS vector with which to multiply `left`.
+ * @param right_vectors Number of RHS vectors.
+ * @param get_right_vector Function that accepts a `RightVectors_` in `[0, right_vectors)` and returns a pointer to an array of length `left.ncol()`.
+ * The array referenced by `get_right_vector(i)` represents the `i`-th RHS vector with which to multiply `left`.
  * This function should be thread-safe.
- * @param get_output Function that accepts a `RightIndex_` in `[0, num_right)` and returns a pointer to an array of length `left.nrow()`.
- * On output, the array referenced by by `get_output(i)` stores the product `left * right[i]`.
+ * @param get_output_vector Function that accepts a `RightVectors_` in `[0, right_vectors)` and returns a pointer to an array of length `left.nrow()`.
+ * On output, the array referenced by by `get_output_vector(i)` stores the product `left * right[i]`.
  * This function should be thread-safe.
  * @param options Further options.
  */
-template<std::size_t accumulators_ = 4, typename LeftValue_, typename LeftIndex_, typename RightIndex_, typename GetRight_, typename GetOutput_>
+template<std::size_t accumulators_ = 4, typename LeftValue_, typename LeftIndex_, typename RightVectors_, typename GetRightVector_, typename GetOutputVector_>
 void multiply_sparse_row_with_multiple_vectors(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
-    const RightIndex_ num_right,
-    GetRight_ get_right,
-    GetOutput_ get_output,
+    const RightVectors_ right_vectors,
+    GetRightVector_ get_right_vector,
+    GetOutputVector_ get_output_vector,
     const MultiplySparseRowWithMultipleVectorsOptions& options
 ) {
     const auto left_NR = left.nrow();
     const auto common_dim = left.ncol();
-    const auto right_NC = num_right; // using an alias just for consistent terminology.
-    typedef I<decltype(get_output(0)[0])> Output;;
+    const auto right_NC = right_vectors; // using an alias just for consistent terminology.
+    typedef I<decltype(get_output_vector(0)[0])> Output;;
 
     if (options.block_size == 1) {
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
@@ -79,18 +79,18 @@ void multiply_sparse_row_with_multiple_vectors(
             for (LeftIndex_ lr = 0; lr < length; ++lr) {
                 const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
                 if (range.number == 0) {
-                    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                        get_output(rc)[start + lr] = 0;
+                    for (RightVectors_ rv = 0; rv < right_NC; ++rv) {
+                        get_output_vector(rv)[start + lr] = 0;
                     }
                     continue;
                 }
 
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    get_output(rc)[start + lr] = sparse_dot_product<accumulators_>(
+                for (RightVectors_ rv = 0; rv < right_NC; ++rv) {
+                    get_output_vector(rv)[start + lr] = sparse_dot_product<accumulators_>(
                         range.number, // Implicit cast to size_t is safe, as per the tatami contract.
                         range.value,
                         range.index,
-                        get_right(rc),
+                        get_right_vector(rv),
                         static_cast<Output>(0)
                     );
                 }
@@ -118,23 +118,23 @@ void multiply_sparse_row_with_multiple_vectors(
             LeftIndex_ lr = 0;
             while (lr < length) {
                 // No point skipping the LHS rows with no structural non-zeros.
-                // We still need to set the corresponding entry of 'outcol' to zero, so we'd end up having to loop through the LHS rows anyway.
+                // We still need to set the corresponding entry of 'outvec' to zero, so we'd end up having to loop through the LHS rows anyway.
                 // We might as well just let it be set to zero naturally in the existing loop below.
                 const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
                 for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     left_ranges[lr_counter] = ext->fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());
                 }
 
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const auto rcol = get_right(rc);
-                    const auto outcol = get_output(rc);
+                for (RightVectors_ rv = 0; rv < right_NC; ++rv) {
+                    const auto rightvec = get_right_vector(rv);
+                    const auto outvec = get_output_vector(rv);
                     for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                         const auto& currange = left_ranges[lr_counter];
-                        outcol[start + lr + lr_counter] = sparse_dot_product<accumulators_>(
+                        outvec[start + lr + lr_counter] = sparse_dot_product<accumulators_>(
                             currange.number, // Implicit cast of range.number to size_t is safe, as per the tatami contract.
                             currange.value,
                             currange.index,
-                            rcol,
+                            rightvec,
                             static_cast<Output>(0)
                         );
                     }
@@ -147,6 +147,8 @@ void multiply_sparse_row_with_multiple_vectors(
 }
 
 /**
+ * Overload of `multiply_sparse_row_with_multiple_vectors()` that uses a vector of pointers to represent the RHS and output vectors.
+ *
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
@@ -170,15 +172,15 @@ void multiply_sparse_row_with_multiple_vectors(
     const std::vector<Output_*>& output,
     const MultiplySparseRowWithMultipleVectorsOptions& options
 ) {
-    const auto num_right = right.size();
-    typedef I<decltype(num_right)> RightIndex;
+    const auto right_vectors = right.size();
+    typedef I<decltype(right_vectors)> RightVectors;
     multiply_sparse_row_with_multiple_vectors(
         left,
-        num_right,
-        [&](const RightIndex rc) -> const RightValue_* {
+        right_vectors,
+        [&](const RightVectors rc) -> const RightValue_* {
             return right[rc];
         },
-        [&](const RightIndex rc) -> Output_* {
+        [&](const RightVectors rc) -> Output_* {
             return output[rc];
         },
         options

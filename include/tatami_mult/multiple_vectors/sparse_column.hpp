@@ -40,19 +40,19 @@ struct MultiplySparseColumnWithMultipleVectorsOptions {
 /**
  * @cond
  */
-template<typename LeftValue_, typename LeftIndex_, typename RightIndex_, typename GetRight_, typename GetOutput_>
+template<typename LeftValue_, typename LeftIndex_, typename RightVectors_, typename GetRightVector_, typename GetOutputVector_>
 void multiply_sparse_column_with_multiple_vectors_internal(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
     const LeftIndex_ start,
     const LeftIndex_ length,
     const LeftIndex_ left_NR,
-    const RightIndex_ right_NC,
-    GetRight_ get_right,
-    GetOutput_ get_output,
+    const RightVectors_ right_vectors,
+    GetRightVector_ get_right_vector,
+    GetOutputVector_ get_output_vector,
     const MultiplySparseColumnWithMultipleVectorsOptions& options
 ) {
     auto ext = tatami::consecutive_extractor<true>(left, false, start, length);
-    typedef I<decltype(get_output(0)[0])> Output;
+    typedef I<decltype(get_output_vector(0)[0])> Output;
 
     if (options.block_size == 1) {
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(left_NR);
@@ -63,9 +63,9 @@ void multiply_sparse_column_with_multiple_vectors_internal(
                 continue;
             }
 
-            for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                const auto optr = get_output(rc);
-                const Output mult = get_right(rc)[start + cd];
+            for (RightVectors_ rv = 0; rv < right_vectors; ++rv) {
+                const auto optr = get_output_vector(rv);
+                const Output mult = get_right_vector(rv)[start + cd];
                 for (LeftIndex_ x = 0; x < range.number; ++x) {
                     optr[range.index[x]] += mult * static_cast<Output>(range.value[x]); 
                 }
@@ -111,14 +111,14 @@ void multiply_sparse_column_with_multiple_vectors_internal(
             // Otherwise, we'll have to access the 'left_non_empty' vector to figure out the indices of each non-empty column.
             if (left_block_info.all_non_empty) {
                 const LeftIndex_ cd_base = start + cd;
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const auto outcol = get_output(rc);
-                    const auto rightcol = get_right(rc);
+                for (RightVectors_ rv = 0; rv < right_vectors; ++rv) {
+                    const auto outvec = get_output_vector(rv);
+                    const auto rightvec = get_right_vector(rv);
                     for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                         const auto& currange = left_ranges[cd_counter];
-                        const Output mult = rightcol[cd_base + cd_counter];
+                        const Output mult = rightvec[cd_base + cd_counter];
                         for (LeftIndex_ x = 0; x < currange.number; ++x) {
-                            outcol[currange.index[x]] += mult * static_cast<Output>(currange.value[x]);
+                            outvec[currange.index[x]] += mult * static_cast<Output>(currange.value[x]);
                         }
                     }
                 }
@@ -127,14 +127,14 @@ void multiply_sparse_column_with_multiple_vectors_internal(
                 for (auto& cdne : left_non_empty) {
                     cdne += start;
                 }
-                for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-                    const auto outcol = get_output(rc);
-                    const auto rightcol = get_right(rc);
+                for (RightVectors_ rv = 0; rv < right_vectors; ++rv) {
+                    const auto outvec = get_output_vector(rv);
+                    const auto rightvec = get_right_vector(rv);
                     for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                         const auto& currange = left_ranges[cd_counter];
-                        const Output mult = rightcol[left_non_empty[cd_counter]];
+                        const Output mult = rightvec[left_non_empty[cd_counter]];
                         for (LeftIndex_ x = 0; x < currange.number; ++x) {
-                            outcol[currange.index[x]] += mult * static_cast<Output>(currange.value[x]);
+                            outvec[currange.index[x]] += mult * static_cast<Output>(currange.value[x]);
                         }
                     }
                 }
@@ -149,40 +149,40 @@ void multiply_sparse_column_with_multiple_vectors_internal(
  */
 
 /**
+ * Overload of `multiply_sparse_column_with_multiple_vectors()` that uses a vector of pointers to represent the RHS and output vectors.
+ *
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
- * @tparam RightIndex_ Integer type of the number of RHS vectors.
- * @tparam GetRight_ Functor that accepts a `RightIndex_` and returns a pointer to a numeric (typically floating-point) array.
- * @tparam GetOutput_ Functor that accepts a `RightIndex_` and returns a pointer to a numeric (typically floating-point) array.
+ * @tparam RightVectors_ Integer type of the number of RHS vectors.
+ * @tparam GetRightVector_ Functor that accepts a `RightIndex_` and returns a pointer to a numeric (typically floating-point) array.
+ * @tparam GetOutputVector_ Functor that accepts a `RightIndex_` and returns a pointer to a numeric (typically floating-point) array.
  * 
  * @param left LHS matrix to be multiplied.
  * This function is optimized for sparse matrices that prefer column access, but will work with all matrices.
- * @param num_right Number of RHS vectors.
- * @param get_right Function that accepts a `RightIndex_` in `[0, num_right)` and returns a pointer to an array of length `left.ncol()`.
- * The array referenced by `get_right(i)` represents the `i`-th RHS vector with which to multiply `left`.
+ * @param right_vectors Number of RHS vectors.
+ * @param get_right_vector Function that accepts a `RightIndex_` in `[0, right_vectors)` and returns a pointer to an array of length `left.ncol()`.
+ * The array referenced by `get_right_vector(i)` represents the `i`-th RHS vector with which to multiply `left`.
  * This function should be thread-safe.
- * @param get_output Function that accepts a `RightIndex_` in `[0, num_right)` and returns a pointer to an array of length `left.nrow()`.
- * On output, the array referenced by by `get_output(i)` stores the product `left * right[i]`.
+ * @param get_output_vector Function that accepts a `RightIndex_` in `[0, right_vectors)` and returns a pointer to an array of length `left.nrow()`.
+ * On output, the array referenced by by `get_output_vector(i)` stores the product `left * right[i]`.
  * @param options Further options.
  */
-template<typename LeftValue_, typename LeftIndex_, typename RightIndex_, typename GetRight_, typename GetOutput_>
+template<typename LeftValue_, typename LeftIndex_, typename RightVectors_, typename GetRightVector_, typename GetOutputVector_>
 void multiply_sparse_column_with_multiple_vectors(
     const tatami::Matrix<LeftValue_, LeftIndex_>& left,
-    const RightIndex_ num_right,
-    GetRight_ get_right,
-    GetOutput_ get_output,
+    const RightVectors_ right_vectors,
+    GetRightVector_ get_right_vector,
+    GetOutputVector_ get_output_vector,
     const MultiplySparseColumnWithMultipleVectorsOptions& options
 ) {
     const auto left_NR = left.nrow();
     const auto common_dim = left.ncol();
-    const auto right_NC = num_right; // alias for naming consistency.
-    typedef I<decltype(right_NC)> RightIndex;
-    for (RightIndex_ rc = 0; rc < right_NC; ++rc) {
-        std::fill_n(get_output(rc), left_NR, 0);
+    for (RightVectors_ rv = 0; rv < right_vectors; ++rv) {
+        std::fill_n(get_output_vector(rv), left_NR, 0);
     }
 
     const bool do_parallel = options.num_threads > 1;
-    typedef I<decltype(get_output(0)[0])> Output;
+    typedef I<decltype(get_output_vector(0)[0])> Output;
     std::optional<std::vector<std::optional<std::vector<std::vector<Output> > > > > tmp_results;
     if (do_parallel) {
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
@@ -195,16 +195,16 @@ void multiply_sparse_column_with_multiple_vectors(
                 start,
                 length,
                 left_NR,
-                right_NC,
-                get_right,
-                get_output,
+                right_vectors,
+                get_right_vector,
+                get_output_vector,
                 options
             );
 
         } else {
             std::vector<std::vector<Output> > tmp_output;
-            tmp_output.reserve(right_NC);
-            for (RightIndex rc = 0; rc < right_NC; ++rc) {
+            tmp_output.reserve(right_vectors);
+            for (RightVectors_ rv = 0; rv < right_vectors; ++rv) {
                 tmp_output.emplace_back(tatami::cast_Index_to_container_size<std::vector<Output> >(left_NR));
             }
             multiply_sparse_column_with_multiple_vectors_internal(
@@ -212,10 +212,10 @@ void multiply_sparse_column_with_multiple_vectors(
                 start,
                 length,
                 left_NR,
-                right_NC,
-                get_right,
-                [&](const RightIndex_ rc) -> Output* {
-                    return tmp_output[rc].data();
+                right_vectors,
+                get_right_vector,
+                [&](const RightVectors_ rv) -> Output* {
+                    return tmp_output[rv].data();
                 },
                 options
             );
@@ -226,9 +226,9 @@ void multiply_sparse_column_with_multiple_vectors(
     if (do_parallel) {
         for (int u = 1; u < num_used; ++u) {
             const auto& tmp = *((*tmp_results)[u - 1]);
-            for (RightIndex rc = 0; rc < right_NC; ++rc) {
-                const auto& tmpvec = tmp[rc];
-                const auto outptr = get_output(rc);
+            for (RightVectors_ rv = 0; rv < right_vectors; ++rv) {
+                const auto& tmpvec = tmp[rv];
+                const auto outptr = get_output_vector(rv);
                 for (LeftIndex_ lr = 0; lr < left_NR; ++lr) {
                     outptr[lr] += tmpvec[lr];
                 }
@@ -259,15 +259,15 @@ void multiply_sparse_column_with_multiple_vectors(
     const std::vector<Output_*>& output,
     const MultiplySparseColumnWithMultipleVectorsOptions& options
 ) {
-    const auto num_right = right.size();
-    typedef I<decltype(num_right)> RightIndex;
+    const auto right_vectors = right.size();
+    typedef I<decltype(right_vectors)> RightVectors;
     multiply_sparse_column_with_multiple_vectors(
         left,
-        num_right,
-        [&](const RightIndex rc) -> const RightValue_* {
+        right_vectors,
+        [&](const RightVectors rc) -> const RightValue_* {
             return right[rc];
         },
-        [&](const RightIndex rc) -> Output_* {
+        [&](const RightVectors rc) -> Output_* {
             return output[rc];
         },
         options
