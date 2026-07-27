@@ -33,9 +33,9 @@ struct MultiplySparseRowWithSingleVectorOptions {
 /**
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
- * @tparam Value_ Numeric type of the LHS matrix value.
- * @tparam Index_ Integer type of the LHS matrix index.
- * @tparam Right_ Numeric type of the RHS vector. 
+ * @tparam LeftValue_ Numeric type of the LHS matrix value.
+ * @tparam LeftIndex_ Integer type of the LHS matrix index.
+ * @tparam RightValue_ Numeric type of the RHS vector. 
  * @tparam Output_ Numeric type of the output array.
  * 
  * @param left LHS matrix to be multiplied.
@@ -46,20 +46,20 @@ struct MultiplySparseRowWithSingleVectorOptions {
  * On output, this stores the product `left * right`.
  * @param options Further options.
  */
-template<std::size_t accumulators_ = 4, typename Value_, typename Index_, typename Right_, typename Output_>
+template<std::size_t accumulators_ = 4, typename LeftValue_, typename LeftIndex_, typename RightValue_, typename Output_>
 void multiply_sparse_row_with_single_vector(
-    const tatami::Matrix<Value_, Index_>& left,
-    const Right_* const right,
+    const tatami::Matrix<LeftValue_, LeftIndex_>& left,
+    const RightValue_* const right,
     Output_* const output,
     const MultiplySparseRowWithSingleVectorOptions& options
 ) {
-    const Index_ NR = left.nrow();
-    const Index_ NC = left.ncol();
-    tatami::parallelize([&](int, Index_ start, Index_ length) -> void {
+    const auto NR = left.nrow();
+    const auto NC = left.ncol();
+    tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
-        auto vbuffer = tatami::create_container_of_Index_size<std::vector<Value_> >(NC);
-        auto ibuffer = tatami::create_container_of_Index_size<std::vector<Index_> >(NC);
-        for (Index_ r = start, end = start + length; r < end; ++r) {
+        auto vbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(NC);
+        auto ibuffer = tatami::create_container_of_Index_size<std::vector<LeftIndex_> >(NC);
+        for (LeftIndex_ r = start, end = start + length; r < end; ++r) {
             auto range = ext->fetch(vbuffer.data(), ibuffer.data());
             output[r] = sparse_dot_product<accumulators_>(
                 range.number, // tatami guarantees that range.number will fit in a std::size_t, so no need to protect the function call.
