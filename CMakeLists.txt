@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(tatami_mult
-    VERSION 0.1.3
+project(
+    tatami_mult
+    VERSION 0.2.0
     DESCRIPTION "Multiplication of tatami matrices"
-    LANGUAGES CXX)
+    LANGUAGES CXX
+)
 
 add_library(tatami_mult INTERFACE)
 add_library(tatami::tatami_mult ALIAS tatami_mult)
@@ -14,8 +16,8 @@ option(TATAMI_MULT_FETCH_EXTERN "Automatically fetch tatami_mult's external depe
 if(TATAMI_MULT_FETCH_EXTERN)
     add_subdirectory(extern)
 else()
-    find_package(tatami_tatami 4.0.0 CONFIG REQUIRED)
-    find_package(ltla_sanisizer 0.1.0 CONFIG REQUIRED)
+    find_package(tatami_tatami 4.1.0 CONFIG REQUIRED)
+    find_package(ltla_sanisizer 0.2.0 CONFIG REQUIRED)
 endif()
 
 target_link_libraries(tatami_mult INTERFACE tatami::tatami ltla::sanisizer)
