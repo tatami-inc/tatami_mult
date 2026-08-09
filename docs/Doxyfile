@@ -1000,6 +1000,7 @@ RECURSIVE              = YES
 EXCLUDE                = ../include/tatami_mult/utils.hpp \
                          ../include/tatami_mult/dense_dot_product.hpp \
                          ../include/tatami_mult/sparse_dot_product.hpp \
+                         ../include/tatami_mult/multiple_vectors/utils.hpp \
                          ../include/tatami_mult/dense_matrix/utils.hpp \
                          ../include/tatami_mult/sparse_matrix/utils.hpp
 

@@ -3,9 +3,12 @@
 
 #include <cstddef>
 #include <vector>
+#include <optional>
+#include <algorithm>
 
 #include "tatami/tatami.hpp"
 
+#include "utils.hpp"
 #include "../utils.hpp"
 #include "../sparse_dot_product.hpp"
 
@@ -259,19 +262,71 @@ void multiply_sparse_column_with_multiple_vectors(
     const std::vector<Output_*>& output,
     const MultiplySparseColumnWithMultipleVectorsOptions& options
 ) {
+    const auto left_NR = left.nrow();
+    const auto common_dim = left.ncol();
     const auto right_vectors = right.size();
     typedef I<decltype(right_vectors)> RightVectors;
-    multiply_sparse_column_with_multiple_vectors(
-        left,
-        right_vectors,
-        [&](const RightVectors rc) -> const RightValue_* {
-            return right[rc];
-        },
-        [&](const RightVectors rc) -> Output_* {
-            return output[rc];
-        },
-        options
-    );
+    for (RightVectors rv = 0; rv < right_vectors; ++rv) {
+        std::fill_n(output[rv], left_NR, 0);
+    }
+
+    const bool do_parallel = options.num_threads > 1;
+    std::optional<std::vector<std::optional<std::vector<Output_*> > > > tmp_results;
+    if (do_parallel) {
+        tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
+    }
+    LiberateArraysScope all_libout(tmp_results); // RAII to release the allocations from all threads.
+
+    const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
+        std::optional<std::vector<Output_*> > tmp_output;
+        Output_* const * output_ptrs;
+        LiberateArraysScope libout(tmp_output); // RAII to release the allocations from this thread.
+
+        if (!do_parallel || t == 0) {
+            output_ptrs = output.data();
+        } else {
+            tmp_output.emplace(sanisizer::cast<I<decltype(tmp_output->size())> >(right_vectors));
+            for (RightVectors rv = 0; rv < right_vectors; ++rv) {
+                auto ptr = new Output_ [left_NR]; // cast to size_t is safe due to the tatami contract.
+                (*tmp_output)[rv] = ptr;
+                std::fill_n(ptr, left_NR, 0);
+            }
+            output_ptrs = tmp_output->data();
+        }
+
+        multiply_sparse_column_with_multiple_vectors_internal(
+            left,
+            start,
+            length,
+            left_NR,
+            right_vectors,
+            [&](const RightVectors rv) -> const RightValue_* {
+                return right[rv];
+            },
+            [&](const RightVectors rv) -> Output_* {
+                return output_ptrs[rv];
+            },
+            options
+        );
+
+        if (do_parallel && t > 0) {
+            (*tmp_results)[t - 1] = std::move(tmp_output);
+            tmp_output.reset(); // clear pointers so they don't get freed by libout's destructor.
+        }
+    }, common_dim, options.num_threads);
+
+    if (do_parallel) {
+        for (int u = 1; u < num_used; ++u) {
+            const auto& tmp = *((*tmp_results)[u - 1]);
+            for (RightVectors rv = 0; rv < right_vectors; ++rv) {
+                const auto tmpvec = tmp[rv];
+                const auto outptr = output[rv];
+                for (LeftIndex_ lr = 0; lr < left_NR; ++lr) {
+                    outptr[lr] += tmpvec[lr];
+                }
+            }
+        }
+    }
 }
 
 }

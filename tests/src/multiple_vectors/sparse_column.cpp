@@ -47,7 +47,6 @@ TEST_P(MultipleVectorsSparseColumnTest, Basic) {
     opt.num_threads = nthreads;
     opt.block_size = block_size;
 
-    std::vector<std::vector<double> > sr_output, sc_output;
     auto formulate_ptrs = [&](std::vector<std::vector<double> >& output) -> std::vector<double*> {
         output.resize(NRHS);
         std::vector<double*> ptrs(NRHS);
@@ -59,14 +58,38 @@ TEST_P(MultipleVectorsSparseColumnTest, Basic) {
         return ptrs;
     };
 
+    std::vector<std::vector<double> > sr_output, sc_output;
     tatami_mult::multiply_sparse_column_with_multiple_vectors(*sparse_row, rhs_ptrs, formulate_ptrs(sr_output), opt);
     tatami_mult::multiply_sparse_column_with_multiple_vectors(*sparse_col, rhs_ptrs, formulate_ptrs(sc_output), opt);
+
+    // Check the overload with custom RHS/output functions.
+    std::vector<std::vector<double> > sr_output2(NRHS), sc_output2(NRHS); 
+    for (int h = 0; h < NRHS; ++h) {
+        sr_output2[h].resize(NR, 2445 + h);
+        sc_output2[h].resize(NR, 2423 + h);
+    }
+    tatami_mult::multiply_sparse_column_with_multiple_vectors(
+        *sparse_row,
+        NRHS,
+        [&](const int h) -> const double* { return rhs_ptrs[h]; },
+        [&](const int h) -> double* { return sr_output2[h].data(); },
+        opt
+    );
+    tatami_mult::multiply_sparse_column_with_multiple_vectors(
+        *sparse_col,
+        NRHS,
+        [&](const int h) -> const double* { return rhs_ptrs[h]; },
+        [&](const int h) -> double* { return sc_output2[h].data(); },
+        opt
+    );
 
     for (int h = 0; h < NRHS; ++h) {
         for (int r = 0; r < NR; ++r) {
             const auto ref = std::inner_product(rhs_ptrs[h], rhs_ptrs[h] + NC, dump.begin() + r * NC, 0.0);
             EXPECT_FLOAT_EQ(ref, sr_output[h][r]);
             EXPECT_FLOAT_EQ(ref, sc_output[h][r]);
+            EXPECT_FLOAT_EQ(ref, sr_output2[h][r]);
+            EXPECT_FLOAT_EQ(ref, sc_output2[h][r]);
         }
     }
 }
@@ -117,7 +140,6 @@ TEST_P(MultipleVectorsSparseColumnEmptyTest, Basic) {
     opt.num_threads = nthreads;
     opt.block_size = block_size;
 
-    std::vector<std::vector<double> > sr_output1, sr_output4, sc_output1, sc_output4;
     auto formulate_ptrs = [&](std::vector<std::vector<double> >& output) -> std::vector<double*> {
         output.resize(NRHS);
         std::vector<double*> ptrs(NRHS);
@@ -133,11 +155,34 @@ TEST_P(MultipleVectorsSparseColumnEmptyTest, Basic) {
     tatami_mult::multiply_sparse_column_with_multiple_vectors(*sparse_row, rhs_ptrs, formulate_ptrs(sr_output), opt);
     tatami_mult::multiply_sparse_column_with_multiple_vectors(*sparse_col, rhs_ptrs, formulate_ptrs(sc_output), opt);
 
+    // Check the overload with custom RHS/output functions.
+    std::vector<std::vector<double> > sr_output2(NRHS), sc_output2(NRHS);
+    for (int h = 0; h < NRHS; ++h) {
+        sr_output2[h].resize(NR, 231 + h);
+        sc_output2[h].resize(NR, 457 + h);
+    }
+    tatami_mult::multiply_sparse_column_with_multiple_vectors(
+        *sparse_row,
+        NRHS,
+        [&](const int h) -> const double* { return rhs_ptrs[h]; },
+        [&](const int h) -> double* { return sr_output2[h].data(); },
+        opt
+    );
+    tatami_mult::multiply_sparse_column_with_multiple_vectors(
+        *sparse_col,
+        NRHS,
+        [&](const int h) -> const double* { return rhs_ptrs[h]; },
+        [&](const int h) -> double* { return sc_output2[h].data(); },
+        opt
+    );
+
     for (int h = 0; h < NRHS; ++h) {
         for (int r = 0; r < NR; ++r) {
             const auto ref = std::inner_product(rhs_ptrs[h], rhs_ptrs[h] + NC, dump.begin() + r * NC, 0.0);
             EXPECT_FLOAT_EQ(ref, sr_output[h][r]);
             EXPECT_FLOAT_EQ(ref, sc_output[h][r]);
+            EXPECT_FLOAT_EQ(ref, sr_output2[h][r]);
+            EXPECT_FLOAT_EQ(ref, sc_output2[h][r]);
         }
     }
 }

@@ -45,7 +45,6 @@ TEST_P(MultipleVectorsDenseColumnTest, Basic) {
     opt.primary_block_size = blocks.first;
     opt.secondary_block_size = blocks.second;
 
-    std::vector<std::vector<double> > dr_output, dc_output; 
     auto formulate_ptrs = [&](std::vector<std::vector<double> >& output) -> std::vector<double*> {
         output.resize(NRHS);
         std::vector<double*> ptrs(NRHS);
@@ -57,14 +56,39 @@ TEST_P(MultipleVectorsDenseColumnTest, Basic) {
         return ptrs;
     };
 
+    std::vector<std::vector<double> > dr_output, dc_output; 
     tatami_mult::multiply_dense_column_with_multiple_vectors(*dense_row, rhs_ptrs, formulate_ptrs(dr_output), opt);
     tatami_mult::multiply_dense_column_with_multiple_vectors(*dense_col, rhs_ptrs, formulate_ptrs(dc_output), opt);
 
+    // Check the overload with custom RHS/output functions.
+    std::vector<std::vector<double> > dr_output2(NRHS), dc_output2(NRHS); 
+    for (int h = 0; h < NRHS; ++h) {
+        dr_output2[h].resize(NR, 44 + h);
+        dc_output2[h].resize(NR, 1321 + h);
+    }
+    tatami_mult::multiply_dense_column_with_multiple_vectors(
+        *dense_row,
+        NRHS,
+        [&](const int h) -> const double* { return rhs_ptrs[h]; },
+        [&](const int h) -> double* { return dr_output2[h].data(); },
+        opt
+    );
+    tatami_mult::multiply_dense_column_with_multiple_vectors(
+        *dense_col,
+        NRHS,
+        [&](const int h) -> const double* { return rhs_ptrs[h]; },
+        [&](const int h) -> double* { return dc_output2[h].data(); },
+        opt
+    );
+
+    // Checking the values.
     for (int h = 0; h < NRHS; ++h) {
         for (int r = 0; r < NR; ++r) {
             const auto ref = std::inner_product(rhs_ptrs[h], rhs_ptrs[h] + NC, dump.begin() + r * NC, 0.0);
             EXPECT_FLOAT_EQ(ref, dr_output[h][r]);
             EXPECT_FLOAT_EQ(ref, dc_output[h][r]);
+            EXPECT_FLOAT_EQ(ref, dr_output2[h][r]);
+            EXPECT_FLOAT_EQ(ref, dc_output2[h][r]);
         }
     }
 }
