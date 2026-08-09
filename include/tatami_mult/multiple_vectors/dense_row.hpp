@@ -47,104 +47,6 @@ struct MultiplyDenseRowWithMultipleVectorsOptions {
 };
 
 /**
- * @cond
- */
-template<std::size_t accumulators_, bool use_local_buffer_, typename LeftValue_, typename LeftIndex_, typename RightVectors_, typename GetRightVector_, typename GetOutputVector_>
-void multiply_dense_row_with_multiple_vectors_blocked_internal(
-    const tatami::Matrix<LeftValue_, LeftIndex_>& left,
-    const LeftIndex_ start,
-    const LeftIndex_ length,
-    const LeftIndex_ common_dim,
-    const RightVectors_ right_vectors,
-    GetRightVector_ get_right_vector,
-    GetOutputVector_ get_output_vector,
-    const MultiplyDenseRowWithMultipleVectorsOptions& options
-) {
-    auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
-
-    const LeftIndex_ max_block_rows = sanisizer::min(length, options.primary_block_size);
-    std::vector<std::vector<LeftValue_> > left_buffers;
-    left_buffers.reserve(max_block_rows);
-    for (LeftIndex_ lr = 0; lr < max_block_rows; ++lr) {
-        left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
-    }
-    auto left_ptrs = tatami::create_container_of_Index_size<std::vector<const LeftValue_*> >(max_block_rows);
-
-    typedef I<decltype(get_output_vector(0)[0])> Output;
-    typename std::conditional<use_local_buffer_, std::vector<std::vector<Output> >, bool>::type tmp_output;
-    if constexpr(!use_local_buffer_) {
-        // Zeroing all of the buffers if we're operating on a single thread,
-        // as we're computing partial dot products and we need to start from zero.
-        for (RightVectors_ rc = 0; rc < right_vectors; ++rc) {
-            std::fill_n(get_output_vector(rc), length, 0);
-        }
-    } else {
-        // For the multi-threaded case, we create some temporary buffers to hold the partial dot products for the current set of submatrices.
-        // This aims to mitigate false sharing as we update each block's partial dot products in the loop over the common dimension.
-        // There is still some potential for false sharing when we transfer the results to the output buffers,
-        // but this is the same as the unblocked case so we won't worry about it.
-        const RightVectors_ max_block_cols = sanisizer::min(right_vectors, options.primary_block_size);
-        tmp_output.reserve(max_block_cols);
-        for (RightVectors_ rc = 0; rc < max_block_cols; ++rc) {
-            tmp_output.emplace_back(tatami::cast_Index_to_container_size<std::vector<Output> >(max_block_rows));
-        }
-    }
-
-    LeftIndex_ lr = 0;
-    while (lr < length) {
-        const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
-        for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-            left_ptrs[lr_counter] = ext->fetch(left_buffers[lr_counter].data());
-        }
-
-        RightVectors_ rc = 0;
-        while (rc < right_vectors) {
-            const RightVectors_ rc_num = sanisizer::min(options.primary_block_size, right_vectors - rc);
-
-            LeftIndex_ cd = 0;
-            while (cd < common_dim) {
-                const LeftIndex_ cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
-                for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
-                    const auto outvec = [&](){
-                        if constexpr(!use_local_buffer_) {
-                            return get_output_vector(rc + rc_counter) + start + lr;
-                        } else {
-                            return tmp_output[rc_counter].data();
-                        }
-                    }();
-                    const auto rightvec = get_right_vector(rc + rc_counter);
-
-                    for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
-                        auto& dest = outvec[lr_counter]; 
-                        dest = dense_dot_product<accumulators_>(
-                            cd_num, // Implicit cast to std::size_t is safe, as per the tatami contract.
-                            rightvec + cd,
-                            left_ptrs[lr_counter] + cd,
-                            dest
-                        );
-                    }
-                }
-                cd += cd_num;
-            }
-
-            if constexpr(use_local_buffer_) {
-                for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
-                    auto& src = tmp_output[rc_counter];
-                    std::copy_n(src.begin(), lr_num, get_output_vector(rc + rc_counter) + start + lr);
-                    std::fill_n(src.begin(), lr_num, 0);
-                }
-            }
-
-            rc += rc_num;
-        }
-        lr += lr_num;
-    }
-}
-/**
- * @endcond
- */
-
-/**
  * @tparam accumulators_ Number of accumulators for computing the dot product,
  * see the @ref multiple-accumulators "Multiple accumulators" section for more details.
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
@@ -197,10 +99,114 @@ void multiply_dense_row_with_multiple_vectors(
 
     const bool do_parallel = options.num_threads > 1;
     tatami::parallelize([&](int, const LeftIndex_ start, const LeftIndex_ length) -> void {
+        auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
+
+        const LeftIndex_ max_block_rows = sanisizer::min(length, options.primary_block_size);
+        std::vector<std::vector<LeftValue_> > left_buffers;
+        left_buffers.reserve(max_block_rows);
+        for (LeftIndex_ lr = 0; lr < max_block_rows; ++lr) {
+            left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
+        }
+        auto left_ptrs = tatami::create_container_of_Index_size<std::vector<const LeftValue_*> >(max_block_rows);
+
         if (!do_parallel) {
-            multiply_dense_row_with_multiple_vectors_blocked_internal<accumulators_, false>(left, start, length, common_dim, right_vectors, get_right_vector, get_output_vector, options);
+            // Zeroing all of the buffers if we're operating on a single thread,
+            // as we're computing partial dot products and we need to start from zero.
+            for (RightVectors_ rc = 0; rc < right_vectors; ++rc) {
+                std::fill_n(get_output_vector(rc), length, 0);
+            }
+
+            LeftIndex_ lr = 0;
+            while (lr < length) {
+                const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
+                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                    left_ptrs[lr_counter] = ext->fetch(left_buffers[lr_counter].data());
+                }
+
+                RightVectors_ rc = 0;
+                while (rc < right_vectors) {
+                    const RightVectors_ rc_num = sanisizer::min(options.primary_block_size, right_vectors - rc);
+
+                    LeftIndex_ cd = 0;
+                    while (cd < common_dim) {
+                        const LeftIndex_ cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
+                        for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                            const auto outvec = get_output_vector(rc + rc_counter) + start + lr;
+                            const auto rightvec = get_right_vector(rc + rc_counter);
+
+                            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                                auto& dest = outvec[lr_counter]; 
+                                dest = dense_dot_product<accumulators_>(
+                                    cd_num, // Implicit cast to std::size_t is safe, as per the tatami contract.
+                                    rightvec + cd,
+                                    left_ptrs[lr_counter] + cd,
+                                    dest
+                                );
+                            }
+                        }
+                        cd += cd_num;
+                    }
+
+                    rc += rc_num;
+                }
+                lr += lr_num;
+            }
+
         } else {
-            multiply_dense_row_with_multiple_vectors_blocked_internal<accumulators_, true>(left, start, length, common_dim, right_vectors, get_right_vector, get_output_vector, options);
+            // For the multi-threaded case, we create some temporary buffers to hold the partial dot products for the current set of submatrices.
+            // This aims to mitigate false sharing as we update each block's partial dot products in the loop over the common dimension.
+            // There is still some potential for false sharing when we transfer the results to the output buffers,
+            // but this is the same as the unblocked case so we won't worry about it.
+            std::vector<std::vector<Output> > tmp_output;
+            {
+                const RightVectors_ max_block_cols = sanisizer::min(right_vectors, options.primary_block_size);
+                tmp_output.reserve(max_block_cols);
+                for (RightVectors_ rc = 0; rc < max_block_cols; ++rc) {
+                    tmp_output.emplace_back(tatami::cast_Index_to_container_size<std::vector<Output> >(max_block_rows));
+                }
+            }
+
+            LeftIndex_ lr = 0;
+            while (lr < length) {
+                const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
+                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                    left_ptrs[lr_counter] = ext->fetch(left_buffers[lr_counter].data());
+                }
+
+                RightVectors_ rc = 0;
+                while (rc < right_vectors) {
+                    const RightVectors_ rc_num = sanisizer::min(options.primary_block_size, right_vectors - rc);
+
+                    LeftIndex_ cd = 0;
+                    while (cd < common_dim) {
+                        const LeftIndex_ cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
+                        for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                            const auto outvec = tmp_output[rc_counter].data();
+                            const auto rightvec = get_right_vector(rc + rc_counter);
+
+                            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                                auto& dest = outvec[lr_counter]; 
+                                dest = dense_dot_product<accumulators_>(
+                                    cd_num, // Implicit cast to std::size_t is safe, as per the tatami contract.
+                                    rightvec + cd,
+                                    left_ptrs[lr_counter] + cd,
+                                    dest
+                                );
+                            }
+                        }
+                        cd += cd_num;
+                    }
+
+                    for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                        auto& src = tmp_output[rc_counter];
+                        std::copy_n(src.begin(), lr_num, get_output_vector(rc + rc_counter) + start + lr);
+                        std::fill_n(src.begin(), lr_num, 0);
+                    }
+
+                    rc += rc_num;
+                }
+                lr += lr_num;
+            }
         }
     }, left_NR, options.num_threads);
 }
