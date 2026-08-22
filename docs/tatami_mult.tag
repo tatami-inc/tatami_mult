@@ -113,138 +113,6 @@
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/dense_matrix/dense_column/</path>
-    <filename>dense__matrix_2dense__column_2dispatch_8hpp.html</filename>
-    <includes id="dense__matrix_2dense__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="dense__matrix_2dense__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="dense__matrix_2dense__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="dense__matrix_2dense__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyDenseColumnWithDenseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/dense_matrix/dense_row/</path>
-    <filename>dense__matrix_2dense__row_2dispatch_8hpp.html</filename>
-    <includes id="dense__matrix_2dense__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="dense__matrix_2dense__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="dense__matrix_2dense__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="dense__matrix_2dense__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyDenseRowWithDenseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/dense_matrix/</path>
-    <filename>dense__matrix_2dispatch_8hpp.html</filename>
-    <includes id="dense__matrix_2dense__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_row/dispatch.hpp</includes>
-    <includes id="dense__matrix_2dense__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_column/dispatch.hpp</includes>
-    <includes id="dense__matrix_2sparse__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_row/dispatch.hpp</includes>
-    <includes id="dense__matrix_2sparse__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_column/dispatch.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyWithDenseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/dense_matrix/sparse_column/</path>
-    <filename>dense__matrix_2sparse__column_2dispatch_8hpp.html</filename>
-    <includes id="dense__matrix_2sparse__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="dense__matrix_2sparse__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="dense__matrix_2sparse__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="dense__matrix_2sparse__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplySparseColumnWithDenseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/dense_matrix/sparse_row/</path>
-    <filename>dense__matrix_2sparse__row_2dispatch_8hpp.html</filename>
-    <includes id="dense__matrix_2sparse__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="dense__matrix_2sparse__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="dense__matrix_2sparse__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="dense__matrix_2sparse__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplySparseRowWithDenseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2dispatch_8hpp.html</filename>
-    <includes id="multiple__vectors_2dense__row_8hpp" name="dense_row.hpp" local="yes" import="no" module="no" objc="no">dense_row.hpp</includes>
-    <includes id="multiple__vectors_2dense__column_8hpp" name="dense_column.hpp" local="yes" import="no" module="no" objc="no">dense_column.hpp</includes>
-    <includes id="multiple__vectors_2sparse__row_8hpp" name="sparse_row.hpp" local="yes" import="no" module="no" objc="no">sparse_row.hpp</includes>
-    <includes id="multiple__vectors_2sparse__column_8hpp" name="sparse_column.hpp" local="yes" import="no" module="no" objc="no">sparse_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2dispatch_8hpp.html</filename>
-    <includes id="single__vector_2dense__row_8hpp" name="dense_row.hpp" local="yes" import="no" module="no" objc="no">dense_row.hpp</includes>
-    <includes id="single__vector_2dense__column_8hpp" name="dense_column.hpp" local="yes" import="no" module="no" objc="no">dense_column.hpp</includes>
-    <includes id="single__vector_2sparse__row_8hpp" name="sparse_row.hpp" local="yes" import="no" module="no" objc="no">sparse_row.hpp</includes>
-    <includes id="single__vector_2sparse__column_8hpp" name="sparse_column.hpp" local="yes" import="no" module="no" objc="no">sparse_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyWithSingleVectorOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/sparse_matrix/dense_column/</path>
-    <filename>sparse__matrix_2dense__column_2dispatch_8hpp.html</filename>
-    <includes id="sparse__matrix_2dense__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="sparse__matrix_2dense__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="sparse__matrix_2dense__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="sparse__matrix_2dense__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/sparse_matrix/dense_row/</path>
-    <filename>sparse__matrix_2dense__row_2dispatch_8hpp.html</filename>
-    <includes id="sparse__matrix_2dense__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="sparse__matrix_2dense__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="sparse__matrix_2dense__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="sparse__matrix_2dense__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyDenseRowWithSparseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/sparse_matrix/</path>
-    <filename>sparse__matrix_2dispatch_8hpp.html</filename>
-    <includes id="sparse__matrix_2dense__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_row/dispatch.hpp</includes>
-    <includes id="sparse__matrix_2dense__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_column/dispatch.hpp</includes>
-    <includes id="sparse__matrix_2sparse__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_row/dispatch.hpp</includes>
-    <includes id="sparse__matrix_2sparse__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_column/dispatch.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplyWithSparseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/sparse_matrix/sparse_column/</path>
-    <filename>sparse__matrix_2sparse__column_2dispatch_8hpp.html</filename>
-    <includes id="sparse__matrix_2sparse__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="sparse__matrix_2sparse__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="sparse__matrix_2sparse__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="sparse__matrix_2sparse__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplySparseColumnWithSparseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dispatch.hpp</name>
-    <path>tatami_mult/sparse_matrix/sparse_row/</path>
-    <filename>sparse__matrix_2sparse__row_2dispatch_8hpp.html</filename>
-    <includes id="sparse__matrix_2sparse__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
-    <includes id="sparse__matrix_2sparse__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
-    <includes id="sparse__matrix_2sparse__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
-    <includes id="sparse__matrix_2sparse__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
-    <class kind="struct">tatami_mult::MultiplySparseRowWithSparseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
     <name>row_to_column.hpp</name>
     <path>tatami_mult/dense_matrix/dense_column/</path>
     <filename>dense__matrix_2dense__column_2row__to__column_8hpp.html</filename>
@@ -382,6 +250,138 @@
     <path>tatami_mult/single_vector/</path>
     <filename>single__vector_2dense__row_8hpp.html</filename>
     <class kind="struct">tatami_mult::MultiplyDenseRowWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/dense_matrix/dense_column/</path>
+    <filename>dense__matrix_2dense__column_2dispatch_8hpp.html</filename>
+    <includes id="dense__matrix_2dense__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="dense__matrix_2dense__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="dense__matrix_2dense__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="dense__matrix_2dense__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithDenseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/dense_matrix/dense_row/</path>
+    <filename>dense__matrix_2dense__row_2dispatch_8hpp.html</filename>
+    <includes id="dense__matrix_2dense__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="dense__matrix_2dense__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="dense__matrix_2dense__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="dense__matrix_2dense__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyDenseRowWithDenseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/dense_matrix/</path>
+    <filename>dense__matrix_2dispatch_8hpp.html</filename>
+    <includes id="dense__matrix_2dense__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_row/dispatch.hpp</includes>
+    <includes id="dense__matrix_2dense__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_column/dispatch.hpp</includes>
+    <includes id="dense__matrix_2sparse__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_row/dispatch.hpp</includes>
+    <includes id="dense__matrix_2sparse__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_column/dispatch.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyWithDenseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/dense_matrix/sparse_column/</path>
+    <filename>dense__matrix_2sparse__column_2dispatch_8hpp.html</filename>
+    <includes id="dense__matrix_2sparse__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="dense__matrix_2sparse__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="dense__matrix_2sparse__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="dense__matrix_2sparse__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplySparseColumnWithDenseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/dense_matrix/sparse_row/</path>
+    <filename>dense__matrix_2sparse__row_2dispatch_8hpp.html</filename>
+    <includes id="dense__matrix_2sparse__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="dense__matrix_2sparse__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="dense__matrix_2sparse__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="dense__matrix_2sparse__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplySparseRowWithDenseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2dispatch_8hpp.html</filename>
+    <includes id="multiple__vectors_2dense__row_8hpp" name="dense_row.hpp" local="yes" import="no" module="no" objc="no">dense_row.hpp</includes>
+    <includes id="multiple__vectors_2dense__column_8hpp" name="dense_column.hpp" local="yes" import="no" module="no" objc="no">dense_column.hpp</includes>
+    <includes id="multiple__vectors_2sparse__row_8hpp" name="sparse_row.hpp" local="yes" import="no" module="no" objc="no">sparse_row.hpp</includes>
+    <includes id="multiple__vectors_2sparse__column_8hpp" name="sparse_column.hpp" local="yes" import="no" module="no" objc="no">sparse_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2dispatch_8hpp.html</filename>
+    <includes id="single__vector_2dense__row_8hpp" name="dense_row.hpp" local="yes" import="no" module="no" objc="no">dense_row.hpp</includes>
+    <includes id="single__vector_2dense__column_8hpp" name="dense_column.hpp" local="yes" import="no" module="no" objc="no">dense_column.hpp</includes>
+    <includes id="single__vector_2sparse__row_8hpp" name="sparse_row.hpp" local="yes" import="no" module="no" objc="no">sparse_row.hpp</includes>
+    <includes id="single__vector_2sparse__column_8hpp" name="sparse_column.hpp" local="yes" import="no" module="no" objc="no">sparse_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/sparse_matrix/dense_column/</path>
+    <filename>sparse__matrix_2dense__column_2dispatch_8hpp.html</filename>
+    <includes id="sparse__matrix_2dense__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="sparse__matrix_2dense__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="sparse__matrix_2dense__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="sparse__matrix_2dense__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSparseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/sparse_matrix/dense_row/</path>
+    <filename>sparse__matrix_2dense__row_2dispatch_8hpp.html</filename>
+    <includes id="sparse__matrix_2dense__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="sparse__matrix_2dense__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="sparse__matrix_2dense__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="sparse__matrix_2dense__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyDenseRowWithSparseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/sparse_matrix/</path>
+    <filename>sparse__matrix_2dispatch_8hpp.html</filename>
+    <includes id="sparse__matrix_2dense__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_row/dispatch.hpp</includes>
+    <includes id="sparse__matrix_2dense__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">dense_column/dispatch.hpp</includes>
+    <includes id="sparse__matrix_2sparse__row_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_row/dispatch.hpp</includes>
+    <includes id="sparse__matrix_2sparse__column_2dispatch_8hpp" name="dispatch.hpp" local="yes" import="no" module="no" objc="no">sparse_column/dispatch.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplyWithSparseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/sparse_matrix/sparse_column/</path>
+    <filename>sparse__matrix_2sparse__column_2dispatch_8hpp.html</filename>
+    <includes id="sparse__matrix_2sparse__column_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="sparse__matrix_2sparse__column_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="sparse__matrix_2sparse__column_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="sparse__matrix_2sparse__column_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplySparseColumnWithSparseMatrixOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dispatch.hpp</name>
+    <path>tatami_mult/sparse_matrix/sparse_row/</path>
+    <filename>sparse__matrix_2sparse__row_2dispatch_8hpp.html</filename>
+    <includes id="sparse__matrix_2sparse__row_2row__to__row_8hpp" name="row_to_row.hpp" local="yes" import="no" module="no" objc="no">row_to_row.hpp</includes>
+    <includes id="sparse__matrix_2sparse__row_2row__to__column_8hpp" name="row_to_column.hpp" local="yes" import="no" module="no" objc="no">row_to_column.hpp</includes>
+    <includes id="sparse__matrix_2sparse__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
+    <includes id="sparse__matrix_2sparse__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
+    <class kind="struct">tatami_mult::MultiplySparseRowWithSparseMatrixOptions</class>
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="file">
