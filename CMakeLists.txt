@@ -18,9 +18,10 @@ if(TATAMI_MULT_FETCH_EXTERN)
 else()
     find_package(tatami_tatami 4.1.0 CONFIG REQUIRED)
     find_package(ltla_sanisizer 0.2.0 CONFIG REQUIRED)
+    find_package(ltla_jiwoo 0.1.0 CONFIG REQUIRED)
 endif()
 
-target_link_libraries(tatami_mult INTERFACE tatami::tatami ltla::sanisizer)
+target_link_libraries(tatami_mult INTERFACE tatami::tatami ltla::sanisizer ltla::jiwoo)
 
 include(GNUInstallDirs)
 target_include_directories(tatami_mult INTERFACE 

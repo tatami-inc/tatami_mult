@@ -8,8 +8,8 @@
 
 #include "tatami/tatami.hpp"
 #include "sanisizer/sanisizer.hpp"
+#include "jiwoo/jiwoo.hpp"
 
-#include "utils.hpp"
 #include "../utils.hpp"
 
 /**
@@ -251,13 +251,13 @@ void multiply_dense_column_with_multiple_vectors(
     if (do_parallel) {
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
     }
-    LiberateArraysScope all_libout(tmp_results); // RAII to release the allocations from all threads.
+    jiwoo::Scope all_libout(tmp_results); // RAII to release the allocations from all threads.
 
     const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         std::optional<std::vector<Output_*> > tmp_output;
-        Output_* const * output_ptrs;
-        LiberateArraysScope libout(tmp_output); // RAII to release the allocations from this thread.
+        jiwoo::Scope libout(tmp_output); // RAII to release the allocations from this thread.
 
+        Output_* const * output_ptrs;
         if (!do_parallel || t == 0) {
             output_ptrs = output.data();
         } else {
@@ -286,8 +286,7 @@ void multiply_dense_column_with_multiple_vectors(
         );
 
         if (do_parallel && t > 0) {
-            (*tmp_results)[t - 1] = std::move(tmp_output);
-            tmp_output.reset(); // clear pointers so they don't get freed by libout's destructor.
+            jiwoo::transfer(tmp_output, (*tmp_results)[t - 1]);
         }
     }, common_dim, options.num_threads);
 
