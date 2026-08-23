@@ -291,67 +291,64 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    }</div>
 <div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
 <div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> do_parallel = options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#aeed1843d2649f296dca957dcf7a38c07">num_threads</a> &gt; 1;</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    std::optional&lt;std::vector&lt;std::optional&lt;std::vector&lt;Output_*&gt; &gt; &gt; &gt; tmp_results;</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    std::optional&lt;std::vector&lt;std::optional&lt;jiwoo::EquilengthArrays&lt;Output_&gt; &gt; &gt; &gt; tmp_results;</div>
 <div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    <span class="keywordflow">if</span> (do_parallel) {</div>
 <div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>        tmp_results.emplace(sanisizer::cast&lt;I&lt;<span class="keyword">decltype</span>(tmp_results-&gt;size())&gt; &gt;(options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#aeed1843d2649f296dca957dcf7a38c07">num_threads</a> - 1));</div>
 <div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    }</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    jiwoo::Scope all_libout(tmp_results); <span class="comment">// RAII to release the allocations from all threads.</span></div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span> </div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    <span class="keyword">const</span> <span class="keyword">auto</span> num_used = <a class="code hl_functionRef" href="https://tatami-inc.github.io/tatami/namespacetatami.html#a9c3979c60e3d7e066be533f7ee3a2f97">tatami::parallelize</a>([&amp;](<span class="keywordtype">int</span> t, LeftIndex_ start, LeftIndex_ length) -&gt; <span class="keywordtype">void</span> {</div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>        std::optional&lt;std::vector&lt;Output_*&gt; &gt; tmp_output;</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        jiwoo::Scope libout(tmp_output); <span class="comment">// RAII to release the allocations from this thread.</span></div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span> </div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>        Output_* <span class="keyword">const</span> * output_ptrs;</div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>        <span class="keywordflow">if</span> (!do_parallel || t == 0) {</div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>            output_ptrs = output.data();</div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>            tmp_output.emplace(sanisizer::cast&lt;I&lt;<span class="keyword">decltype</span>(tmp_output-&gt;size())&gt; &gt;(right_vectors));</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>            <span class="keywordflow">for</span> (RightVectors rv = 0; rv &lt; right_vectors; ++rv) {</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>                <span class="keyword">auto</span> ptr = <span class="keyword">new</span> Output_ [left_NR]; <span class="comment">// cast to size_t is safe due to the tatami contract.</span></div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>                (*tmp_output)[rv] = ptr;</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>                std::fill_n(ptr, left_NR, 0);</div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>            }</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>            output_ptrs = tmp_output-&gt;data();</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>        }</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        multiply_dense_column_with_multiple_vectors_internal(</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>            left,</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>            start,</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>            length,</div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>            left_NR,</div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>            right_vectors,</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>            [&amp;](<span class="keyword">const</span> RightVectors rv) -&gt; <span class="keyword">const</span> RightValue_* {</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>                <span class="keywordflow">return</span> right[rv];</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <span class="keyword">const</span> <span class="keyword">auto</span> num_used = <a class="code hl_functionRef" href="https://tatami-inc.github.io/tatami/namespacetatami.html#a9c3979c60e3d7e066be533f7ee3a2f97">tatami::parallelize</a>([&amp;](<span class="keywordtype">int</span> t, LeftIndex_ start, LeftIndex_ length) -&gt; <span class="keywordtype">void</span> {</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>        std::optional&lt;jiwoo::EquilengthArrays&lt;Output_&gt; &gt; tmp_output;</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        Output_* <span class="keyword">const</span> * output_ptrs;</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        <span class="keywordflow">if</span> (!do_parallel || t == 0) {</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>            output_ptrs = output.data();</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>            tmp_output.emplace(</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>                sanisizer::cast&lt;I&lt;<span class="keyword">decltype</span>(tmp_output-&gt;size())&gt; &gt;(right_vectors),</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>                <span class="keyword">static_cast&lt;</span>std::size_t<span class="keyword">&gt;</span>(left_NR), <span class="comment">// cast to size_t is safe due to the tatami contract.</span></div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>                0</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>            );</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>            output_ptrs = tmp_output-&gt;get();</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>        }</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>        multiply_dense_column_with_multiple_vectors_internal(</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>            left,</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>            start,</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>            length,</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>            left_NR,</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>            right_vectors,</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>            [&amp;](<span class="keyword">const</span> RightVectors rv) -&gt; <span class="keyword">const</span> RightValue_* {</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>                <span class="keywordflow">return</span> right[rv];</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>            },</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>            [&amp;](<span class="keyword">const</span> RightVectors rv) -&gt; Output_* {</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>                <span class="keywordflow">return</span> output_ptrs[rv];</div>
 <div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>            },</div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>            [&amp;](<span class="keyword">const</span> RightVectors rv) -&gt; Output_* {</div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>                <span class="keywordflow">return</span> output_ptrs[rv];</div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>            },</div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>            options</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>        );</div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span> </div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>        <span class="keywordflow">if</span> (do_parallel &amp;&amp; t &gt; 0) {</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>            jiwoo::transfer(tmp_output, (*tmp_results)[t - 1]);</div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        }</div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    }, common_dim, options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#aeed1843d2649f296dca957dcf7a38c07">num_threads</a>);</div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span> </div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    <span class="keywordflow">if</span> (do_parallel) {</div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> u = 1; u &lt; num_used; ++u) {</div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; tmp = *((*tmp_results)[u - 1]);</div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>            <span class="keywordflow">for</span> (RightVectors rv = 0; rv &lt; right_vectors; ++rv) {</div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>                <span class="keyword">const</span> <span class="keyword">auto</span> tmpvec = tmp[rv];</div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>                <span class="keyword">const</span> <span class="keyword">auto</span> outptr = output[rv];</div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>                <span class="keywordflow">for</span> (LeftIndex_ lr = 0; lr &lt; left_NR; ++lr) {</div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>                    outptr[lr] += tmpvec[lr];</div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>                }</div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>            }</div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>        }</div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    }</div>
-<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>}</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>            options</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>        );</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>        <span class="keywordflow">if</span> (do_parallel &amp;&amp; t &gt; 0) {</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>            (*tmp_results)[t - 1] = std::move(tmp_output);</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        }</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    }, common_dim, options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#aeed1843d2649f296dca957dcf7a38c07">num_threads</a>);</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span> </div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    <span class="keywordflow">if</span> (do_parallel) {</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> u = 1; u &lt; num_used; ++u) {</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; tmp = *((*tmp_results)[u - 1]);</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>            <span class="keywordflow">for</span> (RightVectors rv = 0; rv &lt; right_vectors; ++rv) {</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>                <span class="keyword">const</span> <span class="keyword">auto</span> tmpvec = tmp[rv];</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>                <span class="keyword">const</span> <span class="keyword">auto</span> outptr = output[rv];</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>                <span class="keywordflow">for</span> (LeftIndex_ lr = 0; lr &lt; left_NR; ++lr) {</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>                    outptr[lr] += tmpvec[lr];</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>                }</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>            }</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>        }</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    }</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>}</div>
 </div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span> </div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>}</div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span> </div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span> </div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>}</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span> </div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html">tatami::Matrix</a></div></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a1f6fec43d5bae3f831841646bc02377b"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a1f6fec43d5bae3f831841646bc02377b">tatami::Matrix::ncol</a></div><div class="ttdeci">virtual Index_ ncol() const=0</div></div>
 <div class="ttc" id="aclasstatami_1_1Matrix_html_a54fe7b4baf78069d35ff00357a1b6cc6"><div class="ttname"><a href="https://tatami-inc.github.io/tatami/classtatami_1_1Matrix.html#a54fe7b4baf78069d35ff00357a1b6cc6">tatami::Matrix::nrow</a></div><div class="ttdeci">virtual Index_ nrow() const=0</div></div>
