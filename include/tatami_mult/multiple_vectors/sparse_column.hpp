@@ -272,27 +272,24 @@ void multiply_sparse_column_with_multiple_vectors(
     }
 
     const bool do_parallel = options.num_threads > 1;
-    std::optional<std::vector<std::optional<std::vector<Output_*> > > > tmp_results;
+    std::optional<std::vector<std::optional<jiwoo::EquilengthArrays<Output_> > > > tmp_results;
     if (do_parallel) {
         tmp_results.emplace(sanisizer::cast<I<decltype(tmp_results->size())> >(options.num_threads - 1));
     }
-    jiwoo::Scope all_libout(tmp_results); // RAII to release the allocations from all threads.
 
     const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
-        std::optional<std::vector<Output_*> > tmp_output;
-        Output_* const * output_ptrs;
-        jiwoo::Scope libout(tmp_output); // RAII to release the allocations from this thread.
+        std::optional<jiwoo::EquilengthArrays<Output_> > tmp_output;
 
+        Output_* const * output_ptrs;
         if (!do_parallel || t == 0) {
             output_ptrs = output.data();
         } else {
-            tmp_output.emplace(sanisizer::cast<I<decltype(tmp_output->size())> >(right_vectors));
-            for (RightVectors rv = 0; rv < right_vectors; ++rv) {
-                auto ptr = new Output_ [left_NR]; // cast to size_t is safe due to the tatami contract.
-                (*tmp_output)[rv] = ptr;
-                std::fill_n(ptr, left_NR, 0);
-            }
-            output_ptrs = tmp_output->data();
+            tmp_output.emplace(
+                sanisizer::cast<I<decltype(tmp_output->size())> >(right_vectors),
+                static_cast<std::size_t>(left_NR), // cast to size_t is safe due to the tatami contract.
+                0
+            );
+            output_ptrs = tmp_output->get();
         }
 
         multiply_sparse_column_with_multiple_vectors_internal(
@@ -311,7 +308,7 @@ void multiply_sparse_column_with_multiple_vectors(
         );
 
         if (do_parallel && t > 0) {
-            jiwoo::transfer(tmp_output, (*tmp_results)[t - 1]);
+            (*tmp_results)[t - 1] = std::move(tmp_output);
         }
     }, common_dim, options.num_threads);
 
