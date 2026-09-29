@@ -15,19 +15,28 @@ jobs:
       matrix:
         config:
         - {
-            name: "Ubuntu Latest GCC, coverage enabled", 
+            name: "Ubuntu Latest GCC, debug, coverage enabled", 
             os: ubuntu-latest,
             cov: true
           }
         - {
-            name: "macOS Latest Clang", 
+            name: "macOS Latest Clang, debug", 
+            os: macos-latest
+          }
+        - {
+            name: "Ubuntu Latest GCC, debug, force copy", 
+            os: ubuntu-latest,
+            force-copy: true
+          }
+        - {
+            name: "macOS Latest Clang, release", 
             os: macos-latest,
-            cov: false
+            release: true
           }
         - {
-            name: "Ubuntu Latest GCC, force copy", 
+            name: "Ubuntu Latest GCC, release", 
             os: ubuntu-latest,
-            cov: true
+            release: true
           }
 
     steps:
@@ -36,16 +45,20 @@ jobs:
     - name: Get latest CMake
       uses: lukka/get-cmake@latest
 
-    - name: Configure the build for Mac
-      if: ${{ ! matrix.config.cov }}
+    - name: Configure release build
+      if: ${{ matrix.config.release }}
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Configure Mac debug build
+      if: ${{ !matrix.config.cov && matrix.config.os == 'macos-latest' }}
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 
-    - name: Configure the build with coverage
-      if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.cov }}
+    - name: Configure Linux debug build with coverage
+      if: ${{ matrix.config.cov }}
       run: cmake -S . -B build -DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
 
-    - name: Configure the build with forced copy 
-      if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.force-copy }}
+    - name: Configure Linux debug build with forced copy 
+      if: ${{ matrix.config.force-copy }}
       run: cmake -S . -B build -DFORCE_COPY=ON -DCMAKE_BUILD_TYPE=Debug
 
     - name: Run the build
@@ -56,7 +69,7 @@ jobs:
         cd build/tests
         # Avoid using ctest because it's so slow; it starts a
         # new process for each individual test, which is crazy.
-        for exe in $(ctest --show-only=json-v1 | jq -r ".tests[] | .command | .[0]"  | sort | uniq)
+        for exe in $(ls *_test)
         do
             echo "#### RUNNING ${exe} ####"
             echo 
