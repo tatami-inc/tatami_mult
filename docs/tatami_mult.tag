@@ -1,6 +1,62 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile doxygen_version="1.12.0">
   <compound kind="file">
+    <name>dense_column.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2dense__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dense_column.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2dense__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dense_row.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2dense__row_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseRowWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>dense_row.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2dense__row_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplyDenseRowWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>sparse_column.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2sparse__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplySparseColumnWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>sparse_column.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2sparse__column_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplySparseColumnWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>sparse_row.hpp</name>
+    <path>tatami_mult/multiple_vectors/</path>
+    <filename>multiple__vectors_2sparse__row_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplySparseRowWithMultipleVectorsOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
+    <name>sparse_row.hpp</name>
+    <path>tatami_mult/single_vector/</path>
+    <filename>single__vector_2sparse__row_8hpp.html</filename>
+    <class kind="struct">tatami_mult::MultiplySparseRowWithSingleVectorOptions</class>
+    <namespace>tatami_mult</namespace>
+  </compound>
+  <compound kind="file">
     <name>column_to_column.hpp</name>
     <path>tatami_mult/dense_matrix/dense_column/</path>
     <filename>dense__matrix_2dense__column_2column__to__column_8hpp.html</filename>
@@ -225,34 +281,6 @@
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="file">
-    <name>dense_column.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2dense__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseColumnWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dense_column.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2dense__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseColumnWithSingleVectorOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dense_row.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2dense__row_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseRowWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>dense_row.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2dense__row_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplyDenseRowWithSingleVectorOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
     <name>dispatch.hpp</name>
     <path>tatami_mult/dense_matrix/dense_column/</path>
     <filename>dense__matrix_2dense__column_2dispatch_8hpp.html</filename>
@@ -382,34 +410,6 @@
     <includes id="sparse__matrix_2sparse__row_2column__to__row_8hpp" name="column_to_row.hpp" local="yes" import="no" module="no" objc="no">column_to_row.hpp</includes>
     <includes id="sparse__matrix_2sparse__row_2column__to__column_8hpp" name="column_to_column.hpp" local="yes" import="no" module="no" objc="no">column_to_column.hpp</includes>
     <class kind="struct">tatami_mult::MultiplySparseRowWithSparseMatrixOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>sparse_column.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2sparse__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplySparseColumnWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>sparse_column.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2sparse__column_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplySparseColumnWithSingleVectorOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>sparse_row.hpp</name>
-    <path>tatami_mult/multiple_vectors/</path>
-    <filename>multiple__vectors_2sparse__row_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplySparseRowWithMultipleVectorsOptions</class>
-    <namespace>tatami_mult</namespace>
-  </compound>
-  <compound kind="file">
-    <name>sparse_row.hpp</name>
-    <path>tatami_mult/single_vector/</path>
-    <filename>single__vector_2sparse__row_8hpp.html</filename>
-    <class kind="struct">tatami_mult::MultiplySparseRowWithSingleVectorOptions</class>
     <namespace>tatami_mult</namespace>
   </compound>
   <compound kind="file">
