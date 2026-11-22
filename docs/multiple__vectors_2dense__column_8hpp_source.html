@@ -161,9 +161,9 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        std::vector&lt;std::vector&lt;LeftValue_&gt; &gt; left_buffers;</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        std::vector&lt;const LeftValue_*&gt; left_ptrs;</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        {</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            <span class="keyword">const</span> LeftIndex_ max_block_cols = sanisizer::min(length, options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#a31c86246856ed3a6d3ec3b4ff8a8952c">primary_block_size</a>);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            <span class="keyword">const</span> <span class="keyword">auto</span> max_block_cols = sanisizer::min(length, options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#a31c86246856ed3a6d3ec3b4ff8a8952c">primary_block_size</a>);</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>            left_buffers.reserve(max_block_cols);</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>            <span class="keywordflow">for</span> (LeftIndex_ cd = 0; cd &lt; max_block_cols; ++cd) {</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>            <span class="keywordflow">for</span> (I&lt;<span class="keyword">decltype</span>(max_block_cols)&gt; cd = 0; cd &lt; max_block_cols; ++cd) {</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>                left_buffers.emplace_back(<a class="code hl_functionRef" href="https://tatami-inc.github.io/tatami/namespacetatami.html#a32d5ae83f932e5ef00b12e7caf9a7cdc">tatami::cast_Index_to_container_size</a>&lt;std::vector&lt;LeftValue_&gt; &gt;(left_NR));</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>            }</div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>            sanisizer::resize(left_ptrs, max_block_cols);</div>
@@ -171,8 +171,8 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        LeftIndex_ cd = 0;</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        <span class="keywordflow">while</span> (cd &lt; length) {</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            <span class="keyword">const</span> LeftIndex_ cd_num = sanisizer::min(options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#a31c86246856ed3a6d3ec3b4ff8a8952c">primary_block_size</a>, length - cd);</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            <span class="keywordflow">for</span> (LeftIndex_ cd_counter = 0; cd_counter &lt; cd_num; ++cd_counter) {</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            <span class="keyword">const</span> <span class="keyword">auto</span> cd_num = sanisizer::min(options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#a31c86246856ed3a6d3ec3b4ff8a8952c">primary_block_size</a>, length - cd);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            <span class="keywordflow">for</span> (I&lt;<span class="keyword">decltype</span>(cd_num)&gt; cd_counter = 0; cd_counter &lt; cd_num; ++cd_counter) {</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>                left_ptrs[cd_counter] = ext-&gt;fetch(left_buffers[cd_counter].data());</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>            }</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
@@ -183,7 +183,7 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>                <span class="keywordflow">while</span> (lr &lt; left_NR) {</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>                    <span class="keyword">const</span> LeftIndex_ lr_end = lr + sanisizer::min(options.<a class="code hl_variable" href="structtatami__mult_1_1MultiplyDenseColumnWithMultipleVectorsOptions.html#a56fe5ce1a44ee21ca4974f9c6632db9f">secondary_block_size</a>, left_NR - lr);</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                    <span class="keywordflow">for</span> (LeftIndex_ cd_counter = 0; cd_counter &lt; cd_num; ++cd_counter) {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                    <span class="keywordflow">for</span> (I&lt;<span class="keyword">decltype</span>(cd_num)&gt; cd_counter = 0; cd_counter &lt; cd_num; ++cd_counter) {</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>                        <span class="keyword">const</span> <span class="keyword">auto</span> matcol = left_ptrs[cd_counter];</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>                        <span class="keywordflow">for</span> (<span class="keyword">auto</span> rv_copy = rv; rv_copy &lt; rv_end; ++rv_copy) {</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>                            <span class="keyword">const</span> Output mult = get_right_vector(rv_copy)[start + cd + cd_counter];</div>
