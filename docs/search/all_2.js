@@ -3,7 +3,7 @@ var searchData=
   ['caching_20a_20single_20dense_20vector_0',['Caching a single dense vector',['../sparse-blocking.html#autotoc_md10',1,'']]],
   ['caching_20multiple_20dense_20vectors_1',['Caching multiple dense vectors',['../sparse-blocking.html#autotoc_md11',1,'']]],
   ['can_5fcast_5findex_5fto_5fcontainer_5fsize_2',['can_cast_Index_to_container_size',['https://tatami-inc.github.io/tatami/namespacetatami.html#a4d15fa0c5213ad27fc0c99c3dd5c02ad',1,'tatami']]],
-  ['cast_5findex_5fto_5fcontainer_5fsize_3',['cast_Index_to_container_size',['https://tatami-inc.github.io/tatami/namespacetatami.html#ac6d0f6694ab914f57229b925641779d4',1,'tatami']]],
+  ['cast_5findex_5fto_5fcontainer_5fsize_3',['cast_Index_to_container_size',['https://tatami-inc.github.io/tatami/namespacetatami.html#a32d5ae83f932e5ef00b12e7caf9a7cdc',1,'tatami']]],
   ['check_4',['check',['https://tatami-inc.github.io/tatami/structtatami_1_1CompressedSparseMatrixOptions.html#a88f4bdb918e8ce35bf07e6a16c464bfc',1,'tatami::CompressedSparseMatrixOptions::check'],['https://tatami-inc.github.io/tatami/structtatami_1_1FragmentedSparseMatrixOptions.html#ad0bd65e9fafe7060867db6e048b1919d',1,'tatami::FragmentedSparseMatrixOptions::check']]],
   ['cmake_20with_20tt_20fetchcontent_20tt_5',['CMake with &lt;tt&gt;FetchContent&lt;/tt&gt;',['../index.html#autotoc_md4',1,'']]],
   ['cmake_20with_20tt_20find_5fpackage_20tt_6',['CMake with &lt;tt&gt;find_package()&lt;/tt&gt;',['../index.html#autotoc_md5',1,'']]],
