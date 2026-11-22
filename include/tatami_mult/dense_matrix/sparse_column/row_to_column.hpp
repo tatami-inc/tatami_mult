@@ -50,7 +50,7 @@ struct MultiplySparseColumnWithDenseRowMatrixToColumnOutputOptions {
  * @param right_columns Number of columns of the RHS matrix to be multiplied.
  * @param get_right_row Function that accepts a `LeftIndex_` in `[0, left.ncol())` and returns a pointer to an array of length `right_columns`.
  * The array referenced by `get_right_row(i)` represents the `i`-th row of the RHS matrix.
- * This function should be thread-safe.
+ * This function should be thread-safe if `MultiplySparseColumnWithDenseRowMatrixToColumnOutputOptions::num_threads > 1`.
  * @param[out] output Pointer to an array of length equal to `left.nrow() * right_columns`.
  * On output, this contains the matrix product in column-major format.
  * @param options Further options.

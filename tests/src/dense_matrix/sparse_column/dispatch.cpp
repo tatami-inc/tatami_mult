@@ -38,7 +38,10 @@ TEST_P(DenseMatrixSparseColumnTest, Basic) {
         return opt;
     }());
     auto right_col = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NRHS, rhs);
-    auto right_row = tatami::convert_to_dense<double, int>(*right_col, true, {});
+
+    std::vector<double> t_rhs(rhs.size());
+    tatami::transpose(rhs.data(), NRHS, NC, t_rhs.data());
+    auto right_row = std::make_unique<tatami::DenseRowMatrix<double, int> >(NC, NRHS, t_rhs);
 
     tatami_mult::MultiplySparseColumnWithDenseMatrixOptions opt;
     opt.column_to_column.num_threads = nthreads;
@@ -86,10 +89,8 @@ TEST_P(DenseMatrixSparseColumnTest, Basic) {
     }
 
     // Check the functor overloads that aren't directly called.
-    auto rext = right_row->dense(true, tatami::Options());
-    std::vector<double> rxbuffer(NRHS);
-    auto get_right = [&](std::size_t rc) -> const double* {
-        return rext->fetch(rc, rxbuffer.data());
+    auto get_right = [&](std::size_t rr) -> const double* {
+        return t_rhs.data() + rr * NRHS;
     };
     std::vector<double> fun_rr_ro(output_size, 1.2), fun_rr_co(output_size, 2.2);
     tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*sparse_col, NRHS, get_right, fun_rr_co.data(), opt.row_to_column);
@@ -139,6 +140,9 @@ TEST_P(DenseMatrixSparseColumnEmptyTest, Basic) {
         return opt;
     }());
     auto right_col = std::make_unique<tatami::DenseColumnMatrix<double, int> >(NC, NRHS, rhs);
+
+    std::vector<double> t_rhs(rhs.size());
+    tatami::transpose(rhs.data(), NRHS, NC, t_rhs.data());
     auto right_row = tatami::convert_to_dense<double, int>(*right_col, true, {});
 
     // Setting an initial value for the output vectors, to check that dirty outputs are properly zeroed.
@@ -183,10 +187,8 @@ TEST_P(DenseMatrixSparseColumnEmptyTest, Basic) {
     }
 
     // Check the functor overloads that aren't directly called.
-    auto rext = right_row->dense(true, tatami::Options());
-    std::vector<double> rxbuffer(NRHS);
-    auto get_right = [&](std::size_t rc) -> const double* {
-        return rext->fetch(rc, rxbuffer.data());
+    auto get_right = [&](std::size_t rr) -> const double* {
+        return t_rhs.data() + rr * NRHS;
     };
     std::vector<double> fun_rr_ro(output_size, 1.2), fun_rr_co(output_size, 2.2);
     tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*sparse_col, NRHS, get_right, fun_rr_co.data(), opt.row_to_column);

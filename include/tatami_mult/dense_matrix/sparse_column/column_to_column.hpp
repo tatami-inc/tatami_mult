@@ -39,9 +39,6 @@ struct MultiplySparseColumnWithDenseColumnMatrixToColumnOutputOptions {
     int block_size = 16;
 };
 
-
-
-
 /**
  * @tparam LeftValue_ Numeric type of the LHS matrix value.
  * @tparam LeftIndex_ Integer type of the LHS matrix index.
@@ -54,7 +51,7 @@ struct MultiplySparseColumnWithDenseColumnMatrixToColumnOutputOptions {
  * @param right_columns Number of columns of the RHS matrix to be multiplied.
  * @param get_right_column Function that accepts a `RightColumns_` in `[0, right_columns)` and returns a pointer to an array of length `left.ncol()`.
  * The array referenced by `get_right_column(i)` represents the `i`-th column of the RHS matrix.
- * This function should be thread-safe.
+ * This function should be thread-safe if `MultiplySparseColumnWithDenseColumnMatrixToColumnOutputOptions::num_threads > 1`.
  * @param[out] output Vector of pointers, each of which points to an array of length `left.nrow()`.
  * On output, this contains the product `left * right` in column-major format.
  * @param options Further options.
