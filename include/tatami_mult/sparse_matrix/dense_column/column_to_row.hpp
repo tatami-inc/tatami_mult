@@ -74,8 +74,9 @@ void multiply_dense_column_with_sparse_column_matrix_to_row_output(
     conv_opt.num_threads = options.num_threads;
     auto rhs_data = tatami::retrieve_fragmented_sparse_contents<RightValue_, RightIndex_>(right, true, conv_opt);
 
-    // If there are any empty RHS rows, we only iterate over the non-empty ones in the outer loop.
-    auto right_non_empty = filter_non_empty_sparse(
+    // If there are any empty RHS rows, we only iterate over the LHS columns corresponding to the non-empty RHS rows in the outer loop.
+    // (We can safely coerce these indices to LeftIndex_ as they refer to the common dimension.)
+    auto right_non_empty = filter_non_empty_sparse<LeftIndex_>(
         rhs_data.index,
         [&](const RightIndex_) -> void {}
     );
@@ -122,9 +123,9 @@ void multiply_dense_column_with_sparse_column_matrix_to_row_output(
                 std::vector<std::vector<LeftValue_> > left_buffers;
                 std::vector<const LeftValue_*> left_ptrs;
                 {
-                    const LeftIndex_ max_block_cols = sanisizer::min(length, options.block_size);
+                    const auto max_block_cols = sanisizer::min(length, options.block_size);
                     left_buffers.reserve(max_block_cols);
-                    for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+                    for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                         left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
                     }
                     sanisizer::resize(left_ptrs, max_block_cols);
@@ -133,12 +134,12 @@ void multiply_dense_column_with_sparse_column_matrix_to_row_output(
                 LeftIndex_ cd = 0;
                 while (cd < length) {
                     const auto cd_num = sanisizer::min(options.block_size, length - cd);
-                    for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                    for (I<decltype(cd_num)> cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                         left_ptrs[cd_counter] = ext->fetch(left_buffers[cd_counter].data());
                     }
 
                     for (LeftIndex_ lr = 0; lr < left_NR; ++lr) {
-                        for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                        for (I<decltype(cd_num)> cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                             const auto mult = left_ptrs[cd_counter][lr];
                             const auto actual_cd = converter(cd + cd_counter);
                             const auto& right_values = rhs_data.value[actual_cd];

@@ -228,3 +228,55 @@ TEST(DenseMatrixSparseColumn, Options) {
     EXPECT_EQ(opt.column_to_column.block_size, 42);
     EXPECT_EQ(opt.row_to_column.block_size, 42);
 }
+
+/************************************/
+
+TEST(DenseMatrixSparseColumn, UnsignedFunctor) {
+    // Check that the functor overloads are compiled without warnings for different combinations of integer signedness.
+    // (Note that compilation of the regular overloads are handled in the top-level tatami_mult.cpp, so we don't need to check those.)
+    const int NR = 212;
+    const int NC = 13;
+    const int NRHS = 51;
+
+    auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.density = 0.1;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 11 + NR + NC + NRHS;
+        return opt;
+    }());
+    tatami::DenseRowMatrix<double, int> raw_lhs(NR, NC, dump);
+    auto lhs = tatami::convert_to_compressed_sparse<double, int>(raw_lhs, false, {});
+    auto lhs_u = tatami::convert_to_compressed_sparse<double, unsigned>(raw_lhs, false, {});
+
+    auto rdump = tatami_test::simulate_vector<double>(NC * NRHS, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 13 + NR + NC + NRHS;
+        return opt;
+    }());
+    auto get_right = [&](std::size_t rr) -> const double* {
+        return rdump.data() + rr * NRHS;
+    };
+
+    const auto output_size = NR * NRHS;
+    std::vector<double> ref(output_size), out_us(output_size), out_su(output_size), out_uu(output_size);
+
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*lhs, NRHS, get_right, ref.data(), {});
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*lhs, (unsigned)NRHS, get_right, out_su.data(), {});
+    EXPECT_EQ(ref, out_su);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*lhs_u, NRHS, get_right, out_us.data(), {});
+    EXPECT_EQ(ref, out_us);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_column_output(*lhs_u, (unsigned)NRHS, get_right, out_uu.data(), {});
+    EXPECT_EQ(ref, out_uu);
+
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*lhs, NRHS, get_right, ref.data(), {});
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*lhs, (unsigned)NRHS, get_right, out_su.data(), {});
+    EXPECT_EQ(ref, out_su);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*lhs_u, NRHS, get_right, out_us.data(), {});
+    EXPECT_EQ(ref, out_us);
+    tatami_mult::multiply_sparse_column_with_dense_row_matrix_to_row_output(*lhs_u, (unsigned)NRHS, get_right, out_uu.data(), {});
+    EXPECT_EQ(ref, out_uu);
+}

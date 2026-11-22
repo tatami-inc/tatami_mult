@@ -105,10 +105,10 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
     tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
 
-        const LeftIndex_ max_block_rows = sanisizer::min(length, options.primary_block_size);
+        const auto max_block_rows = sanisizer::min(length, options.primary_block_size);
         std::vector<std::vector<LeftValue_> > lbuffers;
         lbuffers.reserve(max_block_rows);
-        for (LeftIndex_ b = 0; b < max_block_rows; ++b) {
+        for (I<decltype(max_block_rows)> b = 0; b < max_block_rows; ++b) {
             lbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
         }
         auto lptrs = tatami::create_container_of_Index_size<std::vector<const LeftValue_*> >(max_block_rows);
@@ -120,8 +120,8 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
             // This aims to mitigate false sharing as we update each block's partial dot products in the loop over the common dimension.
             // There is still some potential for false sharing when we transfer the results to the output buffers,
             // but this is the same as the unblocked case so we won't worry about it.
-            const RightColumns_ max_block_cols = sanisizer::min(right_columns, options.primary_block_size);
-            const LeftIndex_ max_block_rows = sanisizer::min(length, options.primary_block_size);
+            const auto max_block_cols = sanisizer::min(right_columns, options.primary_block_size);
+            const auto max_block_rows = sanisizer::min(length, options.primary_block_size);
             tmp_output.emplace(sanisizer::product<I<decltype(tmp_output->size())> >(max_block_cols, max_block_rows));
             optr = tmp_output->data();
         } else {
@@ -130,14 +130,14 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
 
         LeftIndex_ lr = 0;
         while (lr < length) {
-            const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
-            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+            const auto lr_num = sanisizer::min(options.primary_block_size, length - lr);
+            for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                 lptrs[lr_counter] = ext->fetch(lbuffers[lr_counter].data());
             }
 
             RightColumns_ rc = 0;
             while (rc < right_columns) {
-                const RightColumns_ rc_num = sanisizer::min(options.primary_block_size, right_columns - rc);
+                const auto rc_num = sanisizer::min(options.primary_block_size, right_columns - rc);
 
                 LeftIndex_ out_row_offset, out_stride;
                 RightColumns_ out_col_offset;
@@ -154,10 +154,10 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
 
                 LeftIndex_ cd = 0;
                 while (cd < common_dim) {
-                    const LeftIndex_ cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
-                    for (RightColumns_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                    const auto cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
+                    for (I<decltype(rc_num)> rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
                         const auto& rightcol = get_right_column(rc + rc_counter);
-                        for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                        for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                             auto& dest = optr[sanisizer::nd_offset<std::size_t>(out_row_offset + lr_counter, out_stride, out_col_offset + rc_counter)]; 
                             dest = dense_dot_product<accumulators_>(
                                 cd_num, // cast to size_t is safe due to tatami's contract.
@@ -171,7 +171,7 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
                 }
 
                 if (do_parallel) {
-                    for (RightColumns_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                    for (I<decltype(rc_num)> rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
                         std::copy_n(
                             optr + sanisizer::product_unsafe<std::size_t>(lr_num, rc_counter),
                             lr_num,
@@ -220,7 +220,7 @@ void multiply_dense_row_with_dense_column_matrix_to_column_output(
     auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
     auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
     const auto common_dim = left.ncol();
-    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+    populate_dense_buffers(false, right_NC, static_cast<RightIndex_>(common_dim), right, right_buffers, right_ptrs, options.num_threads);
 
     multiply_dense_row_with_dense_column_matrix_to_column_output<accumulators_>(
         left,

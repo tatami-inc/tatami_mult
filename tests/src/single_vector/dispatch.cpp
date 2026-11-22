@@ -33,7 +33,7 @@ TEST(SingleVectorDispatch, Vector) {
     }());
 
     // Setting an arbitrary initial value for all output vectors, to check that they are properly zeroed.
-    std::vector<double> drout(NR), dcout(NR), srout(NR), scout(NR);
+    std::vector<double> drout(NR, 1), dcout(NR, 2), srout(NR, 3), scout(NR, 4);
 
     tatami_mult::multiply_with_single_vector(*dense_row, rhs.data(), drout.data(), {});
     tatami_mult::multiply_with_single_vector(*dense_col, rhs.data(), dcout.data(), {});
@@ -60,4 +60,35 @@ TEST(SingleVectorDispatch, Options) {
     EXPECT_EQ(opt.dense_column.num_threads, 13);
     EXPECT_EQ(opt.sparse_row.num_threads, 13);
     EXPECT_EQ(opt.sparse_column.num_threads, 13);
+}
+
+TEST(SingleVectorDispatch, Unsigned) {
+    // Check that there are no compiler warnings when the indices are unsigned.
+    // This aims to avoid the use of the wrong integer type in, e.g., comparisons.
+    const int NR = 34;
+    const int NC = 129;
+
+    auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.density = 0.19;
+        opt.seed = 69;
+        return opt;
+    }());
+    auto lhs = std::make_unique<tatami::DenseRowMatrix<double, int> >(NR, NC, dump);
+    auto lhs_u = std::make_unique<tatami::DenseRowMatrix<double, unsigned> >(NR, NC, dump);
+
+    auto rhs = tatami_test::simulate_vector<double>(NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 42;
+        return opt;
+    }());
+
+    std::vector<double> ref(NR), out(NR);
+    tatami_mult::multiply_with_single_vector(*lhs, rhs.data(), ref.data(), {});
+    tatami_mult::multiply_with_single_vector(*lhs_u, rhs.data(), out.data(), {});
+    EXPECT_EQ(ref, out);
 }

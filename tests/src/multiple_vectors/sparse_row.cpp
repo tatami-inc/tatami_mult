@@ -161,3 +161,51 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(1, 3)
     )
 );
+
+/****************************************/
+
+TEST(MultipleVectorsSparseRow, UnsignedFunctor) {
+    // Check that the functor overloads are compiled without warnings for different combinations of integer signedness.
+    const int NR = 99;
+    const int NC = 32;
+    const int NRHS = 62;
+
+    auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.density = 0.2;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 69 + NR + NC + NRHS; 
+        return opt;
+    }());
+    tatami::DenseColumnMatrix<double, int> raw_lhs(NR, NC, dump);
+    auto lhs = tatami::convert_to_compressed_sparse<double, int>(raw_lhs, true, {});
+    auto lhs_u = tatami::convert_to_compressed_sparse<double, unsigned>(raw_lhs, true, {});
+
+    auto rhs = tatami_test::simulate_vector<double>(NC * NRHS, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 42 + NR + NC + NRHS; 
+        return opt;
+    }());
+    auto get_right = [&](const int h) -> const double* { return rhs.data() + h * NC; };
+
+    std::vector<std::vector<double> > ref(NRHS), out_us(NRHS), out_su(NRHS), out_uu(NRHS); 
+    for (int h = 0; h < NRHS; ++h) {
+        ref[h].resize(NR);
+        out_us[h].resize(NR);
+        out_su[h].resize(NR);
+        out_uu[h].resize(NR);
+    }
+
+    tatami_mult::multiply_sparse_row_with_multiple_vectors(*lhs, NRHS, get_right, [&](const int h) -> double* { return ref[h].data(); }, {});
+    tatami_mult::multiply_sparse_row_with_multiple_vectors(*lhs, (unsigned)NRHS, get_right, [&](const int h) -> double* { return out_su[h].data(); }, {});
+    EXPECT_EQ(ref, out_su);
+
+    tatami_mult::multiply_sparse_row_with_multiple_vectors(*lhs_u, NRHS, get_right, [&](const int h) -> double* { return out_us[h].data(); }, {});
+    EXPECT_EQ(ref, out_us);
+
+    tatami_mult::multiply_sparse_row_with_multiple_vectors(*lhs_u, (unsigned)NRHS, get_right, [&](const int h) -> double* { return out_uu[h].data(); }, {});
+    EXPECT_EQ(ref, out_uu);
+}

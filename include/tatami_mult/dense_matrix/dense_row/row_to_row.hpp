@@ -129,9 +129,9 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
 
             std::optional<std::vector<Output_> > tmp_output;
             {
-                const LeftIndex_ max_block_rows = sanisizer::min(length, options.primary_block_size);
+                const auto max_block_rows = sanisizer::min(length, options.primary_block_size);
                 left_buffers.reserve(max_block_rows);
-                for (LeftIndex_  b = 0; b < max_block_rows ; ++b) {
+                for (I<decltype(max_block_rows)> b = 0; b < max_block_rows ; ++b) {
                     left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
                 }
                 sanisizer::resize(left_ptrs, max_block_rows);
@@ -146,8 +146,8 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
 
             LeftIndex_ lr = 0;
             while (lr < length) {
-                const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                const auto lr_num = sanisizer::min(options.primary_block_size, length - lr);
+                for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     left_ptrs[lr_counter] = left_ext->fetch(left_buffers[lr_counter].data());
                 }
 
@@ -166,7 +166,7 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
                     while (rc < right_columns) {
                         const RightColumns_ rc_end = rc + sanisizer::min(options.secondary_block_size, right_columns - rc);
 
-                        for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                        for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                             const auto matrow = left_ptrs[lr_counter];
                             const auto prod = tmp_optr + sanisizer::product_unsafe<std::size_t>(lr_counter, right_columns);
                             for (auto ccopy = cd; ccopy < cd_end; ++ccopy) {
@@ -225,7 +225,7 @@ void multiply_dense_row_with_dense_row_matrix_to_row_output(
     auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(common_dim);
     auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(common_dim);
     const auto right_NC = right.ncol();
-    populate_dense_buffers(true, common_dim, right_NC, right, right_buffers, right_ptrs, options.num_threads);
+    populate_dense_buffers(true, static_cast<RightIndex_>(common_dim), right_NC, right, right_buffers, right_ptrs, options.num_threads);
 
     multiply_dense_row_with_dense_row_matrix_to_row_output(
         left,

@@ -108,3 +108,49 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(1, 3)
     )
 );
+
+/*********************************/
+
+TEST(MultipleVectorsDenseColumn, UnsignedFunctor) {
+    // Check that the functor overloads are compiled without warnings for different combinations of integer signedness.
+    const int NR = 79;
+    const int NC = 123;
+    const int NRHS = 35;
+
+    auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 69 + NR + NC + NRHS; 
+        return opt;
+    }());
+    tatami::DenseColumnMatrix<double, int> lhs(NR, NC, dump);
+    tatami::DenseColumnMatrix<double, unsigned> lhs_u(NR, NC, dump);
+
+    auto rhs = tatami_test::simulate_vector<double>(NC * NRHS, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 42 + NR + NC + NRHS; 
+        return opt;
+    }());
+    auto get_right = [&](const int h) -> const double* { return rhs.data() + h * NC; };
+
+    std::vector<std::vector<double> > ref(NRHS), out_us(NRHS), out_su(NRHS), out_uu(NRHS); 
+    for (int h = 0; h < NRHS; ++h) {
+        ref[h].resize(NR);
+        out_us[h].resize(NR);
+        out_su[h].resize(NR);
+        out_uu[h].resize(NR);
+    }
+
+    tatami_mult::multiply_dense_column_with_multiple_vectors(lhs, NRHS, get_right, [&](const int h) -> double* { return ref[h].data(); }, {});
+    tatami_mult::multiply_dense_column_with_multiple_vectors(lhs, (unsigned)NRHS, get_right, [&](const int h) -> double* { return out_su[h].data(); }, {});
+    EXPECT_EQ(ref, out_su);
+
+    tatami_mult::multiply_dense_column_with_multiple_vectors(lhs_u, NRHS, get_right, [&](const int h) -> double* { return out_us[h].data(); }, {});
+    EXPECT_EQ(ref, out_us);
+
+    tatami_mult::multiply_dense_column_with_multiple_vectors(lhs_u, (unsigned)NRHS, get_right, [&](const int h) -> double* { return out_uu[h].data(); }, {});
+    EXPECT_EQ(ref, out_uu);
+}

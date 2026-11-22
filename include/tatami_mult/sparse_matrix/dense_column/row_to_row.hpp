@@ -78,7 +78,7 @@ void multiply_dense_column_with_sparse_row_matrix_to_row_output(
 
     const int num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         auto left_ext = tatami::consecutive_extractor<false>(left, false, start, length);
-        auto right_ext = tatami::consecutive_extractor<true>(right, true, start, length);
+        auto right_ext = tatami::consecutive_extractor<true>(right, true, static_cast<RightIndex_>(start), static_cast<RightIndex_>(length));
 
         std::optional<std::vector<Output_> > tmp_output;
         Output_* outptr; 
@@ -118,11 +118,11 @@ void multiply_dense_column_with_sparse_row_matrix_to_row_output(
             std::vector<std::vector<RightIndex_> > right_ibuffers;
             std::vector<tatami::SparseRange<RightValue_, RightIndex_> > right_ranges;
             {
-                const LeftIndex_ max_block_cols = sanisizer::min(length, options.block_size);
+                const auto max_block_cols = sanisizer::min(length, options.block_size);
                 left_dbuffers.reserve(max_block_cols);
                 right_vbuffers.reserve(max_block_cols);
                 right_ibuffers.reserve(max_block_cols);
-                for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+                for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                     left_dbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
                     right_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<RightValue_> >(right_NC));
                     right_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<RightIndex_> >(right_NC));

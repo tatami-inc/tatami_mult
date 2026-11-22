@@ -134,7 +134,7 @@ void multiply_sparse_row_with_dense_row_matrix_to_row_output(
     auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(common_dim);
     auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(common_dim);
     const auto right_NC = right.ncol();
-    populate_dense_buffers(true, common_dim, right_NC, right, right_buffers, right_ptrs, options.num_threads);
+    populate_dense_buffers(true, static_cast<RightIndex_>(common_dim), right_NC, right, right_buffers, right_ptrs, options.num_threads);
 
     multiply_sparse_row_with_dense_row_matrix_to_row_output(
         left,

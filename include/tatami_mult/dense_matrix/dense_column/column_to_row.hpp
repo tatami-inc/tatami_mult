@@ -114,50 +114,50 @@ void multiply_dense_column_with_dense_column_matrix_to_row_output(
             std::vector<const LeftValue_*> left_ptrs;
             std::vector<Output_> tmp_output;
             {
-                const LeftIndex_ max_block_cols = sanisizer::min(length, options.primary_block_size);
+                const auto max_block_cols = sanisizer::min(length, options.primary_block_size);
                 left_buffers.reserve(max_block_cols);
-                for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+                for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                     left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
                 }
                 sanisizer::resize(left_ptrs, max_block_cols);
 
                 // We create a temporary buffer so that the inner loop for each block operates on contiguous output.
                 // This improves the efficiency of the hot loop, though we will have to transpose it to the output rows eventually.
-                const RightColumns_ max_block_right_cols = sanisizer::min(right_columns, options.primary_block_size);
-                const LeftIndex_ max_block_rows = sanisizer::min(left_NR, options.secondary_block_size);
+                const auto max_block_right_cols = sanisizer::min(right_columns, options.primary_block_size);
+                const auto max_block_rows = sanisizer::min(left_NR, options.secondary_block_size);
                 tmp_output.resize(sanisizer::product<I<decltype(tmp_output.size())> >(max_block_rows, max_block_right_cols));
             }
 
             LeftIndex_ cd = 0;
             while (cd < length) {
                 const auto cd_num = sanisizer::min(options.primary_block_size, length - cd);
-                for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                for (I<decltype(cd_num)> cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                     left_ptrs[cd_counter] = ext->fetch(left_buffers[cd_counter].data());
                 }
 
                 RightColumns_ rc = 0;
                 while (rc < right_columns) {
-                    const RightColumns_ rc_num = sanisizer::min(options.primary_block_size, right_columns - rc);
+                    const auto rc_num = sanisizer::min(options.primary_block_size, right_columns - rc);
                     LeftIndex_ lr = 0;
                     while (lr < left_NR) {
-                        const LeftIndex_ lr_num = sanisizer::min(options.secondary_block_size, left_NR - lr);
+                        const auto lr_num = sanisizer::min(options.secondary_block_size, left_NR - lr);
 
-                        for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                        for (I<decltype(cd_num)> cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                             const auto matcol = left_ptrs[cd_counter];
-                            for (RightColumns_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                            for (I<decltype(rc_num)> rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
                                 const Output_ mult = get_right_column(rc + rc_counter)[start + cd + cd_counter];
-                                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                                for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                                     tmp_output[sanisizer::nd_offset<std::size_t>(lr_counter, lr_num, rc_counter)] += mult * static_cast<Output_>(matcol[lr + lr_counter]);
                                 }
                             }
                         }
 
                         // Transposition using square blocks of the smaller (primary) block size.
-                        RightColumns_ lrt = 0;
+                        I<decltype(lr_num)> lrt = 0;
                         while (lrt < lr_num) {
-                            const LeftIndex_ lrt_end = lrt + sanisizer::min(options.primary_block_size, lr_num - lrt);
-                            for (RightColumns_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
-                                for (LeftIndex_ lrt_copy = lrt; lrt_copy < lrt_end; ++lrt_copy) {
+                            const I<decltype(lrt)> lrt_end = lrt + sanisizer::min(options.primary_block_size, lr_num - lrt);
+                            for (I<decltype(rc_num)> rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                                for (auto lrt_copy = lrt; lrt_copy < lrt_end; ++lrt_copy) {
                                     const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(lrt_copy, lr_num, rc_counter)];
                                     outptr[sanisizer::nd_offset<std::size_t>(rc + rc_counter, right_columns, lr + lrt_copy)] += val;
                                 }
@@ -221,7 +221,7 @@ void multiply_dense_column_with_dense_column_matrix_to_row_output(
     auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
     auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
     const auto common_dim = left.ncol();
-    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+    populate_dense_buffers(false, right_NC, static_cast<RightIndex_>(common_dim), right, right_buffers, right_ptrs, options.num_threads);
 
     multiply_dense_column_with_dense_column_matrix_to_row_output(
         left,

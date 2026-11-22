@@ -151,7 +151,7 @@ void multiply_sparse_column_with_dense_row_matrix_to_row_output(
 
     const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         auto left_ext = tatami::consecutive_extractor<true>(left, false, start, length);
-        auto right_ext = tatami::consecutive_extractor<false>(right, true, start, length);
+        auto right_ext = tatami::consecutive_extractor<false>(right, true, static_cast<RightIndex_>(start), static_cast<RightIndex_>(length));
 
         auto vbuffer = tatami::create_container_of_Index_size<std::vector<LeftValue_> >(left_NR);
         auto ibuffer = tatami::create_container_of_Index_size<std::vector<LeftIndex_> >(left_NR);

@@ -416,3 +416,52 @@ TEST(MultiplyMatrix, Options) {
     EXPECT_EQ(opt.dense_matrix.sparse_row.column_to_column.block_size, 100);
     EXPECT_EQ(opt.sparse_matrix.sparse_row.column_to_column.block_size, 100);
 }
+
+TEST(MultiplyMatrix, Unsigned) {
+    // Check that there are no compiler warnings when the indices are unsigned.
+    // Testing various combinations of unsigned types to check that the integer types are set correctly.
+    // This is mostly relevant for avoiding comparisons of differing signedness but also pops up when defining Oracles across matrices.
+    std::shared_ptr<tatami::Matrix<double, int> > lhs;
+    std::shared_ptr<tatami::Matrix<double, int> > rhs;
+    std::shared_ptr<tatami::Matrix<double, unsigned> > lhs_u;
+    std::shared_ptr<tatami::Matrix<double, unsigned> > rhs_u;
+
+    int NR = 99, common = 32, NC = 17;
+    {
+        std::vector<double> vec = tatami_test::simulate_vector<double>(NR * common, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 77;
+            return opt;
+        }());
+        lhs.reset(new tatami::DenseRowMatrix<double, int>(NR, common, vec));
+        lhs_u.reset(new tatami::DenseRowMatrix<double, unsigned>(NR, common, std::move(vec)));
+
+        std::vector<double> rvec = tatami_test::simulate_vector<double>(common * NC, []{
+            tatami_test::SimulateVectorOptions opt;
+            opt.lower = -10;
+            opt.upper = 10;
+            opt.seed = 89;
+            return opt;
+        }());
+        rhs.reset(new tatami::DenseRowMatrix<double, int>(common, NC, rvec));
+        rhs_u.reset(new tatami::DenseRowMatrix<double, unsigned>(common, NC, std::move(rvec)));
+    }
+
+    int full_size = NR * NC;
+    std::vector<double> ref(full_size);
+    tatami_mult::multiply(*lhs, *rhs, ref.data(), {});
+
+    std::vector<double> res_su(full_size);
+    tatami_mult::multiply(*lhs, *rhs_u, res_su.data(), {});
+    EXPECT_EQ(ref, res_su);
+
+    std::vector<double> res_us(full_size);
+    tatami_mult::multiply(*lhs_u, *rhs, res_us.data(), {});
+    EXPECT_EQ(ref, res_us);
+
+    std::vector<double> res_uu(full_size);
+    tatami_mult::multiply(*lhs_u, *rhs_u, res_uu.data(), {});
+    EXPECT_EQ(ref, res_uu);
+}

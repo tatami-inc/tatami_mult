@@ -82,9 +82,9 @@ void multiply_dense_column_with_multiple_vectors_internal(
         std::vector<std::vector<LeftValue_> > left_buffers;
         std::vector<const LeftValue_*> left_ptrs;
         {
-            const LeftIndex_ max_block_cols = sanisizer::min(length, options.primary_block_size);
+            const auto max_block_cols = sanisizer::min(length, options.primary_block_size);
             left_buffers.reserve(max_block_cols);
-            for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+            for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                 left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
             }
             sanisizer::resize(left_ptrs, max_block_cols);
@@ -92,8 +92,8 @@ void multiply_dense_column_with_multiple_vectors_internal(
 
         LeftIndex_ cd = 0;
         while (cd < length) {
-            const LeftIndex_ cd_num = sanisizer::min(options.primary_block_size, length - cd);
-            for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+            const auto cd_num = sanisizer::min(options.primary_block_size, length - cd);
+            for (I<decltype(cd_num)> cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                 left_ptrs[cd_counter] = ext->fetch(left_buffers[cd_counter].data());
             }
 
@@ -104,7 +104,7 @@ void multiply_dense_column_with_multiple_vectors_internal(
                 while (lr < left_NR) {
                     const LeftIndex_ lr_end = lr + sanisizer::min(options.secondary_block_size, left_NR - lr);
 
-                    for (LeftIndex_ cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
+                    for (I<decltype(cd_num)> cd_counter = 0; cd_counter < cd_num; ++cd_counter) {
                         const auto matcol = left_ptrs[cd_counter];
                         for (auto rv_copy = rv; rv_copy < rv_end; ++rv_copy) {
                             const Output mult = get_right_vector(rv_copy)[start + cd + cd_counter];

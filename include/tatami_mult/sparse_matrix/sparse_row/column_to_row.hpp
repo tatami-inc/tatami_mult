@@ -76,7 +76,7 @@ void multiply_sparse_row_with_sparse_column_matrix_to_row_output(
     auto right_vbuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
     auto right_ibuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightIndex_> > >(right_NC);
     auto right_ranges = tatami::create_container_of_Index_size<std::vector<tatami::SparseRange<RightValue_, RightIndex_> > >(right_NC);
-    populate_sparse_buffers(false, right_NC, common_dim, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
+    populate_sparse_buffers(false, right_NC, static_cast<RightIndex_>(common_dim), right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
 
     if (options.block_size == 1) {
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
@@ -118,14 +118,14 @@ void multiply_sparse_row_with_sparse_column_matrix_to_row_output(
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
             auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
 
-            const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
+            const auto max_block_rows = sanisizer::min(length, options.block_size);
             std::vector<std::vector<LeftValue_> > left_vbuffers;
             std::vector<std::vector<LeftIndex_> > left_ibuffers;
             std::vector<std::vector<LeftValue_> > expanded;
             left_vbuffers.reserve(max_block_rows);
             left_ibuffers.reserve(max_block_rows);
             expanded.reserve(max_block_rows);
-            for (LeftIndex_ b = 0; b < max_block_rows; ++b) {
+            for (I<decltype(max_block_rows)> b = 0; b < max_block_rows; ++b) {
                 left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
                 left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(common_dim));
                 expanded.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));

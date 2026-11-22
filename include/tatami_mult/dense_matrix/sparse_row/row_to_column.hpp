@@ -119,9 +119,9 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
 
             LeftIndex_ lr = 0;
             while (lr < length) {
-                const LeftIndex_ lrnum = sanisizer::min(options.block_size, length - lr);
+                const auto lr_num = sanisizer::min(options.block_size, length - lr);
                 bool any_non_empty = false;
-                for (LeftIndex_ lrcopy = 0; lrcopy < lrnum; ++lrcopy) {
+                for (I<decltype(lr_num)> lrcopy = 0; lrcopy < lr_num; ++lrcopy) {
                     const auto range = ext->fetch(vbuffer.data(), ibuffer.data());
                     if (range.number == 0) {
                         continue;
@@ -143,7 +143,7 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
                 RightColumns_ rc = 0;
                 while (rc < right_columns) {
                     const RightColumns_ rcend = rc + sanisizer::min(options.block_size, right_columns - rc);
-                    for (LeftIndex_ lrcopy = 0; lrcopy < lrnum; ++lrcopy) {
+                    for (I<decltype(lr_num)> lrcopy = 0; lrcopy < lr_num; ++lrcopy) {
                         for (auto rcopy = rc; rcopy < rcend; ++rcopy) {
                             const auto val = tmp_output[sanisizer::nd_offset<std::size_t>(rcopy, right_columns, lrcopy)];
                             output[sanisizer::nd_offset<std::size_t>(start + lr + lrcopy, left_NR, rcopy)] = val;
@@ -155,10 +155,10 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
                 // Too much effort to track individual non-empty rows, but if they're all empty, we skip the zeroing.
                 // If a few are non-empty, a single memset call is probably faster anyway than splitting it up.
                 if (any_non_empty) {
-                    std::fill_n(tmp_output.begin(), sanisizer::product_unsafe<std::size_t>(right_columns, lrnum), 0);
+                    std::fill_n(tmp_output.begin(), sanisizer::product_unsafe<std::size_t>(right_columns, lr_num), 0);
                 }
 
-                lr += lrnum;
+                lr += lr_num;
             }
         }
     }, left_NR, options.num_threads);
@@ -195,7 +195,7 @@ void multiply_sparse_row_with_dense_row_matrix_to_column_output(
     auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(common_dim);
     auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(common_dim);
     const auto right_NC = right.ncol();
-    populate_dense_buffers(true, common_dim, right_NC, right, right_buffers, right_ptrs, options.num_threads);
+    populate_dense_buffers(true, static_cast<RightIndex_>(common_dim), right_NC, right, right_buffers, right_ptrs, options.num_threads);
 
     multiply_sparse_row_with_dense_row_matrix_to_column_output(
         left,

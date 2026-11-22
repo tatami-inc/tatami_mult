@@ -75,7 +75,7 @@ void multiply_dense_row_with_sparse_row_matrix_to_column_output(
     auto right_vbuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(common_dim);
     auto right_ibuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightIndex_> > >(common_dim);
     auto right_ranges = tatami::create_container_of_Index_size<std::vector<tatami::SparseRange<RightValue_, RightIndex_> > >(common_dim);
-    populate_sparse_buffers(true, common_dim, right_NC, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
+    populate_sparse_buffers(true, static_cast<RightIndex_>(common_dim), right_NC, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
 
     // We'll be skipping the empty RHS rows during iteration.
     auto right_non_empty = filter_non_empty_sparse(
@@ -134,10 +134,10 @@ void multiply_dense_row_with_sparse_row_matrix_to_column_output(
         tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
             auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
 
-            const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
+            const auto max_block_rows = sanisizer::min(length, options.block_size);
             std::vector<std::vector<LeftValue_> > lbuffers;
             lbuffers.reserve(max_block_rows);
-            for (LeftIndex_ b = 0; b < max_block_rows; ++b) {
+            for (I<decltype(max_block_rows)> b = 0; b < max_block_rows; ++b) {
                 lbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
             }
             auto lptrs = tatami::create_container_of_Index_size<std::vector<const LeftValue_*> >(max_block_rows);
@@ -151,8 +151,8 @@ void multiply_dense_row_with_sparse_row_matrix_to_column_output(
 
             LeftIndex_ lr = 0;
             while (lr < length) {
-                const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                const auto lr_num = sanisizer::min(options.block_size, length - lr);
+                for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     lptrs[lr_counter] = ext->fetch(lbuffers[lr_counter].data());
                 }
 
@@ -174,13 +174,13 @@ void multiply_dense_row_with_sparse_row_matrix_to_column_output(
 
                     // Transfer this block of the 'cd'-th LHS column into a single buffer for a faster vector multiply-add in the inner loop.
                     // This rationale is unique to this function and is unlike any of the explanations in the sparse-blocking documentation.
-                    for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                    for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                         colbuffer[lr_counter] = lptrs[lr_counter][cd];
                     }
 
                     for (RightIndex_ x = 0; x < rrange.number; ++x) {
                         const Output_ mult = rrange.value[x];
-                        for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                        for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                             tmp_optr[sanisizer::nd_offset<std::size_t>(out_row_offset + lr_counter, out_stride, rrange.index[x])] += mult * static_cast<Output_>(colbuffer[lr_counter]);
                         }
                     }

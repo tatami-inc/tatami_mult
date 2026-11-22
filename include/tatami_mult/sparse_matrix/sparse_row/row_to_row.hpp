@@ -65,7 +65,7 @@ void multiply_sparse_row_with_sparse_row_matrix_to_row_output(
     auto right_vbuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(common_dim);
     auto right_ibuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightIndex_> > >(common_dim);
     auto right_ranges = tatami::create_container_of_Index_size<std::vector<tatami::SparseRange<RightValue_, RightIndex_> > >(common_dim);
-    populate_sparse_buffers(true, common_dim, right_NC, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
+    populate_sparse_buffers(true, static_cast<RightIndex_>(common_dim), right_NC, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
 
     const bool do_parallel = options.num_threads > 1;
     if (!do_parallel) {

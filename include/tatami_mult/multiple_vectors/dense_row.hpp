@@ -101,10 +101,10 @@ void multiply_dense_row_with_multiple_vectors(
     tatami::parallelize([&](int, const LeftIndex_ start, const LeftIndex_ length) -> void {
         auto ext = tatami::consecutive_extractor<false>(left, true, start, length);
 
-        const LeftIndex_ max_block_rows = sanisizer::min(length, options.primary_block_size);
+        const auto max_block_rows = sanisizer::min(length, options.primary_block_size);
         std::vector<std::vector<LeftValue_> > left_buffers;
         left_buffers.reserve(max_block_rows);
-        for (LeftIndex_ lr = 0; lr < max_block_rows; ++lr) {
+        for (I<decltype(max_block_rows)> lr = 0; lr < max_block_rows; ++lr) {
             left_buffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
         }
         auto left_ptrs = tatami::create_container_of_Index_size<std::vector<const LeftValue_*> >(max_block_rows);
@@ -118,23 +118,23 @@ void multiply_dense_row_with_multiple_vectors(
 
             LeftIndex_ lr = 0;
             while (lr < length) {
-                const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                const auto lr_num = sanisizer::min(options.primary_block_size, length - lr);
+                for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     left_ptrs[lr_counter] = ext->fetch(left_buffers[lr_counter].data());
                 }
 
                 RightVectors_ rc = 0;
                 while (rc < right_vectors) {
-                    const RightVectors_ rc_num = sanisizer::min(options.primary_block_size, right_vectors - rc);
+                    const auto rc_num = sanisizer::min(options.primary_block_size, right_vectors - rc);
 
                     LeftIndex_ cd = 0;
                     while (cd < common_dim) {
-                        const LeftIndex_ cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
-                        for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                        const auto cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
+                        for (I<decltype(cd_num)> rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
                             const auto outvec = get_output_vector(rc + rc_counter) + start + lr;
                             const auto rightvec = get_right_vector(rc + rc_counter);
 
-                            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                            for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                                 auto& dest = outvec[lr_counter]; 
                                 dest = dense_dot_product<accumulators_>(
                                     cd_num, // Implicit cast to std::size_t is safe, as per the tatami contract.
@@ -159,32 +159,32 @@ void multiply_dense_row_with_multiple_vectors(
             // but this is the same as the unblocked case so we won't worry about it.
             std::vector<std::vector<Output> > tmp_output;
             {
-                const RightVectors_ max_block_cols = sanisizer::min(right_vectors, options.primary_block_size);
+                const auto max_block_cols = sanisizer::min(right_vectors, options.primary_block_size);
                 tmp_output.reserve(max_block_cols);
-                for (RightVectors_ rc = 0; rc < max_block_cols; ++rc) {
+                for (I<decltype(max_block_cols)> rc = 0; rc < max_block_cols; ++rc) {
                     tmp_output.emplace_back(tatami::cast_Index_to_container_size<std::vector<Output> >(max_block_rows));
                 }
             }
 
             LeftIndex_ lr = 0;
             while (lr < length) {
-                const LeftIndex_ lr_num = sanisizer::min(options.primary_block_size, length - lr);
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                const auto lr_num = sanisizer::min(options.primary_block_size, length - lr);
+                for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     left_ptrs[lr_counter] = ext->fetch(left_buffers[lr_counter].data());
                 }
 
                 RightVectors_ rc = 0;
                 while (rc < right_vectors) {
-                    const RightVectors_ rc_num = sanisizer::min(options.primary_block_size, right_vectors - rc);
+                    const auto rc_num = sanisizer::min(options.primary_block_size, right_vectors - rc);
 
                     LeftIndex_ cd = 0;
                     while (cd < common_dim) {
-                        const LeftIndex_ cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
-                        for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                        const auto cd_num = sanisizer::min(options.secondary_block_size, common_dim - cd);
+                        for (I<decltype(rc_num)> rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
                             const auto outvec = tmp_output[rc_counter].data();
                             const auto rightvec = get_right_vector(rc + rc_counter);
 
-                            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                            for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                                 auto& dest = outvec[lr_counter]; 
                                 dest = dense_dot_product<accumulators_>(
                                     cd_num, // Implicit cast to std::size_t is safe, as per the tatami contract.
@@ -197,7 +197,7 @@ void multiply_dense_row_with_multiple_vectors(
                         cd += cd_num;
                     }
 
-                    for (RightVectors_ rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
+                    for (I<decltype(rc_num)> rc_counter = 0; rc_counter < rc_num; ++rc_counter) {
                         auto& src = tmp_output[rc_counter];
                         std::copy_n(src.begin(), lr_num, get_output_vector(rc + rc_counter) + start + lr);
                         std::fill_n(src.begin(), lr_num, 0);

@@ -68,8 +68,9 @@ void multiply_sparse_column_with_sparse_column_matrix_to_column_output(
     conv_opt.num_threads = options.num_threads;
     auto rhs_data = tatami::retrieve_fragmented_sparse_contents<RightValue_, RightIndex_>(right, true, conv_opt);
 
-    // If there are any empty RHS columns, we only iterate over the non-empty ones and the corresponding RHS rows.
-    auto right_non_empty = filter_non_empty_sparse(
+    // If there are any empty RHS columns, we only iterate over the non-empty ones and the corresponding LHS rows.
+    // (We can safely coerce these indices to LeftIndex_ as they refer to the common dimension.)
+    auto right_non_empty = filter_non_empty_sparse<LeftIndex_>(
         rhs_data.index,
         [&](const RightIndex_) -> void {}
     );

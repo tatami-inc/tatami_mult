@@ -113,10 +113,10 @@ void multiply_sparse_column_with_dense_row_matrix_to_column_output(
             std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
             std::vector<LeftIndex_> left_non_empty;
             {
-                const LeftIndex_ max_block_cols = sanisizer::min(length, options.block_size);
+                const auto max_block_cols = sanisizer::min(length, options.block_size);
                 left_vbuffers.reserve(max_block_cols);
                 left_ibuffers.reserve(max_block_cols);
-                for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+                for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                     left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
                     left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(left_NR));
                 }
@@ -233,7 +233,7 @@ void multiply_sparse_column_with_dense_row_matrix_to_column_output(
 
     const auto num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         auto left_ext = tatami::consecutive_extractor<true>(left, false, start, length);
-        auto right_ext = tatami::consecutive_extractor<false>(right, true, start, length);
+        auto right_ext = tatami::consecutive_extractor<false>(right, true, static_cast<RightIndex_>(start), static_cast<RightIndex_>(length));
 
         std::optional<std::vector<Output_> > tmp_output;
         Output_* outptr; 
@@ -276,11 +276,11 @@ void multiply_sparse_column_with_dense_row_matrix_to_column_output(
             std::vector<std::vector<RightValue_> > right_dbuffers;
             std::vector<const RightValue_*> right_ptrs;
             {
-                const LeftIndex_ max_block_cols = sanisizer::min(length, options.block_size);
+                const auto max_block_cols = sanisizer::min(length, options.block_size);
                 left_vbuffers.reserve(max_block_cols);
                 left_ibuffers.reserve(max_block_cols);
                 right_dbuffers.reserve(max_block_cols);
-                for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+                for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                     left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
                     left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(left_NR));
                     right_dbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<RightValue_> >(right_NC));

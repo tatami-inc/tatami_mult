@@ -82,10 +82,10 @@ void multiply_sparse_column_with_multiple_vectors_internal(
         std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
         std::vector<LeftIndex_> left_non_empty;
         {
-            const LeftIndex_ max_block_cols = sanisizer::min(length, options.block_size);
+            const auto max_block_cols = sanisizer::min(length, options.block_size);
             left_vbuffers.reserve(max_block_cols);
             left_ibuffers.reserve(max_block_cols);
-            for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+            for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                 left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
                 left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(left_NR));
             }

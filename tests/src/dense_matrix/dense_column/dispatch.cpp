@@ -113,6 +113,8 @@ INSTANTIATE_TEST_SUITE_P(
     )
 );
 
+/************************************/
+
 TEST(DenseMatrixDenseColumn, Options) {
     tatami_mult::MultiplyDenseColumnWithDenseMatrixOptions opt;
     tatami_mult::set_num_threads(opt, 12);
@@ -132,4 +134,54 @@ TEST(DenseMatrixDenseColumn, Options) {
     EXPECT_EQ(opt.column_to_row.secondary_block_size, 34);
     EXPECT_EQ(opt.row_to_column.secondary_block_size, 34);
     EXPECT_EQ(opt.row_to_row.secondary_block_size, 34);
+}
+
+/************************************/
+
+TEST(DenseMatrixDenseColumn, UnsignedFunctor) {
+    // Check that the functor overloads are compiled without warnings for different combinations of integer signedness.
+    // (Note that compilation of the regular overloads are handled in the top-level tatami_mult.cpp, so we don't need to check those.)
+    const int NR = 47;
+    const int NC = 23;
+    const int NRHS = 98;
+
+    auto dump = tatami_test::simulate_vector<double>(NR * NC, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 11 + NR + NC + NRHS;
+        return opt;
+    }());
+    tatami::DenseColumnMatrix<double, int> lhs(NR, NC, dump);
+    tatami::DenseColumnMatrix<double, unsigned> lhs_u(NR, NC, std::move(dump));
+
+    auto rdump = tatami_test::simulate_vector<double>(NC * NRHS, [&]{
+        tatami_test::SimulateVectorOptions opt;
+        opt.lower = -10;
+        opt.upper = 10;
+        opt.seed = 13 + NR + NC + NRHS;
+        return opt;
+    }());
+    auto get_right = [&](std::size_t rr) -> const double* {
+        return rdump.data() + rr * NRHS;
+    };
+
+    const auto output_size = NR * NRHS;
+    std::vector<double> ref(output_size), out_us(output_size), out_su(output_size), out_uu(output_size);
+
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_column_output(lhs, NRHS, get_right, ref.data(), {});
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_column_output(lhs, (unsigned)NRHS, get_right, out_su.data(), {});
+    EXPECT_EQ(ref, out_su);
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_column_output(lhs_u, NRHS, get_right, out_us.data(), {});
+    EXPECT_EQ(ref, out_us);
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_column_output(lhs_u, (unsigned)NRHS, get_right, out_uu.data(), {});
+    EXPECT_EQ(ref, out_uu);
+
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_row_output(lhs, NRHS, get_right, ref.data(), {});
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_row_output(lhs, (unsigned)NRHS, get_right, out_su.data(), {});
+    EXPECT_EQ(ref, out_su);
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_row_output(lhs_u, NRHS, get_right, out_us.data(), {});
+    EXPECT_EQ(ref, out_us);
+    tatami_mult::multiply_dense_column_with_dense_row_matrix_to_row_output(lhs_u, (unsigned)NRHS, get_right, out_uu.data(), {});
+    EXPECT_EQ(ref, out_uu);
 }

@@ -74,8 +74,8 @@ std::optional<std::vector<Index_> > filter_non_empty_sparse(
     return output;
 }
 
-template<typename Index_, class Zero_>
-std::optional<std::vector<Index_> > filter_non_empty_sparse(
+template<typename OutIndex_, typename Index_, class Zero_>
+std::optional<std::vector<OutIndex_> > filter_non_empty_sparse(
     const std::vector<std::vector<Index_> >& all_index,
     Zero_ zerofun
 ) {
@@ -87,7 +87,7 @@ std::optional<std::vector<Index_> > filter_non_empty_sparse(
         }
     }
 
-    std::optional<std::vector<Index_> > output;
+    std::optional<std::vector<OutIndex_> > output;
     if (!all_non_empty) {
         const auto num = all_index.size();
         output.emplace();

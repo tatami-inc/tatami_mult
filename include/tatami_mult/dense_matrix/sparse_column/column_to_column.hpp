@@ -108,10 +108,10 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
             std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
             std::vector<LeftIndex_> left_non_empty;
             {
-                const LeftIndex_ max_block_cols = sanisizer::min(length, options.block_size);
+                const auto max_block_cols = sanisizer::min(length, options.block_size);
                 left_vbuffers.reserve(max_block_cols);
                 left_ibuffers.reserve(max_block_cols);
-                for (LeftIndex_ cd = 0; cd < max_block_cols; ++cd) {
+                for (I<decltype(max_block_cols)> cd = 0; cd < max_block_cols; ++cd) {
                     left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(left_NR));
                     left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(left_NR));
                 }
@@ -218,7 +218,7 @@ void multiply_sparse_column_with_dense_column_matrix_to_column_output(
     auto right_buffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
     auto right_ptrs = tatami::create_container_of_Index_size<std::vector<const RightValue_*> >(right_NC);
     const auto common_dim = left.ncol();
-    populate_dense_buffers(false, right_NC, common_dim, right, right_buffers, right_ptrs, options.num_threads);
+    populate_dense_buffers(false, right_NC, static_cast<RightIndex_>(common_dim), right, right_buffers, right_ptrs, options.num_threads);
 
     multiply_sparse_column_with_dense_column_matrix_to_column_output(
         left,

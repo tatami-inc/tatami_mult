@@ -72,7 +72,7 @@ void multiply_dense_column_with_sparse_row_matrix_to_column_output(
 
     const int num_used = tatami::parallelize([&](int t, LeftIndex_ start, LeftIndex_ length) -> void {
         auto left_ext = tatami::consecutive_extractor<false>(left, false, start, length);
-        auto right_ext = tatami::consecutive_extractor<true>(right, true, start, length);
+        auto right_ext = tatami::consecutive_extractor<true>(right, true, static_cast<RightIndex_>(start), static_cast<RightIndex_>(length));
 
         std::optional<std::vector<Output_> > tmp_output;
         Output_* outptr; 

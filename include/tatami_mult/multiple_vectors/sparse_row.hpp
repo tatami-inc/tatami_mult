@@ -105,10 +105,10 @@ void multiply_sparse_row_with_multiple_vectors(
             std::vector<std::vector<LeftIndex_> > left_ibuffers;
             std::vector<tatami::SparseRange<LeftValue_, LeftIndex_> > left_ranges;
             {
-                const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
+                const auto max_block_rows = sanisizer::min(length, options.block_size);
                 left_vbuffers.reserve(max_block_rows);
                 left_ibuffers.reserve(max_block_rows);
-                for (LeftIndex_ lr = 0; lr < max_block_rows; ++lr) {
+                for (I<decltype(max_block_rows)> lr = 0; lr < max_block_rows; ++lr) {
                     left_vbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
                     left_ibuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(common_dim));
                 }
@@ -120,15 +120,15 @@ void multiply_sparse_row_with_multiple_vectors(
                 // No point skipping the LHS rows with no structural non-zeros.
                 // We still need to set the corresponding entry of 'outvec' to zero, so we'd end up having to loop through the LHS rows anyway.
                 // We might as well just let it be set to zero naturally in the existing loop below.
-                const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                const auto lr_num = sanisizer::min(options.block_size, length - lr);
+                for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     left_ranges[lr_counter] = ext->fetch(left_vbuffers[lr_counter].data(), left_ibuffers[lr_counter].data());
                 }
 
                 for (RightVectors_ rv = 0; rv < right_NC; ++rv) {
                     const auto rightvec = get_right_vector(rv);
                     const auto outvec = get_output_vector(rv);
-                    for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                    for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                         const auto& currange = left_ranges[lr_counter];
                         outvec[start + lr + lr_counter] = sparse_dot_product<accumulators_>(
                             currange.number, // Implicit cast of range.number to size_t is safe, as per the tatami contract.

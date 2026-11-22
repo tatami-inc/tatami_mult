@@ -74,7 +74,7 @@ void multiply_sparse_row_with_sparse_column_matrix_to_column_output(
     auto right_vbuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightValue_> > >(right_NC);
     auto right_ibuffers = tatami::create_container_of_Index_size<std::vector<std::vector<RightIndex_> > >(right_NC);
     auto right_ranges = tatami::create_container_of_Index_size<std::vector<tatami::SparseRange<RightValue_, RightIndex_> > >(right_NC);
-    populate_sparse_buffers(false, right_NC, common_dim, right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
+    populate_sparse_buffers(false, right_NC, static_cast<RightIndex_>(common_dim), right, right_vbuffers, right_ibuffers, right_ranges, options.num_threads);
 
     // If there are any empty RHS columns, we only iterate over the non-empty ones in the loop for each LHS row.
     auto right_non_empty = filter_non_empty_sparse(
@@ -131,14 +131,14 @@ void multiply_sparse_row_with_sparse_column_matrix_to_column_output(
     tatami::parallelize([&](int, LeftIndex_ start, LeftIndex_ length) -> void {
         auto ext = tatami::consecutive_extractor<true>(left, true, start, length);
 
-        const LeftIndex_ max_block_rows = sanisizer::min(length, options.block_size);
+        const auto max_block_rows = sanisizer::min(length, options.block_size);
         std::vector<std::vector<LeftValue_> > lvbuffers;
         std::vector<std::vector<LeftIndex_> > libuffers;
         std::vector<std::vector<LeftValue_> > expanded;
         lvbuffers.reserve(max_block_rows);
         libuffers.reserve(max_block_rows);
         expanded.reserve(max_block_rows);
-        for (LeftIndex_ b = 0; b < max_block_rows; ++b) {
+        for (I<decltype(max_block_rows)> b = 0; b < max_block_rows; ++b) {
             lvbuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
             libuffers.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftIndex_> >(common_dim));
             expanded.emplace_back(tatami::cast_Index_to_container_size<std::vector<LeftValue_> >(common_dim));
@@ -150,8 +150,8 @@ void multiply_sparse_row_with_sparse_column_matrix_to_column_output(
             // No point skipping the LHS rows with no structural non-zeros.
             // We still need to set the corresponding entry of 'output' to zero, so we'd end up having to loop through the LHS rows anyway.
             // We might as well just let it be set to zero naturally in the existing loop below.
-            const LeftIndex_ lr_num = sanisizer::min(options.block_size, length - lr);
-            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+            const auto lr_num = sanisizer::min(options.block_size, length - lr);
+            for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                 auto lrange = ext->fetch(lvbuffers[lr_counter].data(), libuffers[lr_counter].data());
                 auto& curex = expanded[lr_counter];
                 for (LeftIndex_ x = 0; x < lrange.number; ++x) {
@@ -165,7 +165,7 @@ void multiply_sparse_row_with_sparse_column_matrix_to_column_output(
             // If we did it the other way around, it would just be the same as the block_size == 1 case, but with more looping overhead. 
             auto loop_body = [&](RightIndex_ rc) -> void {
                 const auto rrange = right_ranges[rc];
-                for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+                for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                     const auto val = sparse_dot_product<accumulators_>(
                         rrange.number, // Implicit cast to size_t is safe, as per the tatami contract.
                         rrange.value,
@@ -187,7 +187,7 @@ void multiply_sparse_row_with_sparse_column_matrix_to_column_output(
                 }
             }
 
-            for (LeftIndex_ lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
+            for (I<decltype(lr_num)> lr_counter = 0; lr_counter < lr_num; ++lr_counter) {
                 const auto& lrange = lranges[lr_counter]; 
                 auto& curex = expanded[lr_counter];
                 for (LeftIndex_ x = 0; x < lrange.number; ++x) {
